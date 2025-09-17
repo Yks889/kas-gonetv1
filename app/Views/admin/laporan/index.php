@@ -100,12 +100,12 @@
                 backgroundColor: [
                     'rgba(0, 200, 83, 0.7)',   
                     'rgba(255, 99, 132, 0.7)', 
-                    'rgba(54, 162, 235, 0.7)'  
+                    'rgba(54, 162, 235, 0.7)',
                 ],
                 borderColor: [
                     'rgba(0, 200, 83, 1)',
                     'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)'
+                    'rgba(54, 162, 235, 1)',
                 ],
                 borderWidth: 1
             }]
@@ -130,10 +130,11 @@
     });
 
     // Data Ringkasan Pengajuan (Tanpa Total User)
-    const pieLabels = ['Total Pengajuan', 'Pengajuan Pending'];
+    const pieLabels = ['Total Pengajuan', 'Pengajuan Pending', 'Pengajuan Ditolak'];
     const pieData = [
         <?= (int) $total_pengajuan ?>,
-        <?= (int) $pengajuan_pending ?>
+        <?= (int) $pengajuan_pending ?>,
+        <?= (int) $pengajuan_ditolak ?>,
     ];
 
     new Chart(document.getElementById('pengajuanUserChart'), {
@@ -144,11 +145,13 @@
                 data: pieData,
                 backgroundColor: [
                     'rgba(255, 159, 64, 0.7)',  
-                    'rgba(255, 205, 86, 0.7)'   
+                    'rgba(255, 205, 86, 0.7)',
+                    'rgba(255, 99, 132, 0.7)',
                 ],
                 borderColor: [
                     'rgba(255, 159, 64, 1)',
-                    'rgba(255, 205, 86, 1)'
+                    'rgba(255, 205, 86, 1)',
+                    'rgba(255, 99, 132, 0.7)',
                 ],
                 borderWidth: 1
             }]

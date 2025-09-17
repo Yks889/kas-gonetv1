@@ -29,6 +29,7 @@ class Laporan extends BaseController
             'total_user'        => $userModel->countAllResults(),
             'total_users'       => $userModel->where('role !=', 'admin')->countAllResults(),
             'pengajuan_pending' => $pengajuanModel->where('status', 'pending')->countAllResults(),
+            'pengajuan_ditolak' => $pengajuanModel->where('status', 'ditolak')->countAllResults(),
             'activities'        => $activityModel->getAllActivities(20),
         ];
 
