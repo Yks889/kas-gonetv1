@@ -520,7 +520,7 @@
                     </li>
                     <li class="nav-item mt-4">
                         <a class="nav-link text-danger" href="<?= site_url('logout') ?>">
-                            <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
+                            <i class="bi bi-box-arrow-right me-2 text-danger"></i> <span>Logout</span>
                         </a>
                     </li>
                 </ul>
