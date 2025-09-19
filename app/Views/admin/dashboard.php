@@ -14,12 +14,13 @@
                 class="d-inline-flex align-items-center bg-dark p-2 rounded">
                 <span class="text-light me-2 small">Filter:</span>
                 <select name="bulan" class="form-select form-select-sm bg-steam-dark text-light border-steam me-2"
-                    style="width: auto;">
-                    <option value="">-- Pilih Bulan --</option>
-                    <?php foreach ($bulanLabels as $i => $label): ?>
-                        <option value="<?= $i + 1 ?>" <?= (isset($_GET['bulan']) && $_GET['bulan'] == $i + 1) ? 'selected' : '' ?>>
+    style="width: auto;">
+    <option value="">-- Pilih Bulan --</option>
+    <?php foreach ($bulanLabels as $i => $label): ?>
+                        <option value="<?= $i + 1 ?>" <?= ($filterBulan == $i + 1) ? 'selected' : '' ?>>
                             <?= $label ?>
                         </option>
+
                     <?php endforeach; ?>
                 </select>
                 <button type="submit" class="btn btn-sm btn-primary">

@@ -11,9 +11,6 @@
     <div>
         <i class="bi bi-clock-history"></i> Aktivitas User
     </div>
-    <div>
-        <span class="badge bg-primary">Total User: <?= $total_user ?></span>
-    </div>
 </div>
 
 
