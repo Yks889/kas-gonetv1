@@ -20,17 +20,7 @@
             <label for="deadline" class="form-label">Deadline</label>
             <input type="date" name="deadline" id="deadline" value="<?= old('deadline', $pengajuan['deadline']) ?>" class="form-control">
         </div>
-
-        <div class="mb-3">
-            <label for="status" class="form-label">Status</label>
-            <select name="status" id="status" class="form-control">
-                <option value="pending"   <?= $pengajuan['status'] == 'pending' ? 'selected' : '' ?>>Pending</option>
-                <option value="diterima"  <?= $pengajuan['status'] == 'diterima' ? 'selected' : '' ?>>Diterima</option>
-                <option value="ditolak"   <?= $pengajuan['status'] == 'ditolak' ? 'selected' : '' ?>>Ditolak</option>
-                <option value="diproses"  <?= $pengajuan['status'] == 'diproses' ? 'selected' : '' ?>>Diproses</option>
-            </select>
-        </div>
-
+        
         <button type="submit" class="btn btn-primary">Simpan</button>
         <a href="<?= base_url('admin/kas_keluar') ?>" class="btn btn-secondary">Batal</a>
     </form>

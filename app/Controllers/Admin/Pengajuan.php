@@ -79,15 +79,21 @@ class Pengajuan extends BaseController
         $session = session();
         $pengajuanModel = new PengajuanModel();
         $kasKeluarModel = new KasKeluarModel();
-        $kasSaldoModel = new KasSaldoModel();
-        $activityLog = new ActivityLogModel();
+        $kasSaldoModel  = new KasSaldoModel();
+        $activityLog    = new ActivityLogModel();
 
         $pengajuan = $pengajuanModel->find($id);
-        $kasKeluar = $kasKeluarModel->where('pengajuan_id', $id)->first();
-        $metode = $pengajuan['tipe'];
+        if (!$pengajuan) {
+            return redirect()->back()->with('error', 'Data pengajuan tidak ditemukan.');
+        }
 
-        // jika tipe = uang_sendiri
-        if ($metode == 'uang_sendiri') {
+        $kasKeluar = $kasKeluarModel->where('pengajuan_id', $id)->first();
+        $metode    = $pengajuan['tipe']; // uang_sendiri / minta_uang
+
+        // ============================
+        // Metode: UANG SENDIRI
+        // ============================
+        if ($metode === 'uang_sendiri') {
             if (!$kasKeluar) {
                 $kasKeluarModel->save([
                     'pengajuan_id' => $id,
@@ -97,74 +103,91 @@ class Pengajuan extends BaseController
                 ]);
             }
 
+            // Potong saldo (selalu)
+            $saldo = $kasSaldoModel->first();
+            if ($saldo) {
+                $newSaldo = $saldo['saldo_akhir'] - $pengajuan['nominal'];
+                $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
+            }
+
             $pengajuanModel->update($id, ['status' => 'selesai']);
 
-            // log aktivitas
             $activityLog->logActivity(
                 $session->get('id'),
                 'pengajuan diproses',
                 'Memproses pengajuan uang sendiri ID ' . $id
             );
 
-            return redirect()->to('/admin/pengajuan')->with('success', 'Pengajuan uang sendiri berhasil diproses.');
+            return redirect()->back()->with('success', 'Pengajuan diproses & saldo dipotong (uang sendiri).');
         }
 
-        // jika tipe = minta_uang
-        if ($kasKeluar && !empty($kasKeluar['file_nota'])) {
-            $saldo = $kasSaldoModel->first();
-            if ($saldo) {
-                $newSaldo = $saldo['saldo_akhir'] - $pengajuan['nominal'];
-                $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
+        // ============================
+        // Metode: MINTA UANG
+        // ============================
+        if ($metode === 'minta_uang') {
+
+            // Kas keluar sudah ada & file nota tersedia → langsung potong saldo
+            if ($kasKeluar && !empty($kasKeluar['file_nota'])) {
+                $saldo = $kasSaldoModel->first();
+                if ($saldo) {
+                    $newSaldo = $saldo['saldo_akhir'] - $pengajuan['nominal'];
+                    $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
+                }
+
+                $pengajuanModel->update($id, ['status' => 'selesai']);
+
+                // Log aktivitas
+                $activityLog->logActivity(
+                    $session->get('id'),
+                    'pengajuan diproses',
+                    'Memproses pengajuan minta_uang ID ' . $id . ' (nota sudah ada)'
+                );
+
+                return redirect()->back()->with('success', 'Pengajuan selesai & saldo dipotong (minta uang).');
             }
 
-            $pengajuanModel->update($id, ['status' => 'selesai']);
+            // Belum ada file nota → wajib upload
+            helper(['form']);
+            $rules = [
+                'file_nota' => 'uploaded[file_nota]|max_size[file_nota,1024]|ext_in[file_nota,jpg,jpeg,png,pdf]'
+            ];
 
-            // log aktivitas
-            $activityLog->logActivity(
-                $session->get('id'),
-                'pengajuan diproses',
-                'Memproses pengajuan minta_uang ID ' . $id . ' (nota sudah ada)'
-            );
+            if ($this->validate($rules)) {
+                $file = $this->request->getFile('file_nota');
+                if ($file->isValid() && !$file->hasMoved()) {
+                    $newName = $file->getRandomName();
+                    $file->move(FCPATH . 'uploads/nota', $newName);
 
-            return redirect()->to('/admin/pengajuan')->with('success', 'Pengajuan berhasil diproses (file nota sudah ada).');
-        }
+                    $kasKeluarModel->save([
+                        'pengajuan_id' => $id,
+                        'nominal'      => $pengajuan['nominal'],
+                        'keterangan'   => $pengajuan['keterangan'],
+                        'file_nota'    => $newName
+                    ]);
 
-        // jika belum ada file_nota → wajib upload
-        helper(['form']);
-        $rules = [
-            'file_nota' => 'uploaded[file_nota]|max_size[file_nota,1024]|ext_in[file_nota,jpg,jpeg,png,pdf]'
-        ];
+                    // Potong saldo
+                    $saldo = $kasSaldoModel->first();
+                    if ($saldo) {
+                        $newSaldo = $saldo['saldo_akhir'] - $pengajuan['nominal'];
+                        $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
+                    }
 
-        if ($this->validate($rules)) {
-            $file = $this->request->getFile('file_nota');
-            $newName = $file->getRandomName();
-            $file->move(ROOTPATH . 'public/uploads/nota', $newName);
+                    $pengajuanModel->update($id, ['status' => 'selesai']);
 
-            $kasKeluarModel->save([
-                'pengajuan_id' => $id,
-                'nominal'      => $pengajuan['nominal'],
-                'keterangan'   => $pengajuan['keterangan'],
-                'file_nota'    => $newName
-            ]);
+                    // Log aktivitas
+                    $activityLog->logActivity(
+                        $session->get('id'),
+                        'pengajuan diproses',
+                        'Memproses pengajuan minta_uang ID ' . $id . ' dengan upload nota'
+                    );
 
-            $saldo = $kasSaldoModel->first();
-            if ($saldo) {
-                $newSaldo = $saldo['saldo_akhir'] - $pengajuan['nominal'];
-                $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
+                    return redirect()->back()->with('success', 'Pengajuan selesai dengan upload nota & saldo dipotong.');
+                }
             }
 
-            $pengajuanModel->update($id, ['status' => 'selesai']);
-
-            // log aktivitas
-            $activityLog->logActivity(
-                $session->get('id'),
-                'pengajuan diproses',
-                'Memproses pengajuan minta_uang ID ' . $id . ' dengan upload nota'
-            );
-
-            return redirect()->to('/admin/pengajuan')->with('success', 'Pengajuan berhasil diproses dengan upload nota.');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan dalam memproses pengajuan.');
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: file nota wajib diupload.');
         }
+
+        return redirect()->back()->with('warning', 'Pengajuan masih dalam proses, tunggu nota untuk potong saldo.');
     }
 }
