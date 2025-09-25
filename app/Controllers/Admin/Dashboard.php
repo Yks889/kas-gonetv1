@@ -56,7 +56,47 @@ class Dashboard extends BaseController
             ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
             ->countAllResults();
 
-        // Hitung persentase pengajuan selesai (disetujui)
+        // Kas Masuk & Keluar (filter bulan kalau ada)
+        if ($filterBulan) {
+            $total_masuk = $kasMasukModel
+                ->selectSum('nominal', 'total')
+                ->where('MONTH(created_at)', $filterBulan)
+                ->first();
+
+            $total_keluar = $kasKeluarModel
+                ->selectSum('nominal', 'total')
+                ->where('MONTH(created_at)', $filterBulan)
+                ->first();
+        } else {
+            $total_masuk = $kasMasukModel->selectSum('nominal', 'total')->first();
+            $total_keluar = $kasKeluarModel->selectSum('nominal', 'total')->first();
+        }
+
+        // Statistik Pengajuan (terfilter bulan kalau dipilih)
+        if ($filterBulan) {
+            $total_pengajuan = $pengajuanModel
+                ->where('MONTH(created_at)', $filterBulan)
+                ->countAllResults();
+
+            $pengajuan_pending = $pengajuanModel
+                ->where('MONTH(created_at)', $filterBulan)
+                ->where('status', 'pending')
+                ->countAllResults();
+
+            $pengajuan_ditolak = $pengajuanModel
+                ->where('MONTH(created_at)', $filterBulan)
+                ->where('status', 'ditolak')
+                ->countAllResults();
+        } else {
+            $total_pengajuan = $pengajuanModel->countAll();
+            $pengajuan_pending = $pengajuanModel->where('status', 'pending')->countAllResults();
+            $pengajuan_ditolak = $pengajuanModel->where('status', 'ditolak')->countAllResults();
+        }
+
+        // User tetap total semua
+        $total_users = $userModel->where('role !=', 'admin')->countAllResults();
+
+        // Hitung persentase pengajuan selesai
         $pengajuan_selesai = $total_pengajuan - ($pengajuan_pending + $pengajuan_ditolak);
         $persentase_pengajuan = $total_pengajuan > 0
             ? round(($pengajuan_selesai / $total_pengajuan) * 100)
