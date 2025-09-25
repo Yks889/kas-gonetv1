@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
@@ -10,7 +11,7 @@ use App\Models\UserModel;
 
 class Dashboard extends BaseController
 {
-    public function index()
+  public function index()
     {
         $kasSaldoModel = new KasSaldoModel();
         $kasMasukModel = new KasMasukModel();
@@ -18,14 +19,42 @@ class Dashboard extends BaseController
         $pengajuanModel = new PengajuanModel();
         $userModel = new UserModel();
 
+        // Ambil filter bulan (jika ada)
+        $bulan = $this->request->getGet('bulan'); // nilai 1-12
+
         // Ringkasan Kas & Pengguna
         $saldo = $kasSaldoModel->first();
-        $total_masuk = $kasMasukModel->selectSum('nominal', 'total')->first();
-        $total_keluar = $kasKeluarModel->selectSum('nominal', 'total')->first();
-        $total_pengajuan = $pengajuanModel->countAll();
+
+        // Total Masuk
+        $kasMasukQuery = $kasMasukModel->selectSum('nominal', 'total');
+        if ($bulan) {
+            $kasMasukQuery->where('MONTH(created_at)', $bulan);
+        }
+        $total_masuk = $kasMasukQuery->first();
+
+        // Total Keluar
+        $kasKeluarQuery = $kasKeluarModel->selectSum('nominal', 'total');
+        if ($bulan) {
+            $kasKeluarQuery->where('MONTH(created_at)', $bulan);
+        }
+        $total_keluar = $kasKeluarQuery->first();
+
+        // Pengajuan
+        $pengajuanQuery = $pengajuanModel;
+        if ($bulan) {
+            $pengajuanQuery->where('MONTH(created_at)', $bulan);
+        }
+        $total_pengajuan = $pengajuanQuery->countAllResults(false);
+
         $total_users = $userModel->where('role !=', 'admin')->countAllResults();
-        $pengajuan_pending = $pengajuanModel->where('status', 'pending')->countAllResults();
-        $pengajuan_ditolak = $pengajuanModel->where('status', 'ditolak')->countAllResults();
+
+        $pengajuan_pending = $pengajuanModel->where('status', 'pending')
+            ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
+            ->countAllResults();
+
+        $pengajuan_ditolak = $pengajuanModel->where('status', 'ditolak')
+            ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
+            ->countAllResults();
 
         // Hitung persentase pengajuan selesai (disetujui)
         $pengajuan_selesai = $total_pengajuan - ($pengajuan_pending + $pengajuan_ditolak);
@@ -58,6 +87,13 @@ class Dashboard extends BaseController
             $keluarData[(int) $row['bulan']] = (float) $row['total'];
         }
 
+        $masukDataFinal = [];
+        $keluarDataFinal = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $masukDataFinal[] = $masukData[$i];
+            $keluarDataFinal[] = $keluarData[$i];
+        }
+
         // Data untuk dikirim ke view
         $data = [
             'saldo' => $saldo,
@@ -68,9 +104,10 @@ class Dashboard extends BaseController
             'pengajuan_pending' => $pengajuan_pending,
             'pengajuan_ditolak' => $pengajuan_ditolak,
             'bulanLabels' => $bulanLabels,
-            'masukData' => array_values($masukData),
-            'keluarData' => array_values($keluarData),
+            'masukData' => $masukDataFinal,
+            'keluarData' => $keluarDataFinal,
             'persentase_pengajuan' => $persentase_pengajuan,
+            'bulanDipilih' => $bulan
         ];
 
         return view('admin/dashboard', $data);
