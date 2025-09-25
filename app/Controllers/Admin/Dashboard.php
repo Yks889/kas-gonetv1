@@ -57,15 +57,15 @@ class Dashboard extends BaseController
             ->countAllResults();
 
         // Kas Masuk & Keluar (filter bulan kalau ada)
-        if ($filterBulan) {
+        if ($bulan) {
             $total_masuk = $kasMasukModel
                 ->selectSum('nominal', 'total')
-                ->where('MONTH(created_at)', $filterBulan)
+                ->where('MONTH(created_at)', $bulan)
                 ->first();
 
             $total_keluar = $kasKeluarModel
                 ->selectSum('nominal', 'total')
-                ->where('MONTH(created_at)', $filterBulan)
+                ->where('MONTH(created_at)', $bulan)
                 ->first();
         } else {
             $total_masuk = $kasMasukModel->selectSum('nominal', 'total')->first();
@@ -73,18 +73,18 @@ class Dashboard extends BaseController
         }
 
         // Statistik Pengajuan (terfilter bulan kalau dipilih)
-        if ($filterBulan) {
+        if ($bulan) {
             $total_pengajuan = $pengajuanModel
-                ->where('MONTH(created_at)', $filterBulan)
+                ->where('MONTH(created_at)', $bulan)
                 ->countAllResults();
 
             $pengajuan_pending = $pengajuanModel
-                ->where('MONTH(created_at)', $filterBulan)
+                ->where('MONTH(created_at)', $bulan)
                 ->where('status', 'pending')
                 ->countAllResults();
 
             $pengajuan_ditolak = $pengajuanModel
-                ->where('MONTH(created_at)', $filterBulan)
+                ->where('MONTH(created_at)', $bulan)
                 ->where('status', 'ditolak')
                 ->countAllResults();
         } else {
