@@ -115,7 +115,7 @@ class KasMasuk extends BaseController
         $session = session();
         $activityModel->logActivity(
             $session->get('id'),
-            'delete_kas_masuk',
+            'menghapus kas masuk',
             "Menghapus kas masuk ID {$id} (nominal: Rp {$data['nominal']}, keterangan: {$data['keterangan']})"
         );
 
