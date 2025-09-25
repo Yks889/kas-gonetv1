@@ -81,44 +81,73 @@ class KasMasuk extends BaseController
 
     public function update($id)
     {
-        $model = new KasMasukModel();
-        $activityModel = new ActivityLogModel(); 
+        $kasMasukModel = new KasMasukModel();
+        $kasSaldoModel = new KasSaldoModel();
+        $activityModel = new ActivityLogModel();
+
+        $oldKas = $kasMasukModel->find($id);
+        if (!$oldKas) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Data kas masuk dengan ID $id tidak ditemukan");
+        }
 
         $nominal = $this->request->getVar('nominal');
         $keterangan = $this->request->getVar('keterangan');
 
-        $model->update($id, [
+        $kasMasukModel->update($id, [
             'nominal' => $nominal,
             'keterangan' => $keterangan
         ]);
+
+        // 🔄 Update saldo (kurangi nominal lama, tambah nominal baru)
+        $saldo = $kasSaldoModel->first();
+        if ($saldo) {
+            $newSaldo = $saldo['saldo_akhir'] - $oldKas['nominal'] + $nominal;
+            $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
+        }
 
         // ✅ Simpan log aktivitas
         $session = session();
         $activityModel->logActivity(
             $session->get('id'),
             'update_kas_masuk',
-            "Mengubah kas masuk ID {$id} menjadi Rp {$nominal} (keterangan: {$keterangan})"
+            "Mengubah kas masuk ID {$id} dari Rp {$oldKas['nominal']} menjadi Rp {$nominal} (keterangan: {$keterangan})"
         );
 
         return redirect()->to('/admin/kas_masuk')->with('success', 'Data kas masuk berhasil diperbarui.');
     }
 
+
     public function delete($id)
     {
-        $model = new KasMasukModel();
+        $kasMasukModel = new KasMasukModel();
+        $kasSaldoModel = new KasSaldoModel();
         $activityModel = new ActivityLogModel();
 
-        $data = $model->find($id); 
-        $model->delete($id);
+        // ambil data sebelum dihapus
+        $data = $kasMasukModel->find($id);
 
-        // ✅ Simpan log aktivitas
-        $session = session();
-        $activityModel->logActivity(
-            $session->get('id'),
-            'menghapus kas masuk',
-            "Menghapus kas masuk ID {$id} (nominal: Rp {$data['nominal']}, keterangan: {$data['keterangan']})"
-        );
+        if ($data) {
+            // hapus data kas masuk
+            $kasMasukModel->delete($id);
 
-        return redirect()->to('/admin/kas_masuk')->with('success', 'Data kas masuk berhasil dihapus.');
+            // update saldo otomatis
+            $saldo = $kasSaldoModel->first();
+            if ($saldo) {
+                $newSaldo = max(0, $saldo['saldo_akhir'] - $data['nominal']);
+                $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
+            }
+
+            // log aktivitas
+            $session = session();
+            $activityModel->logActivity(
+                $session->get('id'),
+                'menghapus kas masuk',
+                "Menghapus kas masuk ID {$id} (nominal: Rp {$data['nominal']}, keterangan: {$data['keterangan']})"
+            );
+
+            return redirect()->to('/admin/kas_masuk')->with('success', 'Data kas masuk berhasil dihapus dan saldo diperbarui.');
+        }
+
+        return redirect()->to('/admin/kas_masuk')->with('error', 'Data kas masuk tidak ditemukan.');
     }
 }
