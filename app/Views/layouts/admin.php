@@ -145,6 +145,9 @@
             </div>
 
             <ul class="nav flex-column">
+                 <li>
+                    <div class="sidebar-divider"></div>
+                </li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'dashboard' ? 'active' : '' ?>" href="<?= site_url('admin/dashboard') ?>"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a></li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'users' ? 'active' : '' ?>" href="<?= site_url('admin/users') ?>"><i class="bi bi-person-badge"></i> <span>Manajemen User</span></a></li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'laporan' ? 'active' : '' ?>" href="<?= site_url('admin/laporan') ?>"><i class="bi bi-journal-text"></i> <span>Aktivitas User</span></a></li>
