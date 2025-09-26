@@ -53,6 +53,12 @@
                 gap: 10px;
             }
 
+            .sidebar-divider {
+                height: 2px;
+                background-color: #2c2c2c;
+                margin: 10px 20px;
+            }
+
             .sidebar .nav-link {
                 color: #aaa;
                 padding: 12px 20px;
@@ -137,12 +143,20 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="logo">
-                <i class="bi bi-kanban"></i>Kas - GoNet
+                <img src="<?= base_url('uploads/logo.png') ?>" alt="Logo" style="height: 40px; width: auto;">
+                <span>Kas - GoNet</span>
             </div>
+
             <ul class="nav flex-column">
+                 <li>
+                    <div class="sidebar-divider"></div>
+                </li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'dashboard' ? 'active' : '' ?>" href="<?= site_url('admin/dashboard') ?>"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a></li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'users' ? 'active' : '' ?>" href="<?= site_url('admin/users') ?>"><i class="bi bi-person-badge"></i> <span>Manajemen User</span></a></li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'laporan' ? 'active' : '' ?>" href="<?= site_url('admin/laporan') ?>"><i class="bi bi-journal-text"></i> <span>Aktivitas User</span></a></li>
+                 <li>
+                    <div class="sidebar-divider"></div>
+                </li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'kas_masuk' ? 'active' : '' ?>" href="<?= site_url('admin/kas_masuk') ?>"><i class="bi bi-cash-coin"></i> <span>Kas Masuk</span></a></li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'kas_keluar' ? 'active' : '' ?>" href="<?= site_url('admin/kas_keluar') ?>"><i class="bi bi-cash-stack"></i> <span>Kas Keluar</span></a></li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'pengajuan' ? 'active' : '' ?>" href="<?= site_url('admin/pengajuan') ?>"><i class="bi bi-clipboard-check"></i> <span>Pengajuan</span></a></li>

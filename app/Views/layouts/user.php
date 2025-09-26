@@ -1,557 +1,397 @@
-<!DOCTYPE html>
-<html lang="id" data-theme="light">
+<?php if (session()->get('role') === 'user'): ?>
+    <!DOCTYPE html>
+    <html lang="id" data-theme="dark">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Sistem Kas - GoNet' ?></title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title><?= $title ?? 'Sistem Kas - GoNet' ?></title>
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Bootstrap 5 CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+        <!-- Bootstrap Icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+        <!-- DataTables CSS -->
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css">
 
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css">
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        :root {
-            --steam-dark: #1b2838;
-            --steam-blue: #66c0f4;
-            --steam-light-blue: #c7d5e0;
-            --steam-gray: #2a475e;
-            --steam-light-gray: #c7d5e0;
-            --steam-green: #5c7e10;
-            --steam-header: #171a21;
-            --steam-panel: #1e252d;
-            --steam-accent: #3d4450;
-            --sidebar-width: 240px;
-            --sidebar-collapsed-width: 70px;
-            --header-height: 60px;
-            --transition: all 0.2s ease;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--steam-dark);
-            color: var(--steam-light-blue);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header Styles - Steam Inspired */
-        .main-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background-color: var(--steam-header);
-            height: var(--header-height);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            border-bottom: 1px solid rgba(102, 192, 244, 0.1);
-        }
-
-        .brand-logo {
-            height: 36px;
-            width: auto;
-        }
-
-        .brand-name {
-            font-weight: 700;
-            color: var(--steam-blue);
-            font-size: 1.4rem;
-        }
-
-        .arsip-surat {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--steam-light-blue);
-        }
-
-        /* Sidebar Styles - Steam Inspired */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: linear-gradient(to bottom, #1e252d, #171a21);
-            height: calc(100vh - var(--header-height));
-            position: fixed;
-            top: var(--header-height);
-            left: 0;
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.4);
-            transition: var(--transition);
-            overflow-y: auto;
-            z-index: 999;
-            border-right: 1px solid rgba(102, 192, 244, 0.1);
-        }
-
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
-
-        .sidebar .nav-link {
-            color: #b8b6b4;
-            padding: 12px 15px;
-            margin: 4px 10px;
-            border-radius: 3px;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .sidebar .nav-link i {
-            margin-right: 12px;
-            font-size: 18px;
-            width: 24px;
-            text-align: center;
-            transition: var(--transition);
-            color: #66c0f4;
-        }
-
-        .sidebar.collapsed .nav-link span {
-            display: none;
-        }
-
-        .sidebar.collapsed .nav-link i {
-            margin-right: 0;
-        }
-
-        .sidebar .nav-link:hover {
-            background-color: rgba(102, 192, 244, 0.1);
-            color: #ffffff;
-        }
-
-        .sidebar .nav-link:hover i {
-            color: #ffffff;
-        }
-
-        .sidebar .nav-link.active {
-            background-color: rgba(102, 192, 244, 0.2);
-            color: #ffffff;
-            border-left: 3px solid var(--steam-blue);
-        }
-
-        .sidebar .nav-link.active i {
-            color: #ffffff;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 20px;
-            padding-top: calc(var(--header-height) + 20px);
-            min-height: calc(100vh - var(--header-height));
-            transition: var(--transition);
-            background-color: var(--steam-dark);
-        }
-
-        .main-content.expanded {
-            margin-left: var(--sidebar-collapsed-width);
-        }
-
-        /* Card Styles - Steam Inspired */
-        .dashboard-card {
-            border-radius: 3px;
-            border: none;
-            background: linear-gradient(to bottom, #2a3f5a, #1e2a38);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-            transition: var(--transition);
-            color: var(--steam-light-blue);
-            border: 1px solid rgba(102, 192, 244, 0.1);
-            overflow: hidden;
-        }
-
-        .dashboard-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            background: linear-gradient(to bottom, #2f4b6b, #212e40);
-        }
-
-        .card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            margin-bottom: 15px;
-            background-color: rgba(102, 192, 244, 0.15);
-            color: var(--steam-blue);
-        }
-
-        .sidebar .divider {
-            border: 0;
-            height: 1px;
-            width: 85%;
-            margin: 12px auto;
-            background: linear-gradient(to right, transparent, rgba(102, 192, 244, 0.2), transparent);
-        }
-
-        /* Button Styles - Steam Inspired */
-        .btn-primary {
-            background: linear-gradient(to bottom, #6ba2d1, #4a7ea8);
-            border: none;
-            border-radius: 2px;
-            padding: 8px 16px;
-            font-weight: 500;
-            color: #d8e8f7;
-            text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.33);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(to bottom, #79afe0, #5590c0);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-            color: white;
-        }
-
-        /* Table Styles - Steam Inspired */
-        .table-container {
-            background: linear-gradient(to bottom, #2a3f5a, #1e2a38);
-            border-radius: 3px;
-            overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(102, 192, 244, 0.1);
-        }
-
-        .table {
-            color: var(--steam-light-blue);
-            margin-bottom: 0;
-        }
-
-        .table th {
-            background-color: rgba(35, 53, 72, 0.9);
-            font-weight: 600;
-            color: #6ba2d1;
-            border-top: none;
-            border-bottom: 1px solid rgba(102, 192, 244, 0.15);
-            padding: 12px 15px;
-            font-size: 0.9rem;
-        }
-
-        .table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid rgba(102, 192, 244, 0.08);
-            vertical-align: middle;
-            font-size: 0.9rem;
-        }
-
-        .table tr:hover {
-            background-color: rgba(102, 192, 244, 0.07);
-        }
-
-        /* Form Styles */
-        .form-control {
-            background-color: rgba(35, 53, 72, 0.6);
-            border: 1px solid rgba(102, 192, 244, 0.15);
-            color: var(--steam-light-blue);
-            border-radius: 2px;
-            font-size: 0.9rem;
-        }
-
-        .form-control:focus {
-            background-color: rgba(35, 53, 72, 0.8);
-            border-color: #6ba2d1;
-            box-shadow: 0 0 0 0.2rem rgba(107, 162, 209, 0.25);
-            color: var(--steam-light-blue);
-        }
-
-        .form-label {
-            color: #6ba2d1;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        /* Badge Styles */
-        .badge-success {
-            background: linear-gradient(to bottom, #5c7e10, #43590c);
-        }
-
-        .badge-warning {
-            background: linear-gradient(to bottom, #f2b51c, #b3871a);
-        }
-
-        .badge-danger {
-            background: linear-gradient(to bottom, #d33c40, #9d2c2f);
-        }
-
-        /* Alert Styles */
-        .alert {
-            border-radius: 2px;
-            border: none;
-            background: linear-gradient(to bottom, #2a3f5a, #1e2a38);
-            border: 1px solid rgba(102, 192, 244, 0.1);
-            color: var(--steam-light-blue);
-        }
-
-        /* Dropdown Styles */
-        .dropdown-menu {
-            background-color: #2a3f5a;
-            border: 1px solid rgba(102, 192, 244, 0.15);
-            border-radius: 2px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Samakan warna Role dengan item dropdown lain */
-        .dropdown-item-text {
-            color: var(--steam-light-blue) !important;
-            font-size: 0.9rem;
-            padding: 8px 16px;
-            display: block;
-            text-align: center;
-        }
-
-        .dropdown-item {
-            color: var(--steam-light-blue);
-            padding: 8px 16px;
-            font-size: 0.9rem;
-        }
-
-        .dropdown-item:hover {
-            background-color: rgba(102, 192, 244, 0.1);
-            color: white;
-        }
-
-        .dropdown-divider {
-            border-color: rgba(102, 192, 244, 0.15);
-        }
-
-        /* User dropdown */
-        .btn-outline-light {
-            border-color: rgba(102, 192, 244, 0.2);
-            color: var(--steam-light-blue);
-            background-color: rgba(42, 63, 90, 0.4);
-        }
-
-        .btn-outline-light:hover {
-            background-color: rgba(102, 192, 244, 0.1);
-            border-color: rgba(102, 192, 244, 0.3);
-            color: white;
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 992px) {
-            .sidebar {
-                width: var(--sidebar-collapsed-width);
+        <style>
+            body {
+                font-family: 'Montserrat', sans-serif;
+                background-color: #0f0f0f;
+                color: #e0e0e0;
+                margin: 0;
             }
 
-            .sidebar .nav-link span {
-                display: none;
+            /* Sidebar */
+            .sidebar {
+                width: 260px;
+                background: #141414;
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                padding: 20px 0;
+                border-right: 1px solid #2c2c2c;
+                display: flex;
+                flex-direction: column;
+                transition: all 0.3s ease;
+                z-index: 1000;
+            }
+
+            .sidebar .logo {
+                font-size: 1.3rem;
+                font-weight: 600;
+                padding: 0 20px;
+                margin-bottom: 30px;
+                color: #fff;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .sidebar-divider {
+                height: 2px;
+                background-color: #2c2c2c;
+                margin: 10px 20px;
+            }
+
+            .sidebar .nav-link {
+                color: #aaa;
+                padding: 12px 20px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-size: 0.95rem;
+                transition: all 0.2s;
+                border-radius: 8px;
+                margin: 3px 10px;
             }
 
             .sidebar .nav-link i {
-                margin-right: 0;
+                font-size: 1.2rem;
+                color: #888;
             }
 
+            .sidebar .nav-link.active,
+            .sidebar .nav-link:hover {
+                background: #1f1f1f;
+                color: #fff;
+            }
+
+            .sidebar .nav-link.active i,
+            .sidebar .nav-link:hover i {
+                color: #4da3ff;
+            }
+
+            .sidebar .bottom-logout {
+                margin-top: auto;
+                padding: 0 20px;
+            }
+
+            /* Header */
+            .main-header {
+                position: fixed;
+                top: 0;
+                left: 260px;
+                right: 0;
+                height: 60px;
+                background: #141414;
+                border-bottom: 1px solid #2c2c2c;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 20px;
+                z-index: 100;
+            }
+
+            .main-header .title {
+                font-size: 1.2rem;
+                font-weight: 600;
+                color: #fff;
+            }
+
+            /* Content */
             .main-content {
-                margin-left: var(--sidebar-collapsed-width);
+                margin-left: 260px;
+                padding: 80px 25px 25px 25px;
+                min-height: 100vh;
+                background-color: #0f0f0f;
             }
 
-            .sidebar.mobile-expanded {
-                width: var(--sidebar-width);
+            /* Dropdown */
+            .dropdown-menu {
+                background: #1f1f1f;
+                border: 1px solid #2c2c2c;
             }
 
-            .sidebar.mobile-expanded .nav-link span {
-                display: inline;
+            .dropdown-item {
+                color: #e0e0e0;
             }
 
-            .sidebar.mobile-expanded .nav-link i {
-                margin-right: 12px;
+            .dropdown-item:hover {
+                background: #2c2c2c;
+                color: #fff;
             }
 
-            .main-content.mobile-expanded {
-                margin-left: var(--sidebar-width);
-            }
-        }
-
-        /* Animation */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+            /* Card Styles */
+            .dashboard-card {
+                background: #1a1a1a;
+                border: 1px solid #2c2c2c;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 20px;
+                transition: all 0.3s ease;
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .dashboard-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             }
-        }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease forwards;
-        }
+            /* Table Styles */
+            .table-container {
+                background: #1a1a1a;
+                border-radius: 8px;
+                overflow: hidden;
+                border: 1px solid #2c2c2c;
+            }
 
-        /* DataTables Customization */
-        .dataTables_wrapper .dataTables_length,
-        .dataTables_wrapper .dataTables_filter,
-        .dataTables_wrapper .dataTables_info,
-        .dataTables_wrapper .dataTables_paginate {
-            color: var(--steam-light-blue) !important;
-        }
+            .table {
+                color: #e0e0e0;
+                margin-bottom: 0;
+            }
 
-        .dataTables_wrapper .dataTables_filter input {
-            background-color: rgba(35, 53, 72, 0.6);
-            border: 1px solid rgba(102, 192, 244, 0.15);
-            color: var(--steam-light-blue);
-            border-radius: 2px;
-            padding: 4px 8px;
-        }
+            .table th {
+                background: #2c2c2c;
+                color: #fff;
+                border-bottom: 1px solid #3c3c3c;
+                padding: 12px 15px;
+            }
 
-        .page-item .page-link {
-            background-color: rgba(35, 53, 72, 0.6);
-            border: 1px solid rgba(102, 192, 244, 0.15);
-            color: var(--steam-light-blue);
-        }
+            .table td {
+                padding: 12px 15px;
+                border-bottom: 1px solid #2c2c2c;
+            }
 
-        .page-item.active .page-link {
-            background: linear-gradient(to bottom, #6ba2d1, #4a7ea8);
-            border-color: rgba(102, 192, 244, 0.2);
-        }
+            .table tr:hover {
+                background: #1f1f1f;
+            }
 
-        /* Chart Container */
-        .chart-container {
-            background: linear-gradient(to bottom, #2a3f5a, #1e2a38);
-            border-radius: 3px;
-            padding: 20px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(102, 192, 244, 0.1);
-        }
-    </style>
-</head>
+            /* Form Styles */
+            .form-control {
+                background: #1a1a1a;
+                border: 1px solid #2c2c2c;
+                color: #e0e0e0;
+            }
 
-<body>
-    <!-- Header -->
-    <header class="main-header sticky-top">
-        <div class="container-fluid h-100">
-            <div class="d-flex align-items-center justify-content-between h-100">
-                <div class="d-flex align-items-center">
-                    <button class="btn text-white me-3 d-lg-none" id="mobileSidebarToggle">
-                        <i class="bi bi-list"></i>
-                    </button>
-                    <a href="/user/dashboard" class="navbar-brand d-flex align-items-center">
-                        <img src="/uploads/logo.png" alt="Logo GoNet" class="brand-logo me-2">
-                        <span class="arsip-surat">Sistem Kas - <span class="brand-name">Gonet</span></span>
-                    </a>
-                </div>
+            .form-control:focus {
+                background: #1a1a1a;
+                border-color: #4da3ff;
+                color: #e0e0e0;
+                box-shadow: 0 0 0 0.2rem rgba(77, 163, 255, 0.25);
+            }
 
-                <div class="dropdown">
-                    <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" type="button"
-                        id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle me-2"></i>
-                        <span><?= session()->get('username') ?></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><span class="dropdown-item-text"><i
-                                    class="bi bi-person-circle me-2"></i><?= ucfirst(session()->get('role')) ?></span>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profil</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Pengaturan</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item text-danger" href="<?= site_url('logout') ?>"><i
-                                    class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
-                    </ul>
-                </div>
+            /* Responsive */
+            @media (max-width: 768px) {
+                .sidebar {
+                    width: 100%;
+                    left: -100%;
+                }
+
+                .sidebar.mobile-show {
+                    left: 0;
+                }
+
+                .main-header {
+                    left: 0;
+                }
+
+                .main-content {
+                    margin-left: 0;
+                    padding-top: 60px;
+                }
+            }
+
+            /* Mobile menu button */
+            .mobile-menu-btn {
+                display: none;
+                background: none;
+                border: none;
+                color: #fff;
+                font-size: 1.5rem;
+            }
+
+            @media (max-width: 768px) {
+                .mobile-menu-btn {
+                    display: block;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn position-fixed" style="top: 15px; left: 15px; z-index: 1001;">
+            <i class="bi bi-list"></i>
+        </button>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="<?= base_url('uploads/logo.png') ?>" alt="Logo" style="height: 40px; width: auto;">
+                <span>Kas - GoNet</span>
+            </div>
+
+            <ul class="nav flex-column">
+                 <li>
+                    <div class="sidebar-divider"></div>
+                </li>
+                <li><a class="nav-link <?= service('uri')->getSegment(2) === 'dashboard' ? 'active' : '' ?>"
+                        href="<?= site_url('user/dashboard') ?>"><i class="bi bi-speedometer2"></i>
+                        <span>Dashboard</span></a></li>
+                <li><a class="nav-link <?= service('uri')->getSegment(2) === 'pengajuan' ? 'active' : '' ?>"
+                        href="<?= site_url('user/pengajuan/index') ?>"><i class="bi bi-pencil-square"></i> <span>Pengajuan
+                            Kas</span></a></li>
+            </ul>
+            <div class="bottom-logout">
+                <a class="nav-link text-danger" href="<?= site_url('logout') ?>"><i class="bi bi-box-arrow-right"></i>
+                    Logout</a>
             </div>
         </div>
-    </header>
+      
+        <!-- Main Content -->
+        <main class="main-content">
+            <?= $this->renderSection('content') ?>
+        </main>
 
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="pt-3">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link <?= service('uri')->getSegment(2) === 'dashboard' ? 'active' : '' ?>"
-                        href="<?= site_url('user/dashboard') ?>">
-                        <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?= service('uri')->getSegment(2) === 'pengajuan' ? 'active' : '' ?>"
-                        href="<?= site_url('user/pengajuan/index') ?>">
-                        <i class="bi bi-pencil-square"></i> <span>Pengajuan Kas</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?= service('uri')->getSegment(2) === 'riwayat' ? 'active' : '' ?>"
-                        href="<?= site_url('user/riwayat') ?>">
-                        <i class="bi bi-clock-history"></i> <span>Riwayat Pengajuan</span>
-                    </a>
-                </li>   
-                <li class="nav-item mt-4">
-                    <a class="nav-link text-danger" href="<?= site_url('logout') ?>">
-                        <i class="bi bi-box-arrow-right me-2 text-danger"></i> <span>Logout</span>
-                    </a>
-                </li>
-            </ul>
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
+
+        <script>
+            // Mobile sidebar toggle
+            document.querySelector('.mobile-menu-btn').addEventListener('click', function () {
+                document.querySelector('.sidebar').classList.toggle('mobile-show');
+            });
+
+            // Initialize DataTables if table exists
+            document.addEventListener('DOMContentLoaded', function () {
+                if (document.querySelector('.data-table')) {
+                    $('.data-table').DataTable({
+                        language: {
+                            search: "Cari:",
+                            lengthMenu: "Tampilkan _MENU_ data per halaman",
+                            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                            paginate: {
+                                first: "Pertama",
+                                last: "Terakhir",
+                                next: "Selanjutnya",
+                                previous: "Sebelumnya"
+                            }
+                        },
+                        responsive: true
+                    });
+                }
+
+                // Auto-hide alerts after 5 seconds
+                setTimeout(function () {
+                    const alerts = document.querySelectorAll('.alert');
+                    alerts.forEach(function (alert) {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    });
+                }, 5000);
+            });
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function (event) {
+                const sidebar = document.querySelector('.sidebar');
+                const menuBtn = document.querySelector('.mobile-menu-btn');
+
+                if (window.innerWidth <= 768 &&
+                    !sidebar.contains(event.target) &&
+                    !menuBtn.contains(event.target) &&
+                    sidebar.classList.contains('mobile-show')) {
+                    sidebar.classList.remove('mobile-show');
+                }
+            });
+        </script>
+
+        <?= $this->renderSection('scripts') ?>
+    </body>
+
+    </html>
+<?php else: ?>
+    <!DOCTYPE html>
+    <html lang="id">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Akses Ditolak - Sistem Kas GoNet</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                background: linear-gradient(135deg, #1b2838, #2a475e);
+                height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: 'Montserrat', sans-serif;
+            }
+
+            .access-denied {
+                background: linear-gradient(to bottom, #2a475e, #1b2838);
+                padding: 3rem;
+                border-radius: 4px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                text-align: center;
+                max-width: 500px;
+                border: 1px solid rgba(102, 192, 244, 0.2);
+                color: #c7d5e0;
+            }
+
+            .access-denied i {
+                font-size: 5rem;
+                color: #d33c40;
+                margin-bottom: 1.5rem;
+            }
+
+            .access-denied h1 {
+                color: #66c0f4;
+            }
+
+            .btn-primary {
+                background: linear-gradient(to bottom, #67c1f5, #417a9b);
+                border: none;
+                border-radius: 2px;
+                padding: 8px 16px;
+                font-weight: 500;
+                color: #fff;
+                text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.33);
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="access-denied">
+            <i class="bi bi-shield-exclamation"></i>
+            <h1 class="text-danger">Akses Ditolak</h1>
+            <p class="lead">Anda tidak memiliki izin untuk mengakses halaman ini.</p>
+            <a href="<?= site_url('login') ?>" class="btn btn-primary mt-3">Kembali ke Login</a>
         </div>
-    </div>
+    </body>
 
-    <!-- Main Content -->
-    <main class="main-content" id="mainContent">
-        <?= $this->renderSection('content') ?>
-    </main>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
-
-    <script>
-        // Toggle sidebar on mobile
-        document.getElementById('mobileSidebarToggle').addEventListener('click', function () {
-            document.getElementById('sidebar').classList.toggle('mobile-expanded');
-            document.getElementById('mainContent').classList.toggle('mobile-expanded');
-        });
-
-        // Initialize DataTables if table exists
-        document.addEventListener('DOMContentLoaded', function () {
-            $('.data-table').DataTable({
-                language: {
-                    search: "Cari:",
-                    lengthMenu: "Tampilkan _MENU_ data per halaman",
-                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                    paginate: {
-                        first: "Pertama",
-                        last: "Terakhir",
-                        next: "Selanjutnya",
-                        previous: "Sebelumnya"
-                    }
-                },
-                responsive: true
-            });
-        });
-
-        // Auto-hide alerts after 5 seconds
-        setTimeout(function () {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function (alert) {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 5000);
-    </script>
-
-    <?= $this->renderSection('scripts') ?>
-</body>
-
-</html>
+    </html>
+<?php endif; ?>
