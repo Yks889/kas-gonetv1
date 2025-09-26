@@ -11,7 +11,32 @@ class KasMasuk extends BaseController
     public function index()
     {
         $model = new KasMasukModel();
-        $data['kas_masuk'] = $model->findAll();
+
+        $month = $this->request->getGet('month');
+        $year  = $this->request->getGet('year');
+
+        if ($month && $year) {
+            $data['kas_masuk'] = $model
+                ->where("MONTH(created_at) = $month")
+                ->where("YEAR(created_at) = $year")
+                ->orderBy('created_at', 'DESC')
+                ->findAll();
+        } elseif ($year) {
+            $data['kas_masuk'] = $model
+                ->where("YEAR(created_at) = $year")
+                ->orderBy('created_at', 'DESC')
+                ->findAll();
+        } elseif ($month) {
+            $data['kas_masuk'] = $model
+                ->where("MONTH(created_at) = $month")
+                ->orderBy('created_at', 'DESC')
+                ->findAll();
+        } else {
+            $data['kas_masuk'] = $model
+                ->orderBy('created_at', 'DESC')
+                ->findAll();
+        }
+
         return view('admin/kas_masuk/index', $data);
     }
 
