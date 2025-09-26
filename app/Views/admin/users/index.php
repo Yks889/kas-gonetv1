@@ -3,18 +3,13 @@
 
 <div class="container-fluid">
     <!-- Header -->
-    <div class="row align-items-center mb-4">
-        <div class="col-md-6">
-            <h1 class="h3 mb-0 text-white">
-                <i class="bi bi-people-fill me-2"></i> Manajemen User
-            </h1>
-            <p class="text-light mb-0">Kelola data pengguna sistem kas</p>
-        </div>
-        <div class="col-md-6 text-md-end mt-2 mt-md-0">
-            <a href="<?= base_url('admin/users/create') ?>" class="btn btn-gradient-primary shadow-sm">
-                <i class="bi bi-person-plus-fill me-1"></i> Tambah User
-            </a>
-        </div>
+    <div class="d-flex justify-content-between align-items-center pb-3 mb-5 border-bottom">
+        <h1 class="h3 mb-1 text-white">
+            <i class="bi bi-people-fill me-2"></i> Manajemen User
+        </h1>
+        <a href="<?= base_url('admin/users/create') ?>" class="btn btn-gradient-primary shadow-sm btn-add-user mb-2">
+            <i class="bi bi-person-plus-fill me-1"></i> Tambah User
+        </a>
     </div>
 
     <?php if (session()->getFlashdata('success')): ?>
@@ -25,27 +20,23 @@
     <?php endif; ?>
 
     <!-- Table Controls -->
-    <div class="dashboard-card p-4 mb-4">
-        <div class="row g-3 align-items-center">
-            <!-- Rows per page -->
-            <div class="col-md-3 d-flex align-items-center">
-                <label class="text-white me-2 small">Tampilkan</label>
-                <select id="rowsPerPage" class="form-select form-select-sm stylish-select w-auto">
-                    <option value="5">5</option>
-                    <option value="10" selected>10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                </select>
-                <label class="text-white ms-2 small">baris</label>
-            </div>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <!-- Rows per page -->
+        <div class="d-flex align-items-center">
+            <label class="text-white me-2">Tampilkan</label>
+            <select id="rowsPerPage" class="form-select form-select-sm modern-select w-auto">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+            <label class="text-white ms-2">baris</label>
+        </div>
 
-            <!-- Search -->
-            <div class="col-md-6">
-                <div class="modern-search">
-                    <i class="bi bi-search"></i>
-                    <input type="text" id="searchInput" class="form-control form-control-sm text-light" placeholder="Cari berdasarkan username...">
-                </div>
-            </div>
+        <!-- Search -->
+        <div class="modern-search">
+            <i class="bi bi-search"></i>
+            <input type="text" id="searchInput" class="form-control form-control-sm text-light" placeholder="Cari berdasarkan username...">
         </div>
     </div>
 
@@ -54,31 +45,28 @@
         <div class="table-responsive">
             <table class="table table-dark table-hover align-middle mb-0" id="userTable">
                 <thead>
-                    <tr class="text-steam-blue text-uppercase small">
-                        <th style="width: 5%;" class="text-center">No</th>
+                    <tr class="text-steam-blue text-uppercase small text-center">
+                        <th style="width: 5%;">No</th>
                         <th style="width: 25%;" class="text-start">Username</th>
-                        <th style="width: 20%;" class="text-center">Role</th>
-                        <th style="width: 30%;" class="text-center">Tanggal Dibuat</th>
-                        <th style="width: 20%;" class="text-center">Aksi</th>
+                        <th style="width: 20%;">Role</th>
+                        <th style="width: 30%;">Tanggal Dibuat</th>
+                        <th style="width: 20%;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (!empty($users)): ?>
                         <?php $no = 1;
                         foreach ($users as $user): ?>
-                            <tr>
-                                <td class="text-center"><?= $no++ ?></td>
+                            <tr class="text-center">
+                                <td><?= $no++ ?></td>
                                 <td class="text-start">
                                     <div class="d-flex align-items-center">
-                                        <div class="user-avatar bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                            <i class="bi bi-person-fill text-white"></i>
-                                        </div>
                                         <div>
                                             <div class="fw-medium text-white"><?= esc($user['username']) ?></div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="text-center" data-role="<?= strtolower($user['role']) ?>">
+                                <td>
                                     <?php if ($user['role'] === 'admin'): ?>
                                         <span class="badge bg-gradient-danger px-3 py-2">
                                             <i class="bi bi-shield-lock-fill me-1"></i> Admin
@@ -89,10 +77,10 @@
                                         </span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-center text-light">
+                                <td class="text-light">
                                     <?= date('d M Y', strtotime($user['created_at'] ?? 'now')) ?>
                                 </td>
-                                <td class="text-center">
+                                <td>
                                     <div class="btn-group" role="group">
                                         <a href="<?= base_url('admin/users/edit/' . $user['id']) ?>"
                                             class="btn btn-sm btn-outline-light stylish-btn"
@@ -100,13 +88,37 @@
                                             data-bs-toggle="tooltip">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <a href="<?= base_url('admin/users/delete/' . $user['id']) ?>"
+                                        <button onclick="confirmDelete(<?= $user['id'] ?>, '<?= esc($user['username']) ?>')"
                                             class="btn btn-sm btn-outline-danger stylish-btn"
                                             title="Hapus User"
-                                            data-bs-toggle="tooltip"
-                                            onclick="return confirm('Yakin hapus user <?= esc($user['username']) ?>?')">
+                                            data-bs-toggle="tooltip">
                                             <i class="bi bi-trash"></i>
-                                        </a>
+                                        </button>
+                                        <!-- Modal Konfirmasi Hapus -->
+                                        <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content bg-dark text-white border-0 rounded-3 shadow-lg">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title text-danger">
+                                                            <i class="bi bi-exclamation-triangle-fill me-2"></i> Konfirmasi Hapus
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Apakah Anda yakin ingin menghapus user <strong id="deleteUsername"></strong>?</p>
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                            <i class="bi bi-x-circle me-1"></i> Batal
+                                                        </button>
+                                                        <a href="#" id="confirmDeleteBtn" class="btn btn-danger">
+                                                            <i class="bi bi-trash me-1"></i> Hapus
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </td>
                             </tr>
@@ -131,26 +143,25 @@
     </div>
 
     <!-- Pagination -->
-    <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2">
-        <button id="prevPage" class="btn btn-outline-light stylish-btn" disabled>
-            <i class="bi bi-chevron-left"></i> Sebelumnya
+    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+        <button id="prevPage" class="btn btn-sm btn-outline-light stylish-btn" disabled>
+            <i class="bi bi-chevron-left"></i> Prev
         </button>
 
         <div id="paginationInfo" class="text-white small text-center flex-grow-1"></div>
 
-        <button id="nextPage" class="btn btn-outline-light stylish-btn">
-            Selanjutnya <i class="bi bi-chevron-right"></i>
+        <button id="nextPage" class="btn btn-sm btn-outline-light stylish-btn">
+            Next <i class="bi bi-chevron-right"></i>
         </button>
     </div>
 </div>
 
-<!-- Styling -->
 <style>
     .dashboard-card {
         background: rgba(26, 26, 26, 0.9);
         border-radius: 14px;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow: hidden;
     }
 
     .table thead {
@@ -178,20 +189,21 @@
         font-weight: 500;
     }
 
-    .stylish-select {
+    /* Select modern */
+    .modern-select {
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.2);
         color: #fff;
-        border-radius: 8px;
+        border-radius: 12px;
         transition: 0.3s;
     }
 
-    .stylish-select:focus {
+    .modern-select:focus {
         border-color: #4361ee;
         box-shadow: 0 0 8px rgba(67, 97, 238, 0.6);
-        background: rgba(255, 255, 255, 0.1);
     }
 
+    /* Search modern */
     .modern-search {
         position: relative;
     }
@@ -210,8 +222,9 @@
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.2);
         color: #fff;
-        border-radius: 8px;
+        border-radius: 12px;
         transition: all 0.3s ease;
+        width: 100%;
     }
 
     .modern-search input::placeholder {
@@ -226,8 +239,9 @@
     }
 
     .btn-gradient-primary {
-        background: linear-gradient(45deg, #4361ee, #4cc9f0);
-        border: none;
+        background-color: #0d6efd;
+        /* Bootstrap Primary */
+        border: 1px solid #0d6efd;
         border-radius: 8px;
         color: #fff;
         font-weight: 500;
@@ -236,14 +250,26 @@
     }
 
     .btn-gradient-primary:hover {
-        opacity: 0.9;
+        background-color: #0b5ed7;
+        /* lebih gelap saat hover */
+        border-color: #0a58ca;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+
+    /* Ukuran tombol Tambah User lebih kecil */
+    .btn-add-user {
+        padding: 10px 17px;
+        /* lebih ramping */
+        font-size: 0.9rem;
+        /* sedikit lebih kecil */
+        border-radius: 10px;
+        /* sudut lebih rapih */
     }
 
     .stylish-btn {
-        border-radius: 8px;
-        padding: 6px 12px;
+        border-radius: 10px;
+        padding: 4px 14px;
         transition: 0.3s;
         margin: 0 2px;
     }
@@ -281,12 +307,81 @@
     .table tbody tr td[colspan] {
         background: rgba(26, 26, 26, 0.5);
     }
+
+    /* === SweetAlert2 Stylish Modal === */
+    .swal2-popup.stylish-modal {
+        background: linear-gradient(135deg, rgba(40, 40, 60, 0.98), rgba(30, 30, 50, 0.98));
+        border: 1px solid rgba(67, 97, 238, 0.3);
+        border-radius: 16px;
+        padding: 1.5rem;
+        color: #fff;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(15px);
+    }
+
+    .swal2-popup.stylish-modal .modal-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        border-radius: 12px;
+        margin-right: 1rem;
+    }
+
+    .swal2-popup.stylish-modal .modal-icon i {
+        color: #fff;
+        font-size: 1.5rem;
+    }
+
+    .swal2-popup.stylish-modal .swal2-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 0;
+        color: #fff;
+    }
+
+    .swal2-popup.stylish-modal .modal-subtitle {
+        color: #aaa;
+        font-size: 0.9rem;
+        margin: 0.25rem 0 0;
+    }
+
+    .swal2-popup.stylish-modal .info-highlight {
+        background: rgba(255, 107, 107, 0.1);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        margin: 1rem 0;
+        display: flex;
+        align-items: center;
+        color: #fff;
+    }
+
+    .swal2-popup.stylish-modal .info-highlight i {
+        color: #ff6b6b;
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .swal2-popup.stylish-modal .warning-text {
+        color: #ffd166;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        margin-top: 0.5rem;
+    }
+
+    .swal2-popup.stylish-modal .warning-text i {
+        margin-right: 0.5rem;
+    }
+    
 </style>
 
 <script>
     const rowsPerPageSelect = document.getElementById("rowsPerPage");
     const searchInput = document.getElementById("searchInput");
-    const roleFilter = document.getElementById("roleFilter");
     const userTable = document.getElementById("userTable").getElementsByTagName("tbody")[0];
     const prevBtn = document.getElementById("prevPage");
     const nextBtn = document.getElementById("nextPage");
@@ -301,16 +396,9 @@
 
     function filterRows() {
         const searchValue = searchInput.value.toLowerCase();
-        const selectedRole = roleFilter.value;
-
         return getRows().filter(row => {
             const username = row.cells[1]?.textContent.toLowerCase() || "";
-            const role = row.cells[2]?.getAttribute("data-role") || "";
-
-            const matchSearch = username.includes(searchValue);
-            const matchRole = selectedRole === "" || role === selectedRole;
-
-            return matchSearch && matchRole;
+            return username.includes(searchValue);
         });
     }
 
@@ -318,28 +406,24 @@
         const allRows = getRows();
         const filteredRows = filterRows();
         const totalRows = filteredRows.length;
-        const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
 
-        // sembunyikan semua
         allRows.forEach(row => row.style.display = "none");
 
-        // tampilkan sesuai halaman
         const start = (currentPage - 1) * rowsPerPage;
         const end = start + rowsPerPage;
         for (let i = start; i < end && i < totalRows; i++) {
             filteredRows[i].style.display = "";
         }
 
-        // info pagination
         paginationInfo.innerHTML = totalRows > 0 ?
             `Menampilkan ${start + 1} - ${Math.min(end, totalRows)} dari ${totalRows} user | Halaman ${currentPage} dari ${totalPages}` :
             "Tidak ada data ditemukan";
 
         prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages || totalRows === 0;
+        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
     }
 
-    // Event listeners
     rowsPerPageSelect.addEventListener("change", () => {
         rowsPerPage = parseInt(rowsPerPageSelect.value);
         currentPage = 1;
@@ -347,11 +431,6 @@
     });
 
     searchInput.addEventListener("input", () => {
-        currentPage = 1;
-        displayTable();
-    });
-
-    roleFilter.addEventListener("change", () => {
         currentPage = 1;
         displayTable();
     });
@@ -372,16 +451,68 @@
         }
     });
 
-    // Initialize tooltips
     document.addEventListener('DOMContentLoaded', function() {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-
-        // Initial display
         displayTable();
     });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const deleteButtons = document.querySelectorAll(".btn-delete-user");
+        const deleteModal = new bootstrap.Modal(document.getElementById("deleteUserModal"));
+        const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+        const deleteUsername = document.getElementById("deleteUsername");
+
+        deleteButtons.forEach(btn => {
+            btn.addEventListener("click", function() {
+                const userId = this.dataset.id;
+                const username = this.dataset.username;
+
+                // Set tampilan username di modal
+                deleteUsername.textContent = username;
+
+                // Set link delete
+                confirmDeleteBtn.href = "<?= base_url('admin/users/delete/') ?>" + userId;
+
+                // Tampilkan modal
+                deleteModal.show();
+            });
+        });
+    });
+
+    function confirmDelete(id, username) {
+        Swal.fire({
+            customClass: {
+                popup: 'stylish-modal'
+            },
+            html: `
+                <div class="d-flex align-items-center mb-3">
+                    <div class="modal-icon">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="swal2-title">Konfirmasi Hapus</h5>
+                        <p class="modal-subtitle">Aksi ini tidak bisa dibatalkan</p>
+                    </div>
+                </div>
+                <div class="info-highlight">
+                    <i class="bi bi-person-fill"></i>
+                    <span>Anda akan menghapus user <b>${username}</b></span>
+                </div>
+                <div class="warning-text">
+                    <i class="bi bi-exclamation-circle"></i> User akan dihapus secara permanen!
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: '<i class="bi bi-trash me-1"></i> Hapus',
+            cancelButtonText: '<i class="bi bi-x-circle me-1"></i> Batal',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            buttonsStyling: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "<?= base_url('admin/users/delete/') ?>" + id;
+            }
+        });
+    }
 </script>
 
 <?= $this->endSection() ?>

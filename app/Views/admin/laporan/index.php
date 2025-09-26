@@ -3,8 +3,8 @@
 
 <div class="container-fluid">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
-        <h1 class="h3 mb-0 text-white">
+    <div class="d-flex justify-content-between align-items-center pb-3 mb-5 border-bottom">
+        <h1 class="h3 mb-1 text-white">
             <i class="bi bi-activity me-2"></i> Aktivitas User
         </h1>
     </div>
@@ -60,7 +60,11 @@
                         foreach ($activities as $act): ?>
                             <tr class="text-center">
                                 <td><?= $no++ ?></td>
-                                <td class="text-start"><?= esc($act['username']) ?></td>
+                                <td class="text-start">
+                                    <div class="d-flex align-items-center">
+                                        <div class="fw-medium text-white"><?= esc($act['username']) ?></div>
+                                    </div>
+                                </td>
                                 <td data-role="<?= strtolower($act['role']) ?>">
                                     <?php if ($act['role'] === 'admin'): ?>
                                         <span class="badge bg-gradient-danger px-3 py-2">
@@ -72,18 +76,22 @@
                                         </span>
                                     <?php endif; ?>
                                 </td>
-                                <td><?= esc($act['activity']) ?></td>
-                                <td>
+                                <td class="text-light"><?= esc($act['activity']) ?></td>
+                                <td class="text-light">
                                     <?= !empty($act['created_at'])
-                                        ? date('d-m-Y H:i:s', strtotime($act['created_at']))
+                                        ? date('d M Y H:i:s', strtotime($act['created_at']))
                                         : '-' ?>
                                 </td>
                             </tr>
                         <?php endforeach ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-3">
-                                <em>Belum ada aktivitas</em>
+                            <td colspan="5" class="text-center text-light py-5">
+                                <div class="py-4">
+                                    <i class="bi bi-activity display-1 text-light"></i>
+                                    <h5 class="mt-3 text-light">Belum ada aktivitas</h5>
+                                    <p class="text-light">Aktivitas user akan muncul di sini setelah ada interaksi</p>
+                                </div>
                             </td>
                         </tr>
                     <?php endif ?>
@@ -106,7 +114,7 @@
     </div>
 </div>
 
-<!-- Styling tambahan -->
+<!-- Styling -->
 <style>
     .dashboard-card {
         background: rgba(26, 26, 26, 0.9);
@@ -117,18 +125,27 @@
 
     .table thead {
         background: rgba(67, 97, 238, 0.15);
+        border-bottom: 2px solid rgba(67, 97, 238, 0.3);
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .table tbody tr:hover {
         background: rgba(67, 97, 238, 0.08) !important;
+        transform: translateX(2px);
     }
 
     .badge.bg-gradient-danger {
         background: linear-gradient(45deg, #ef233c, #d90429);
+        font-weight: 500;
     }
 
     .badge.bg-gradient-primary {
         background: linear-gradient(45deg, #4361ee, #4cc9f0);
+        font-weight: 500;
     }
 
     /* Select modern */
@@ -156,6 +173,7 @@
         left: 12px;
         transform: translateY(-50%);
         color: #aaa;
+        z-index: 2;
     }
 
     .modern-search input {
@@ -165,6 +183,7 @@
         color: #fff;
         border-radius: 12px;
         transition: all 0.3s ease;
+        width: 100%;
     }
 
     .modern-search input::placeholder {
@@ -178,11 +197,11 @@
         background: rgba(255, 255, 255, 0.1);
     }
 
-    /* Pagination Buttons */
     .stylish-btn {
         border-radius: 10px;
         padding: 4px 14px;
         transition: 0.3s;
+        margin: 0 2px;
     }
 
     .stylish-btn:hover {
@@ -190,6 +209,25 @@
         border-color: #4361ee;
         color: #fff;
         box-shadow: 0 0 8px rgba(67, 97, 238, 0.8);
+        transform: translateY(-1px);
+    }
+
+    .user-avatar {
+        background: linear-gradient(45deg, #4361ee, #4cc9f0);
+    }
+
+    .text-steam-blue {
+        color: #66c0f4;
+    }
+
+    /* Pagination styling */
+    #paginationInfo {
+        font-weight: 500;
+    }
+
+    /* Empty state styling */
+    .table tbody tr td[colspan] {
+        background: rgba(26, 26, 26, 0.5);
     }
 </style>
 
@@ -245,20 +283,30 @@
         nextBtn.disabled = currentPage === totalPages || totalPages === 0;
     }
 
-    rowsPerPageSelect.addEventListener("change", function() {
-        rowsPerPage = parseInt(this.value);
+    rowsPerPageSelect.addEventListener("change", () => {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
         currentPage = 1;
         displayTable();
     });
 
-    prevBtn.addEventListener("click", function() {
+    roleFilter.addEventListener("change", () => {
+        currentPage = 1;
+        displayTable();
+    });
+
+    searchInput.addEventListener("input", () => {
+        currentPage = 1;
+        displayTable();
+    });
+
+    prevBtn.addEventListener("click", () => {
         if (currentPage > 1) {
             currentPage--;
             displayTable();
         }
     });
 
-    nextBtn.addEventListener("click", function() {
+    nextBtn.addEventListener("click", () => {
         const totalPages = Math.ceil(filterRows().length / rowsPerPage);
         if (currentPage < totalPages) {
             currentPage++;
@@ -266,17 +314,7 @@
         }
     });
 
-    roleFilter.addEventListener("change", function() {
-        currentPage = 1;
-        displayTable();
-    });
-
-    searchInput.addEventListener("keyup", function() {
-        currentPage = 1;
-        displayTable();
-    });
-
-    displayTable();
+    document.addEventListener('DOMContentLoaded', displayTable);
 </script>
 
 <?= $this->endSection() ?>
