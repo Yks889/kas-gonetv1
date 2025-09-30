@@ -102,35 +102,45 @@
             </div>
         </div>
 
-        <div class="col-lg-4 mb-4">
-            <div class="dashboard-card h-100 p-4">
-                <h5 class="text-steam-blue mb-3">Statistik Pengguna</h5>
-                <div class="row text-center">
-                    <div class="col-6 mb-3">
-                        <div class="p-3 bg-steam-dark rounded">
-                            <h3 class="text-primary mb-0"><?= $total_users ?></h3>
-                            <small class="text-white">Total User</small>
-                        </div>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <div class="p-3 bg-steam-dark rounded">
-                            <h3 class="text-success mb-0"><?= $total_pengajuan ?></h3>
-                            <small class="text-white">Total Pengajuan</small>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="p-3 bg-steam-dark rounded">
-                            <h3 class="text-warning mb-0"><?= $pengajuan_pending ?></h3>
-                            <small class="text-white">Pending</small>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="p-3 bg-steam-dark rounded">
-                            <h3 class="text-danger mb-0"><?= $pengajuan_ditolak ?></h3>
-                            <small class="text-white">Ditolak</small>
-                        </div>
+       <div class="col-lg-4 mb-4">
+    <div class="dashboard-card h-100 p-4">
+        <h5 class="text-steam-blue mb-3">Statistik Pengguna</h5>
+        <div class="row text-center">
+            <div class="col-6 mb-3">
+                <div class="p-3 bg-steam-dark rounded">
+                    <h3 class="text-primary mb-0"><?= $total_users ?></h3>
+                        <small class="text-white">Total User</small>
                     </div>
                 </div>
+                <div class="col-6 mb-3">
+                    <div class="p-3 bg-steam-dark rounded">
+                        <h3 class="text-success mb-0"><?= $total_pengajuan ?></h3>
+                        <small class="text-white">Total Pengajuan</small>
+                    </div>
+                </div>
+                <div class="col-6 mb-3">
+                    <div class="p-3 bg-steam-dark rounded">
+                        <h3 class="text-warning mb-0"><?= $pengajuan_pending ?></h3>
+                        <small class="text-white">Pending</small>
+                    </div>
+                </div>
+                <div class="col-6 mb-3">
+                    <div class="p-3 bg-steam-dark rounded">
+                        <h3 class="text-danger mb-0"><?= $pengajuan_ditolak ?></h3>
+                        <small class="text-white">Ditolak</small>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Persegi panjang Lihat Pengajuan -->
+            <a href="<?= site_url('admin/pengajuan') ?>"
+                class="btn btn-warning w-100 mt-3 py-3 d-flex flex-column align-items-center justify-content-center stylish-btn">
+                <i class="bi bi-list-check display-6 mb-2"></i>
+                <span>Lihat Pengajuan</span>
+            </a>
+        </div>
+    </div>
+
             </div>
         </div>
     </div>
