@@ -179,7 +179,7 @@
                 transition: all 0.3s ease;
             }
 
-            /* Modern Profile & Logout Section */
+            /* ========== MODERN PROFILE SECTION - DIPERBAIKI ========== */
             .sidebar-profile {
                 margin-top: auto;
                 padding: 20px 15px 20px;
@@ -190,45 +190,37 @@
 
             .profile-card {
                 background: var(--gradient-card);
-                border-radius: 16px;
-                padding: 18px;
-                margin-bottom: 12px;
+                border-radius: 12px;
+                padding: 15px;
+                margin: 0 10px 12px 10px;
                 border: 1px solid rgba(255, 255, 255, 0.1);
-                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: all 0.3s ease;
                 box-shadow: var(--shadow-light);
-                position: relative;
-                overflow: hidden;
-            }
-
-            .profile-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 1px;
-                background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+                height: 70px;
+                display: flex;
+                align-items: center;
             }
 
             .profile-card:hover {
-                transform: translateY(-3px);
+                transform: translateX(5px);
                 box-shadow: var(--shadow-medium);
                 border-color: var(--primary-color);
             }
 
             .profile-avatar {
-                width: 50px;
-                height: 50px;
+                width: 45px;
+                height: 45px;
                 border-radius: 50%;
                 object-fit: cover;
                 border: 2px solid var(--primary-color);
                 box-shadow: var(--shadow-glow);
                 transition: all 0.3s ease;
+                flex-shrink: 0;
             }
 
             .profile-avatar-placeholder {
-                width: 50px;
-                height: 50px;
+                width: 45px;
+                height: 45px;
                 border-radius: 50%;
                 background: var(--gradient-primary);
                 display: flex;
@@ -238,6 +230,7 @@
                 border: 2px solid rgba(255, 255, 255, 0.2);
                 box-shadow: var(--shadow-glow);
                 transition: all 0.3s ease;
+                flex-shrink: 0;
             }
 
             .profile-card:hover .profile-avatar,
@@ -247,32 +240,35 @@
             }
 
             .profile-avatar-placeholder i {
-                font-size: 1.4rem;
+                font-size: 1.3rem;
             }
 
             .profile-info {
                 flex: 1;
-                margin-left: 15px;
+                margin-left: 12px;
+                min-width: 0;
             }
 
             .profile-name {
                 font-weight: 600;
-                font-size: 0.95rem;
+                font-size: 0.9rem;
                 color: var(--text-primary);
-                margin-bottom: 3px;
-                letter-spacing: 0.3px;
+                margin-bottom: 2px;
+                line-height: 1.2;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             .profile-role {
-                font-size: 0.75rem;
+                font-size: 0.7rem;
                 color: var(--text-secondary);
                 text-transform: uppercase;
-                letter-spacing: 1px;
-                font-weight: 500;
-                background: var(--gradient-primary);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
+                letter-spacing: 0.5px;
+                line-height: 1.2;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             .profile-link {
@@ -282,50 +278,30 @@
                 transition: all 0.3s ease;
             }
 
-            /* Modern Logout Button */
+            /* Modern Logout Button - DIPERBAIKI */
             .logout-btn {
                 display: flex;
                 align-items: center;
-                gap: 14px;
-                padding: 16px 18px;
+                gap: 12px;
+                padding: 14px 18px;
                 color: var(--secondary-color);
-                border-radius: 9px;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                border-radius: 12px;
+                transition: all 0.3s ease;
                 text-decoration: none;
                 font-size: 0.95rem;
                 font-weight: 500;
-                margin: 0 5px;
+                margin: 0 10px;
                 background: rgba(255, 107, 107, 0.05);
                 border: 1px solid transparent;
-                position: relative;
-                overflow: hidden;
                 height: 50px;
-                width: 240px;
-            }
-
-            .logout-btn::before {
-                content: '';
-                position: absolute;
-                left: 0;
-                top: 0;
-                height: 100%;
-                width: 3px;
-                background: var(--secondary-color);
-                transform: scaleY(0);
-                transition: transform 0.3s ease;
-                border-radius: 0 4px 4px 0;
             }
 
             .logout-btn:hover {
                 background: rgba(255, 107, 107, 0.1);
                 color: #ff8e8e;
                 border-color: rgba(255, 107, 107, 0.3);
-                transform: translateY(-5px);
+                transform: translateX(5px);
                 box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
-            }
-
-            .logout-btn:hover::before {
-                transform: scaleY(1);
             }
 
             .logout-btn i {
@@ -466,6 +442,12 @@
                 <li>
                     <div class="sidebar-divider"></div>
                 </li>
+                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'informasi_kas' ? 'active' : '' ?>"
+                        href="<?= site_url('admin/informasi_kas') ?>">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Informasi Kas</span>
+                    </a>
+                </li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'kas_masuk' ? 'active' : '' ?>"
                         href="<?= site_url('admin/kas_masuk') ?>">
                         <i class="bi bi-cash-coin"></i>
@@ -486,7 +468,7 @@
                 </li>
             </ul>
 
-            <!-- Profile & Logout Section -->
+            <!-- Profile & Logout Section - DIPERBAIKI -->
             <div class="sidebar-profile">
                 <!-- Profile Card -->
                 <?php
@@ -496,7 +478,7 @@
                 <a class="profile-link <?= service('uri')->getSegment(2) === 'profile' ? 'active' : '' ?>"
                     href="<?= site_url(session()->get('role') === 'admin' ? 'admin/profile' : 'user/profile') ?>">
                     <div class="profile-card">
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center w-100">
                             <div class="flex-shrink-0">
                                 <?php
                                 $photoPath = 'uploads/profiles/' . ($sidebarUser['photo'] ?? '');
@@ -524,7 +506,6 @@
                 </a>
             </div>
         </div>
-
 
         <!-- Main Content -->
         <main class="main-content">
