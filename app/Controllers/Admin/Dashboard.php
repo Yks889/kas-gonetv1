@@ -11,7 +11,7 @@ use App\Models\UserModel;
 
 class Dashboard extends BaseController
 {
-  public function index()
+    public function index()
     {
         $kasSaldoModel = new KasSaldoModel();
         $kasMasukModel = new KasMasukModel();
@@ -53,6 +53,45 @@ class Dashboard extends BaseController
             ->countAllResults();
 
         $pengajuan_ditolak = $pengajuanModel->where('status', 'ditolak')
+            ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
+            ->countAllResults();
+
+        // Data untuk tabs - DIPERBAIKI
+        $pengajuan = $pengajuanModel
+            ->select('pengajuan.*, users.username')
+            ->join('users', 'users.id = pengajuan.user_id')
+            ->when($bulan, fn($q) => $q->where('MONTH(pengajuan.created_at)', $bulan))
+            ->orderBy('pengajuan.created_at', 'DESC')
+            ->findAll(10); // Limit to 10 records
+
+        $kas_masuk = $kasMasukModel
+            ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
+            ->orderBy('created_at', 'DESC')
+            ->findAll(10);
+
+        // QUERY KAS KELUAR DIPERBAIKI
+        $kas_keluar = $kasKeluarModel
+            ->select('kas_keluar.*, pengajuan.user_id, users.username, pengajuan.keterangan as pengajuan_keterangan')
+            ->join('pengajuan', 'pengajuan.id = kas_keluar.pengajuan_id', 'left')
+            ->join('users', 'users.id = pengajuan.user_id', 'left')
+            ->when($bulan, fn($q) => $q->where('MONTH(kas_keluar.created_at)', $bulan))
+            ->orderBy('kas_keluar.created_at', 'DESC')
+            ->findAll(10);
+
+        // Jika masih error, gunakan query yang lebih sederhana:
+        // $kas_keluar = $kasKeluarModel
+        //     ->select('kas_keluar.*, pengajuan.keterangan as pengajuan_keterangan')
+        //     ->join('pengajuan', 'pengajuan.id = kas_keluar.pengajuan_id', 'left')
+        //     ->when($bulan, fn($q) => $q->where('MONTH(kas_keluar.created_at)', $bulan))
+        //     ->orderBy('kas_keluar.created_at', 'DESC')
+        //     ->findAll(10);
+
+        // Hitung jumlah untuk ringkasan
+        $kas_masuk_count = $kasMasukModel
+            ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
+            ->countAllResults();
+
+        $kas_keluar_count = $kasKeluarModel
             ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
             ->countAllResults();
 
@@ -147,7 +186,12 @@ class Dashboard extends BaseController
             'masukData' => $masukDataFinal,
             'keluarData' => $keluarDataFinal,
             'persentase_pengajuan' => $persentase_pengajuan,
-            'bulanDipilih' => $bulan
+            'bulanDipilih' => $bulan,
+            'pengajuan' => $pengajuan,
+            'kas_masuk' => $kas_masuk,
+            'kas_keluar' => $kas_keluar,
+            'kas_masuk_count' => $kas_masuk_count,
+            'kas_keluar_count' => $kas_keluar_count
         ];
 
         return view('admin/dashboard', $data);

@@ -143,7 +143,7 @@
     </div>
 
     <!-- Pagination -->
-    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" id="paginationContainer">
         <button id="prevPage" class="btn btn-sm btn-outline-light stylish-btn" disabled>
             <i class="bi bi-chevron-left"></i> Prev
         </button>
@@ -159,7 +159,7 @@
 <style>
     .dashboard-card {
         background: rgba(26, 26, 26, 0.9);
-        border-radius: 14px;
+        border-radius: 10px;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
         overflow: hidden;
     }
@@ -194,7 +194,7 @@
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.2);
         color: #fff;
-        border-radius: 12px;
+        border-radius: 8px;
         transition: 0.3s;
     }
 
@@ -222,7 +222,7 @@
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.2);
         color: #fff;
-        border-radius: 12px;
+        border-radius: 7px;
         transition: all 0.3s ease;
         width: 100%;
     }
@@ -308,6 +308,11 @@
         background: rgba(26, 26, 26, 0.5);
     }
 
+    /* Hide pagination when not needed */
+    .pagination-hidden {
+        display: none !important;
+    }
+
     /* === SweetAlert2 Stylish Modal === */
     .swal2-popup.stylish-modal {
         background: linear-gradient(135deg, rgba(40, 40, 60, 0.98), rgba(30, 30, 50, 0.98));
@@ -376,7 +381,6 @@
     .swal2-popup.stylish-modal .warning-text i {
         margin-right: 0.5rem;
     }
-    
 </style>
 
 <script>
@@ -386,6 +390,7 @@
     const prevBtn = document.getElementById("prevPage");
     const nextBtn = document.getElementById("nextPage");
     const paginationInfo = document.getElementById("paginationInfo");
+    const paginationContainer = document.getElementById("paginationContainer");
 
     let currentPage = 1;
     let rowsPerPage = parseInt(rowsPerPageSelect.value);
@@ -422,6 +427,13 @@
 
         prevBtn.disabled = currentPage === 1;
         nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+        // Sembunyikan seluruh pagination jika data kurang dari atau sama dengan rowsPerPage
+        if (totalRows <= rowsPerPage) {
+            paginationContainer.classList.add('pagination-hidden');
+        } else {
+            paginationContainer.classList.remove('pagination-hidden');
+        }
     }
 
     rowsPerPageSelect.addEventListener("change", () => {
