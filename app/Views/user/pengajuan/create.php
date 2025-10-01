@@ -1,54 +1,217 @@
 <?= $this->extend('layouts/user') ?>
 
 <?= $this->section('content') ?>
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h4>Form Pengajuan Kas</h4>
-            </div>
-            <div class="card-body">
-                <?php if (isset($validation)): ?>
-                    <div class="alert alert-danger"><?= $validation->listErrors() ?></div>
-                <?php endif; ?>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom border-secondary">
+        <h1 class="h3 mb-0 text-white">
+            <i class="bi bi-plus-circle me-2"></i> Form Pengajuan Kas
+        </h1>
+        <a href="<?= site_url('user/pengajuan') ?>" class="btn btn-sm btn-outline-light stylish-btn">
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Data Pengajuan
+        </a>
+    </div>
 
-                <form method="post" action="<?= site_url('user/pengajuan/store') ?>" enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label for="tipe" class="form-label">Tipe Pengajuan</label>
-                        <select class="form-select" id="tipe" name="tipe" required>
-                            <option value="uang_sendiri">Pakai Uang Sendiri (Reimburse)</option>
-                            <option value="minta_uang">Minta Uang ke Admin</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="nominal" class="form-label">Nominal (Rp)</label>
-                        <input type="number" class="form-control" id="nominal" name="nominal" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="keterangan" class="form-label">Keterangan</label>
-                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="deadline" class="form-label">Deadline (Opsional)</label>
-                        <input type="date" class="form-control" id="deadline" name="deadline">
-                    </div>
-
-                    <!-- Field Upload Nota (hanya tampil jika uang_sendiri) -->
-                    <div class="mb-3" id="uploadNotaField" style="display: none;">
-                        <label for="file_nota" class="form-label">Upload Nota/Struk</label>
-                        <input type="file" class="form-control" id="file_nota" name="file_nota" accept=".jpg,.jpeg,.png,.pdf">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Ajukan</button>
-                    <a href="<?= site_url('user/pengajuan') ?>" class="btn btn-secondary">Kembali</a>
-                </form>
-            </div>
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i> <?= session()->getFlashdata('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    <?php endif; ?>
+
+    <?php if (isset($validation)): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i> Terdapat kesalahan dalam pengisian form:
+            <ul class="mb-0 mt-1">
+                <?php foreach ($validation->getErrors() as $error): ?>
+                    <li><?= esc($error) ?></li>
+                <?php endforeach ?>
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
+    <!-- Form Card -->
+    <div class="dashboard-card p-4">
+        <form method="post" action="<?= site_url('user/pengajuan/store') ?>" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <div class="row g-3">
+                <!-- Tipe Pengajuan -->
+                <div class="col-md-6">
+                    <label for="tipe" class="form-label text-white">
+                        <i class="bi bi-tag me-1"></i> Tipe Pengajuan
+                    </label>
+                    <select class="form-select modern-input" id="tipe" name="tipe" required>
+                        <option value="uang_sendiri">Pakai Uang Sendiri (Reimburse)</option>
+                        <option value="minta_uang">Minta Uang ke Admin</option>
+                    </select>
+                    <div class="form-text text-light">Pilih jenis pengajuan yang sesuai dengan kebutuhan Anda</div>
+                </div>
+
+                <!-- Nominal Input -->
+                <div class="col-md-6">
+                    <label for="nominal" class="form-label text-white">
+                        <i class="bi bi-currency-dollar me-1"></i> Nominal (Rp)
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">Rp</span>
+                        <input type="text"
+                            class="form-control modern-input <?= (isset($validation) && $validation->hasError('nominal')) ? 'is-invalid' : '' ?>"
+                            id="nominal"
+                            name="nominal"
+                            placeholder="Masukkan nominal pengajuan"
+                            required>
+                        <div class="invalid-feedback">
+                            <?= isset($validation) ? $validation->getError('nominal') : 'Nominal harus diisi dengan angka yang valid' ?>
+                        </div>
+                    </div>
+                    <div class="form-text text-light">Masukkan nominal maksimal Rp 5.000.000.000</div>
+                </div>
+
+                <!-- Keterangan Input -->
+                <div class="col-12">
+                    <label for="keterangan" class="form-label text-white">
+                        <i class="bi bi-card-text me-1"></i> Keterangan
+                    </label>
+                    <textarea class="form-control modern-input <?= (isset($validation) && $validation->hasError('keterangan')) ? 'is-invalid' : '' ?>"
+                        id="keterangan"
+                        name="keterangan"
+                        rows="4"
+                        placeholder="Masukkan keterangan pengajuan (contoh: Pembelian alat tulis, Biaya transportasi, dll.)"
+                        required></textarea>
+                    <div class="invalid-feedback">
+                        <?= isset($validation) ? $validation->getError('keterangan') : 'Keterangan harus diisi' ?>
+                    </div>
+                    <div class="form-text text-light">Jelaskan secara detail alasan dan tujuan pengajuan kas</div>
+                </div>
+
+                <!-- Deadline Input -->
+                <div class="col-md-6">
+                    <label for="deadline" class="form-label text-white">
+                        <i class="bi bi-calendar me-1"></i> Deadline (Opsional)
+                    </label>
+                    <input type="date"
+                        class="form-control modern-input"
+                        id="deadline"
+                        name="deadline">
+                    <div class="form-text text-light">Tentukan batas waktu jika diperlukan</div>
+                </div>
+
+                <!-- Field Upload Nota (hanya tampil jika uang_sendiri) -->
+                <div class="col-md-6" id="uploadNotaField" style="display: none;">
+                    <label for="file_nota" class="form-label text-white">
+                        <i class="bi bi-paperclip me-1"></i> Upload Nota/Struk
+                    </label>
+                    <input type="file"
+                        class="form-control modern-input"
+                        id="file_nota"
+                        name="file_nota"
+                        accept=".jpg,.jpeg,.png,.pdf">
+                    <div class="form-text text-light">Format yang didukung: JPG, PNG, PDF (maks. 5MB)</div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="col-12 mt-4">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="<?= site_url('user/pengajuan') ?>" class="btn btn-outline-light stylish-btn">
+                            <i class="bi bi-x-circle me-1"></i> Batal
+                        </a>
+                        <button type="submit" class="btn btn-gradient-primary">
+                            <i class="bi bi-check-circle me-1"></i> Ajukan Kas
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
-<!-- Script untuk toggle field upload nota -->
+<!-- Styling tambahan -->
+<style>
+    .dashboard-card {
+        background: rgba(26, 26, 26, 0.9);
+        border-radius: 14px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modern-input {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        padding: 12px 16px;
+    }
+
+    .form-control.modern-input:focus,
+    .form-select.modern-input:focus {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-color: rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.8) !important;
+        color: #fff !important;
+    }
+
+    .modern-input::placeholder {
+        color: #bbb;
+        font-style: italic;
+    }
+
+    .btn-gradient-primary {
+        background: linear-gradient(45deg, #4361ee, #4cc9f0);
+        border: none;
+        border-radius: 10px;
+        color: #fff;
+        font-weight: 500;
+        padding: 10px 24px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-gradient-primary:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+    }
+
+    .stylish-btn {
+        border-radius: 10px;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .stylish-btn:hover {
+        background: #4361ee;
+        border-color: #4361ee;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+    }
+
+    .input-group-text {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: #fff !important;
+    }
+</style>
+
+<!-- Script Format Nominal -->
 <script>
+    const nominalInput = document.getElementById('nominal');
+    const form = document.querySelector('form');
+
+    // Format saat input
+    nominalInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        e.target.dataset.raw = value; // simpan angka murni
+        e.target.value = value ? new Intl.NumberFormat('id-ID').format(value) : '';
+    });
+
+    // Saat submit, kirim angka murni
+    form.addEventListener('submit', function() {
+        nominalInput.value = nominalInput.dataset.raw || '';
+    });
+
+    // Script untuk toggle field upload nota
     document.addEventListener('DOMContentLoaded', function() {
         const tipeSelect = document.getElementById('tipe');
         const uploadNotaField = document.getElementById('uploadNotaField');

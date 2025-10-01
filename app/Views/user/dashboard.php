@@ -93,7 +93,7 @@
                         <h4 class="text-white mb-0">
                             <?= $total_pengajuan > 0 ? round(($pengajuan_diterima / $total_pengajuan) * 100, 1) : 0 ?>%
                         </h4>
-                        <small class="text-muted">Diterima</small>
+                        <small class="text-light">Diterima</small>
                     </div>
                 </div>
             </div>
@@ -107,9 +107,9 @@
                     <!-- Kotak kiri atas -->
                     <div class="col-md-6">
                         <a href="<?= site_url('user/pengajuan') ?>"
-                            class="btn btn-info w-100 h-100 py-3 d-flex flex-column align-items-center justify-content-center stylish-btn">
-                            <i class="bi bi-list-ul display-5 mb-1"></i>
-                            <span class="text-center">Lihat Pengajuan Saya</span>
+                            class="btn btn-info text-light w-100 h-100 py-3 d-flex flex-column align-items-center justify-content-center stylish-btn">
+                            <i class="bi bi-list-ul  display-5 mb-1"></i>
+                            <span class="text-center">Lihat Pengajuan</span>
                         </a>
                     </div>
 
@@ -289,6 +289,49 @@
     .stylish-select:focus {
         border-color: rgba(255, 255, 255, 0.5);
         box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.2);
+    }
+
+    /* Supaya isi card tetap rapi */
+    .dashboard-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        word-wrap: break-word;
+        overflow: hidden;
+        /* cegah isi keluar */
+    }
+
+    /* Ikon di kiri dan teks di kanan biar tetap fleksibel */
+    .dashboard-card .d-flex {
+        flex-wrap: wrap;
+        /* biar kalau sempit, teks turun */
+    }
+
+    /* Batasi ukuran teks supaya tidak melebihi container */
+    .dashboard-card h3,
+    .dashboard-card h6,
+    .dashboard-card span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        /* teks panjang dipotong dengan "..." */
+    }
+
+    /* Kalau layar kecil, teks jangan dipotong, biar turun ke bawah */
+    @media (max-width: 576px) {
+        .dashboard-card {
+            padding: 1.2rem;
+            /* agak longgar di HP */
+        }
+
+        .dashboard-card h3 {
+            font-size: 1.4rem;
+            /* biar angka tidak terlalu besar */
+        }
+
+        .dashboard-card h6 {
+            font-size: 0.9rem;
+        }
     }
 </style>
 

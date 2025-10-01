@@ -121,7 +121,7 @@
             /* Content */
             .main-content {
                 margin-left: 260px;
-                padding: 80px 25px 25px 25px;
+                padding: 25px 25px 25px 25px;
                 min-height: 100vh;
                 background-color: #0f0f0f;
             }
