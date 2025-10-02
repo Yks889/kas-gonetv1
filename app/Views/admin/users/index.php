@@ -13,16 +13,17 @@
     </div>
 
     <?php if (session()->getFlashdata('success')): ?>
-        <div class="alert alert-success d-flex align-items-center" role="alert">
+        <div class="alert alert-success alert-dismissible fade show stylish-alert" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
-            <div><?= session()->getFlashdata('success') ?></div>
+            <?= session()->getFlashdata('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
 
     <!-- Table Controls -->
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="row mb-3 g-2">
         <!-- Rows per page -->
-        <div class="d-flex align-items-center">
+        <div class="col-md-3 d-flex align-items-center">
             <label class="text-white me-2">Tampilkan</label>
             <select id="rowsPerPage" class="form-select form-select-sm modern-select w-auto">
                 <option value="5">5</option>
@@ -34,9 +35,11 @@
         </div>
 
         <!-- Search -->
-        <div class="modern-search">
-            <i class="bi bi-search"></i>
-            <input type="text" id="searchInput" class="form-control form-control-sm text-light" placeholder="Cari berdasarkan username...">
+        <div class="col-md-9 d-flex align-items-center">
+            <div class="modern-search flex-grow-1 d-flex align-items-center text-light">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" class="form-control form-control-sm w-100 text-light" placeholder="Cari username...">
+            </div>
         </div>
     </div>
 
@@ -61,6 +64,9 @@
                                 <td><?= $no++ ?></td>
                                 <td class="text-start">
                                     <div class="d-flex align-items-center">
+                                        <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-person-fill text-white"></i>
+                                        </div>
                                         <div>
                                             <div class="fw-medium text-white"><?= esc($user['username']) ?></div>
                                         </div>
@@ -94,31 +100,6 @@
                                             data-bs-toggle="tooltip">
                                             <i class="bi bi-trash"></i>
                                         </button>
-                                        <!-- Modal Konfirmasi Hapus -->
-                                        <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content bg-dark text-white border-0 rounded-3 shadow-lg">
-                                                    <div class="modal-header border-0">
-                                                        <h5 class="modal-title text-danger">
-                                                            <i class="bi bi-exclamation-triangle-fill me-2"></i> Konfirmasi Hapus
-                                                        </h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <p>Apakah Anda yakin ingin menghapus user <strong id="deleteUsername"></strong>?</p>
-                                                    </div>
-                                                    <div class="modal-footer border-0">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                            <i class="bi bi-x-circle me-1"></i> Batal
-                                                        </button>
-                                                        <a href="#" id="confirmDeleteBtn" class="btn btn-danger">
-                                                            <i class="bi bi-trash me-1"></i> Hapus
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
                                     </div>
                                 </td>
                             </tr>
@@ -129,7 +110,7 @@
                                 <div class="py-4">
                                     <i class="bi bi-people display-1 text-light"></i>
                                     <h5 class="mt-3 text-light">Belum ada data user</h5>
-                                    <p class="text-light">Klik tombol "Tambah User" untuk menambahkan user baru</p>
+                                    <p class="text-muted">Klik tombol "Tambah User" untuk menambahkan user baru</p>
                                     <a href="<?= base_url('admin/users/create') ?>" class="btn btn-primary mt-2">
                                         <i class="bi bi-person-plus-fill me-1"></i> Tambah User Pertama
                                     </a>
@@ -143,7 +124,7 @@
     </div>
 
     <!-- Pagination -->
-    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" id="paginationContainer">
+    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
         <button id="prevPage" class="btn btn-sm btn-outline-light stylish-btn" disabled>
             <i class="bi bi-chevron-left"></i> Prev
         </button>
@@ -159,7 +140,7 @@
 <style>
     .dashboard-card {
         background: rgba(26, 26, 26, 0.9);
-        border-radius: 10px;
+        border-radius: 14px;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
         overflow: hidden;
     }
@@ -194,7 +175,7 @@
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.2);
         color: #fff;
-        border-radius: 8px;
+        border-radius: 12px;
         transition: 0.3s;
     }
 
@@ -222,7 +203,7 @@
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.2);
         color: #fff;
-        border-radius: 7px;
+        border-radius: 12px;
         transition: all 0.3s ease;
         width: 100%;
     }
@@ -240,7 +221,6 @@
 
     .btn-gradient-primary {
         background-color: #0d6efd;
-        /* Bootstrap Primary */
         border: 1px solid #0d6efd;
         border-radius: 8px;
         color: #fff;
@@ -251,7 +231,6 @@
 
     .btn-gradient-primary:hover {
         background-color: #0b5ed7;
-        /* lebih gelap saat hover */
         border-color: #0a58ca;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
@@ -260,11 +239,8 @@
     /* Ukuran tombol Tambah User lebih kecil */
     .btn-add-user {
         padding: 10px 17px;
-        /* lebih ramping */
         font-size: 0.9rem;
-        /* sedikit lebih kecil */
         border-radius: 10px;
-        /* sudut lebih rapih */
     }
 
     .stylish-btn {
@@ -308,9 +284,14 @@
         background: rgba(26, 26, 26, 0.5);
     }
 
-    /* Hide pagination when not needed */
-    .pagination-hidden {
-        display: none !important;
+    /* Alert Styling */
+    .stylish-alert {
+        border-radius: 12px;
+        font-weight: 500;
+        border: none;
+        background: rgba(40, 167, 69, 0.15);
+        color: #28a745;
+        border-left: 4px solid #28a745;
     }
 
     /* === SweetAlert2 Stylish Modal === */
@@ -318,10 +299,19 @@
         background: linear-gradient(135deg, rgba(40, 40, 60, 0.98), rgba(30, 30, 50, 0.98));
         border: 1px solid rgba(67, 97, 238, 0.3);
         border-radius: 16px;
-        padding: 1.5rem;
+        padding: 0;
         color: #fff;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
         backdrop-filter: blur(15px);
+        overflow: hidden;
+    }
+
+    /* Header Style */
+    .swal2-popup.stylish-modal .swal2-header {
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.2) 0%, rgba(67, 97, 238, 0.1) 100%);
+        border-bottom: 1px solid rgba(67, 97, 238, 0.3);
+        margin: 0;
+        padding: 1.5rem 1.5rem 1rem;
     }
 
     .swal2-popup.stylish-modal .modal-icon {
@@ -341,16 +331,25 @@
     }
 
     .swal2-popup.stylish-modal .swal2-title {
+        color: #fff;
         font-size: 1.3rem;
         font-weight: 600;
         margin: 0;
-        color: #fff;
     }
 
     .swal2-popup.stylish-modal .modal-subtitle {
         color: #aaa;
         font-size: 0.9rem;
-        margin: 0.25rem 0 0;
+        margin: 0.25rem 0 0 0;
+    }
+
+    /* Body Style */
+    .swal2-popup.stylish-modal .swal2-html-container {
+        margin: 0;
+        padding: 1.5rem;
+        color: #e0e0e0;
+        font-size: 1rem;
+        line-height: 1.5;
     }
 
     .swal2-popup.stylish-modal .info-highlight {
@@ -361,7 +360,6 @@
         margin: 1rem 0;
         display: flex;
         align-items: center;
-        color: #fff;
     }
 
     .swal2-popup.stylish-modal .info-highlight i {
@@ -381,6 +379,63 @@
     .swal2-popup.stylish-modal .warning-text i {
         margin-right: 0.5rem;
     }
+
+    /* Footer & Buttons */
+    .swal2-popup.stylish-modal .swal2-actions {
+        margin: 0;
+        padding: 1rem 1.5rem 1.5rem;
+        gap: 0.75rem;
+    }
+
+    .swal2-popup.stylish-modal .swal2-confirm {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        border: none;
+        border-radius: 10px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .swal2-popup.stylish-modal .swal2-confirm:hover {
+        background: linear-gradient(135deg, #ff5252, #e53935);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+    }
+
+    .swal2-popup.stylish-modal .swal2-cancel {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        border-radius: 10px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .swal2-popup.stylish-modal .swal2-cancel:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .swal2-popup.stylish-modal .modal-icon {
+        animation: pulseWarning 2s infinite;
+    }
+
+    /* Animasi khusus untuk modal hapus */
+    @keyframes pulseWarning {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
 </style>
 
 <script>
@@ -390,7 +445,6 @@
     const prevBtn = document.getElementById("prevPage");
     const nextBtn = document.getElementById("nextPage");
     const paginationInfo = document.getElementById("paginationInfo");
-    const paginationContainer = document.getElementById("paginationContainer");
 
     let currentPage = 1;
     let rowsPerPage = parseInt(rowsPerPageSelect.value);
@@ -427,13 +481,6 @@
 
         prevBtn.disabled = currentPage === 1;
         nextBtn.disabled = currentPage === totalPages || totalPages === 0;
-
-        // Sembunyikan seluruh pagination jika data kurang dari atau sama dengan rowsPerPage
-        if (totalRows <= rowsPerPage) {
-            paginationContainer.classList.add('pagination-hidden');
-        } else {
-            paginationContainer.classList.remove('pagination-hidden');
-        }
     }
 
     rowsPerPageSelect.addEventListener("change", () => {
@@ -465,62 +512,74 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         displayTable();
-    });
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const deleteButtons = document.querySelectorAll(".btn-delete-user");
-        const deleteModal = new bootstrap.Modal(document.getElementById("deleteUserModal"));
-        const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
-        const deleteUsername = document.getElementById("deleteUsername");
-
-        deleteButtons.forEach(btn => {
-            btn.addEventListener("click", function() {
-                const userId = this.dataset.id;
-                const username = this.dataset.username;
-
-                // Set tampilan username di modal
-                deleteUsername.textContent = username;
-
-                // Set link delete
-                confirmDeleteBtn.href = "<?= base_url('admin/users/delete/') ?>" + userId;
-
-                // Tampilkan modal
-                deleteModal.show();
-            });
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     });
 
     function confirmDelete(id, username) {
         Swal.fire({
-            customClass: {
-                popup: 'stylish-modal'
-            },
             html: `
-                <div class="d-flex align-items-center mb-3">
-                    <div class="modal-icon">
-                        <i class="bi bi-exclamation-triangle-fill"></i>
+                <div class="swal2-custom">
+                    <div class="d-flex align-items-center">
+                        <div class="modal-icon me-3">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        </div>
+                        <div>
+                            <div class="swal2-title">Konfirmasi Hapus</div>
+                            <div class="modal-subtitle">Aksi ini tidak bisa dibatalkan</div>
+                        </div>
                     </div>
-                    <div>
-                        <h5 class="swal2-title">Konfirmasi Hapus</h5>
-                        <p class="modal-subtitle">Aksi ini tidak bisa dibatalkan</p>
+
+                    <div class="swal2-html-container mt-3">
+                        <p>Apakah Anda yakin ingin menghapus user berikut:</p>
+                        <div class="info-highlight">
+                            <i class="bi bi-person-fill"></i>
+                            <span class="fw-bold">${username}</span>
+                        </div>
+                        <div class="warning-text">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <span>User akan dihapus secara permanen!</span>
+                        </div>
                     </div>
-                </div>
-                <div class="info-highlight">
-                    <i class="bi bi-person-fill"></i>
-                    <span>Anda akan menghapus user <b>${username}</b></span>
-                </div>
-                <div class="warning-text">
-                    <i class="bi bi-exclamation-circle"></i> User akan dihapus secara permanen!
                 </div>
             `,
             showCancelButton: true,
-            confirmButtonText: '<i class="bi bi-trash me-1"></i> Hapus',
-            cancelButtonText: '<i class="bi bi-x-circle me-1"></i> Batal',
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            buttonsStyling: true
+            focusConfirm: false,
+            confirmButtonText: '<i class="bi bi-check-lg me-1"></i> Ya, Hapus',
+            cancelButtonText: '<i class="bi bi-x-lg me-1"></i> Batal',
+            customClass: {
+                popup: 'stylish-modal',
+                header: 'd-none',
+                title: 'swal2-title',
+                htmlContainer: 'swal2-html-container',
+                confirmButton: 'swal2-confirm',
+                cancelButton: 'swal2-cancel'
+            },
+            buttonsStyling: false,
+            showClass: {
+                popup: 'swal2-noanimation',
+                backdrop: 'swal2-noanimation'
+            },
+            hideClass: {
+                popup: '',
+                backdrop: ''
+            }
         }).then((result) => {
             if (result.isConfirmed) {
+                // Tampilkan loading sebelum redirect
+                Swal.fire({
+                    title: 'Menghapus...',
+                    text: 'User sedang dihapus',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading()
+                    }
+                });
+
                 window.location.href = "<?= base_url('admin/users/delete/') ?>" + id;
             }
         });
