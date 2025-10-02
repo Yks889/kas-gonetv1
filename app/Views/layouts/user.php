@@ -320,6 +320,34 @@
                 transform: translateX(2px);
             }
 
+            .logout-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.logout-btn::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: var(--secondary-color);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+    border-radius: 0 4px 4px 0;
+}
+
+.logout-btn:hover::before {
+    transform: scaleY(1);
+}
+
+.logout-btn:hover i {
+    color: var(--secondary-color);
+    transform: scale(1.1);
+}
+
+
             /* Dashboard Card Styles */
             .dashboard-card {
                 background: var(--gradient-card);

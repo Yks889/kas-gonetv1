@@ -35,7 +35,8 @@
         <div class="col-md-9">
             <div class="modern-search">
                 <i class="bi bi-search"></i>
-                <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Cari user, keterangan, atau status...">
+                <input type="text" id="searchInput" class="form-control form-control-sm"
+                    placeholder="Cari user, keterangan, atau status...">
             </div>
         </div>
     </div>
@@ -71,11 +72,11 @@
                                     <?php
                                     $status = strtolower($row['status'] ?? '');
                                     $badgeClass = match ($status) {
-                                        'pending'  => 'secondary',
+                                        'pending' => 'secondary',
                                         'diterima' => 'success',
-                                        'ditolak'  => 'danger',
-                                        'selesai'  => 'warning text-dark',
-                                        default    => 'secondary'
+                                        'ditolak' => 'danger',
+                                        'selesai' => 'warning text-dark',
+                                        default => 'secondary'
                                     };
                                     ?>
                                     <span class="badge rounded-pill bg-<?= $badgeClass ?>">
@@ -112,7 +113,7 @@
     </div>
 
     <!-- Pagination -->
-    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" id="paginationContainer">
         <button id="prevPage" class="btn btn-sm btn-outline-light stylish-btn" disabled>
             <i class="bi bi-chevron-left"></i> Prev
         </button>
@@ -213,6 +214,11 @@
     .stylish-alert {
         border-radius: 12px;
         font-weight: 500;
+    }
+
+    /* Hide pagination when not needed */
+    .pagination-hidden {
+        display: none !important;
     }
 
     /* === SweetAlert2 Stylish Modal - Diperbarui === */
@@ -367,6 +373,7 @@
     const prevBtn = document.getElementById("prevPage");
     const nextBtn = document.getElementById("nextPage");
     const searchInput = document.getElementById("searchInput");
+    const paginationContainer = document.getElementById("paginationContainer");
 
     let currentPage = 1;
     let rowsPerPage = parseInt(rowsPerPageSelect.value);
@@ -406,22 +413,34 @@
 
         prevBtn.disabled = currentPage === 1;
         nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+        // Sembunyikan seluruh pagination jika data kurang dari atau sama dengan rowsPerPage
+        if (totalRows <= rowsPerPage) {
+            paginationContainer.classList.add('pagination-hidden');
+        } else {
+            paginationContainer.classList.remove('pagination-hidden');
+        }
     }
 
-    rowsPerPageSelect.addEventListener("change", function() {
-        rowsPerPage = parseInt(this.value);
+    rowsPerPageSelect.addEventListener("change", () => {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
         currentPage = 1;
         displayTable();
     });
 
-    prevBtn.addEventListener("click", function() {
+    searchInput.addEventListener("input", () => {
+        currentPage = 1;
+        displayTable();
+    });
+
+    prevBtn.addEventListener("click", () => {
         if (currentPage > 1) {
             currentPage--;
             displayTable();
         }
     });
 
-    nextBtn.addEventListener("click", function() {
+    nextBtn.addEventListener("click", () => {
         const totalPages = Math.ceil(filterRows().length / rowsPerPage);
         if (currentPage < totalPages) {
             currentPage++;
@@ -429,12 +448,7 @@
         }
     });
 
-    searchInput.addEventListener("keyup", function() {
-        currentPage = 1;
-        displayTable();
-    });
-
-    displayTable();
+    document.addEventListener('DOMContentLoaded', displayTable);
 
     function confirmDelete(id, keterangan) {
         Swal.fire({

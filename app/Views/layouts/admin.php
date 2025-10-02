@@ -313,6 +313,33 @@
                 transform: translateX(2px);
             }
 
+             .logout-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.logout-btn::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: var(--secondary-color);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+    border-radius: 0 4px 4px 0;
+}
+
+.logout-btn:hover::before {
+    transform: scaleY(1);
+}
+
+.logout-btn:hover i {
+    color: var(--secondary-color);
+    transform: scale(1.1);
+}
+
             /* Responsive Design */
             @media (max-width: 768px) {
                 .sidebar {
@@ -439,15 +466,15 @@
                         <span>Aktivitas User</span>
                     </a>
                 </li>
-                <li>
-                    <div class="sidebar-divider"></div>
-                </li>
-                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'informasi_kas' ? 'active' : '' ?>"
-                        href="<?= site_url('admin/informasi_kas') ?>">
-                        <i class="bi bi-cash-coin"></i>
-                        <span>Informasi Kas</span>
-                    </a>
-                </li>
+                <li><a class="nav-link <?= service('uri')->getSegment(2) === 'informasi_kas' ? 'active' : '' ?>"
+                href="<?= site_url('admin/informasi_kas') ?>">
+                <i class="bi bi-graph-up"></i>
+                <span>Laporan Kas</span>
+            </a>
+        </li>
+        <li>
+            <div class="sidebar-divider"></div>
+        </li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'kas_masuk' ? 'active' : '' ?>"
                         href="<?= site_url('admin/kas_masuk') ?>">
                         <i class="bi bi-cash-coin"></i>
