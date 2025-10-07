@@ -82,10 +82,10 @@
             }
 
             .sidebar-divider {
-                height: 1px;
-                background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+                height: 2px;
+                background: linear-gradient(50deg, transparent, var(--border-color), transparent);
                 margin: 15px 25px;
-                opacity: 0.6;
+                opacity: 1;
             }
 
             .sidebar .nav-link {
@@ -212,7 +212,6 @@
                 height: 45px;
                 border-radius: 50%;
                 object-fit: cover;
-                border: 2px solid var(--primary-color);
                 box-shadow: var(--shadow-glow);
                 transition: all 0.3s ease;
                 flex-shrink: 0;
@@ -313,32 +312,117 @@
                 transform: translateX(2px);
             }
 
-             .logout-btn {
-    position: relative;
-    overflow: hidden;
-}
+            .logout-btn {
+                position: relative;
+                overflow: hidden;
+            }
 
-.logout-btn::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 4px;
-    background: var(--secondary-color);
-    transform: scaleY(0);
-    transition: transform 0.3s ease;
-    border-radius: 0 4px 4px 0;
-}
+            .logout-btn::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 4px;
+                background: var(--secondary-color);
+                transform: scaleY(0);
+                transition: transform 0.3s ease;
+                border-radius: 0 4px 4px 0;
+            }
 
-.logout-btn:hover::before {
-    transform: scaleY(1);
-}
+            .logout-btn:hover::before {
+                transform: scaleY(1);
+            }
 
-.logout-btn:hover i {
-    color: var(--secondary-color);
-    transform: scale(1.1);
-}
+            .logout-btn:hover i {
+                color: var(--secondary-color);
+                transform: scale(1.1);
+            }
+
+            /* Floating Button untuk Kembali ke Dashboard - DIKANAN BAWAH */
+            .floating-btn {
+                position: fixed;
+                right: 25px;
+                bottom: 25px;
+                width: 60px;
+                height: 60px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 1.5rem;
+                box-shadow: var(--shadow-medium);
+                cursor: pointer;
+                z-index: 1000;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                border: none;
+                overflow: hidden;
+            }
+
+            .floating-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, #4cc9f0, #4361ee);
+                border-radius: 50%;
+                z-index: -1;
+                transition: opacity 0.3s ease;
+            }
+
+            .floating-btn:hover {
+                transform: translateY(-5px) scale(1.05);
+                box-shadow: var(--shadow-glow);
+            }
+
+            .floating-btn:active {
+                transform: translateY(-2px) scale(0.98);
+            }
+
+            .floating-btn i {
+                transition: transform 0.3s ease;
+            }
+
+            .floating-btn:hover i {
+                transform: scale(1.1);
+            }
+
+            /* Tooltip untuk floating button */
+            .floating-btn::after {
+                content: 'Kembali ke Dashboard';
+                position: absolute;
+                right: 70px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: var(--bg-card);
+                color: var(--text-primary);
+                padding: 8px 12px;
+                border-radius: 8px;
+                font-size: 0.8rem;
+                white-space: nowrap;
+                opacity: 0;
+                pointer-events: none;
+                transition: all 0.3s ease;
+                border: 1px solid var(--border-color);
+                box-shadow: var(--shadow-medium);
+            }
+
+            .floating-btn:hover::after {
+                opacity: 1;
+                right: 75px;
+            }
+
+            /* Class untuk menyembunyikan floating button di dashboard */
+            .floating-btn.hidden {
+                opacity: 0;
+                visibility: hidden;
+                transform: scale(0.8);
+                pointer-events: none;
+            }
 
             /* Responsive Design */
             @media (max-width: 768px) {
@@ -375,6 +459,25 @@
                     font-size: 1.2rem;
                     cursor: pointer;
                     box-shadow: var(--shadow-medium);
+                }
+
+                /* Responsive adjustments untuk floating button */
+                .floating-btn {
+                    right: 20px;
+                    bottom: 20px;
+                    width: 55px;
+                    height: 55px;
+                    font-size: 1.3rem;
+                }
+
+                /* Sembunyikan tooltip di mobile */
+                .floating-btn::after {
+                    display: none;
+                }
+
+                /* Animasi untuk hidden state di mobile */
+                .floating-btn.hidden {
+                    transform: scale(0.7);
                 }
             }
 
@@ -467,14 +570,14 @@
                     </a>
                 </li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'informasi_kas' ? 'active' : '' ?>"
-                href="<?= site_url('admin/informasi_kas') ?>">
-                <i class="bi bi-graph-up"></i>
-                <span>Laporan Kas</span>
-            </a>
-        </li>
-        <li>
-            <div class="sidebar-divider"></div>
-        </li>
+                        href="<?= site_url('admin/informasi_kas') ?>">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Laporan Kas</span>
+                    </a>
+                </li>
+                <li>
+                    <div class="sidebar-divider"></div>
+                </li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'kas_masuk' ? 'active' : '' ?>"
                         href="<?= site_url('admin/kas_masuk') ?>">
                         <i class="bi bi-cash-coin"></i>
@@ -539,6 +642,13 @@
             <?= $this->renderSection('content') ?>
         </main>
 
+        <!-- Floating Button untuk kembali ke Dashboard -->
+        <!-- Button akan disembunyikan jika berada di halaman dashboard -->
+        <button class="floating-btn <?= service('uri')->getSegment(2) === 'dashboard' ? 'hidden' : '' ?>"
+            id="floatingDashboardBtn" title="Kembali ke Dashboard">
+            <i class="bi bi-house-door"></i>
+        </button>
+
         <!-- Scripts -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -547,6 +657,24 @@
                 const sidebar = document.getElementById('sidebar');
                 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
                 const sidebarOverlay = document.getElementById('sidebarOverlay');
+                const floatingDashboardBtn = document.getElementById('floatingDashboardBtn');
+
+                // Cek apakah sedang di halaman dashboard
+                function isDashboardPage() {
+                    const currentPath = window.location.pathname;
+                    return currentPath.includes('/admin/dashboard') ||
+                        currentPath.endsWith('/admin') ||
+                        currentPath.endsWith('/admin/');
+                }
+
+                // Update visibility floating button berdasarkan halaman
+                function updateFloatingButtonVisibility() {
+                    if (isDashboardPage()) {
+                        floatingDashboardBtn.classList.add('hidden');
+                    } else {
+                        floatingDashboardBtn.classList.remove('hidden');
+                    }
+                }
 
                 // Mobile menu toggle
                 function toggleMobileMenu() {
@@ -557,6 +685,13 @@
 
                 mobileMenuBtn.addEventListener('click', toggleMobileMenu);
                 sidebarOverlay.addEventListener('click', toggleMobileMenu);
+
+                // Floating button functionality
+                floatingDashboardBtn.addEventListener('click', function () {
+                    if (!isDashboardPage()) {
+                        window.location.href = "<?= site_url('admin/dashboard') ?>";
+                    }
+                });
 
                 // Close sidebar when clicking on nav links in mobile
                 const navLinks = document.querySelectorAll('.sidebar .nav-link');
@@ -597,6 +732,12 @@
                         document.body.style.overflow = '';
                     }
                 });
+
+                // Update visibility saat pertama kali load
+                updateFloatingButtonVisibility();
+
+                // Update visibility saat navigasi (untuk SPA-like behavior)
+                window.addEventListener('popstate', updateFloatingButtonVisibility);
             });
         </script>
     </body>

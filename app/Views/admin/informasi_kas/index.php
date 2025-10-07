@@ -8,16 +8,17 @@
             <h1 class="h3 mb-1 text-white">
                 <i class="bi bi-graph-up me-2"></i> Laporan Kas
             </h1>
+            <p class="text-muted mb-0">Monitor keuangan dan status pengajuan secara real-time</p>
         </div>
 
-        <!-- Filter Bulan -->
+        <!-- Filter Bulan - Hanya untuk Status Pengajuan -->
         <form method="get" action="<?= site_url('admin/informasi-kas') ?>" class="d-inline-flex align-items-center">
             <div class="filter-card d-flex align-items-center">
-                <span class="text-light me-2 small"><i class="bi bi-calendar3 me-1"></i> Filter:</span>
+                <span class="text-light me-2 small"><i class="bi bi-calendar3 me-1"></i> Filter Status Pengajuan:</span>
                 <select name="bulan"
                     class="form-select form-select-sm bg-dark text-light border-secondary stylish-select me-2"
                     style="width: auto;">
-                    <option value="">-- Pilih Bulan --</option>
+                    <option value="">-- Semua Bulan --</option>
                     <?php foreach ($bulanLabels as $i => $label): ?>
                         <option value="<?= $i + 1 ?>" <?= (isset($_GET['bulan']) && $_GET['bulan'] == $i + 1) ? 'selected' : '' ?>>
                             <?= $label ?>
@@ -27,33 +28,215 @@
                 <button type="submit" class="btn btn-sm btn-outline-light stylish-btn">
                     <i class="bi bi-funnel me-1"></i> Terapkan
                 </button>
+                <?php if (isset($_GET['bulan']) && $_GET['bulan'] != ''): ?>
+                    <a href="<?= site_url('admin/informasi-kas') ?>" class="btn btn-sm btn-outline-secondary ms-2">
+                        <i class="bi bi-x-circle me-1"></i> Reset
+                    </a>
+                <?php endif; ?>
             </div>
         </form>
     </div>
 
     <!-- Diagram Utama -->
     <div class="row">
-        <!-- Diagram Batang - Statistik Bulanan -->
+        <!-- Statistik Bulanan (TETAP data keseluruhan) -->
         <div class="col-lg-8 mb-4">
             <div class="dashboard-card h-100 p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="text-steam-blue mb-0">Statistik Bulanan</h5>
+                <!-- Header dengan Summary -->
+                <div class="row mb-4">
+                    <div class="col">
+                        <h5 class="text-steam-blue mb-2">Statistik Bulanan
+                        </h5>
+                        <div class="summary-stats d-flex gap-4">
+                            <div class="stat-item">
+                                <div class="text-white small">Total Kas Masuk</div>
+                                <div class="text-success fw-bold h6 mb-0">
+                                    Rp <?= number_format(array_sum($masukData), 0, ',', '.') ?>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="text-white small">Total Kas Keluar</div>
+                                <div class="text-danger fw-bold h6 mb-0">
+                                    Rp <?= number_format(array_sum($keluarData), 0, ',', '.') ?>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="text-white small">Saldo Bersih</div>
+                                <div class="text-white fw-bold h6 mb-0">
+                                    Rp <?= number_format(array_sum($masukData) - array_sum($keluarData), 0, ',', '.') ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="chart-container" style="height: 400px;">
+
+                <!-- Chart Legend -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="chart-legend d-flex gap-4">
+                        <div class="legend-item d-flex align-items-center">
+                            <div class="legend-color me-2"
+                                style="width: 16px; height: 16px; background: linear-gradient(135deg, #66c0f4, #4a9fd5); border-radius: 4px;">
+                            </div>
+                            <small class="text-light">Kas Masuk</small>
+                        </div>
+                        <div class="legend-item d-flex align-items-center">
+                            <div class="legend-color me-2"
+                                style="width: 16px; height: 16px; background: linear-gradient(135deg, #ef5350, #d32f2f); border-radius: 4px;">
+                            </div>
+                            <small class="text-light">Kas Keluar</small>
+                        </div>
+                    </div>
+                    <div class="chart-actions">
+                        <small class="text-white">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Data dalam Rupiah (Keseluruhan Tahun)
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="chart-container" style="height: 350px;">
                     <canvas id="monthlyChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Diagram Lingkaran - Status Pengajuan -->
+        <!-- Status Pengajuan (MENGIKUTI FILTER BULAN) -->
         <div class="col-lg-4 mb-4">
             <div class="dashboard-card h-100 p-4">
-                <h5 class="text-steam-blue mb-3">Status Pengajuan</h5>
-                <div class="d-flex justify-content-center align-items-center position-relative" style="height: 300px;">
-                    <canvas id="earningChart"></canvas>
-                    <div id="earningCenterText" class="position-absolute text-center">
-                        <h2 class="text-white mb-0"><?= $persentase_pengajuan ?>%</h2>
-                        <small class="text-muted">Selesai</small>
+                <!-- Header dengan Overview -->
+                <div class="row mb-4">
+                    <div class="col">
+                        <h5 class="text-steam-blue mb-2">Status Pengajuan
+                            <?php if (isset($_GET['bulan']) && $_GET['bulan'] != ''): ?>
+                                <span class="badge bg-primary ms-2">Bulan:
+                                    <?= $bulanLabels[$_GET['bulan'] - 1] ?? 'Tidak Diketahui' ?></span>
+                            <?php else: ?>
+                                <span class="badge bg-secondary ms-2">Semua Bulan</span>
+                            <?php endif; ?>
+                        </h5>
+                        <div class="overview-stats">
+                            <div class="text-muted small mb-1">
+                                <?php if (isset($_GET['bulan']) && $_GET['bulan'] != ''): ?>
+                                    Ringkasan Bulan <?= $bulanLabels[$_GET['bulan'] - 1] ?? 'Tidak Diketahui' ?>
+                                <?php else: ?>
+                                    Ringkasan Keseluruhan
+                                <?php endif; ?>
+                            </div>
+                            <div class="text-white fw-bold h6 mb-0">
+                                <?= (int) ($pengajuan_selesai + $pengajuan_pending + $pengajuan_ditolak) ?> Total
+                                Pengajuan
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Diagram Donat -->
+                <div class="modern-donut-container position-relative mb-4">
+                    <div class="d-flex justify-content-center align-items-center position-relative"
+                        style="height: 200px;">
+                        <canvas id="earningChart"></canvas>
+                        <div id="earningCenterText" class="position-absolute text-center">
+                            <div class="percentage-display">
+                                <h2 class="text-white mb-0 fw-bold"><?= $persentase_pengajuan ?>%</h2>
+                                <small class="text-muted">Selesai</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Status -->
+                <div class="status-details">
+                    <div class="status-header d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-light fw-semibold">Detail Status</span>
+                        <span class="text-muted small">Persentase</span>
+                    </div>
+
+                    <div class="status-item modern-status-item d-flex justify-content-between align-items-center mb-3 p-3 rounded-3"
+                        data-status="selesai">
+                        <div class="d-flex align-items-center">
+                            <div class="status-icon me-3">
+                                <i class="bi bi-check-circle-fill" style="color: #66c0f4;"></i>
+                            </div>
+                            <div>
+                                <div class="text-light fw-semibold">Selesai</div>
+                                <small class="text-muted">Disetujui</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold h6 mb-1"><?= (int) $pengajuan_selesai ?></div>
+                            <div class="progress mini-progress" style="width: 80px; height: 4px;">
+                                <div class="progress-bar"
+                                    style="background-color: #66c0f4; width: <?= $persentase_pengajuan ?>%"></div>
+                            </div>
+                            <small class="text-muted"><?= $persentase_pengajuan ?>%</small>
+                        </div>
+                    </div>
+
+                    <div class="status-item modern-status-item d-flex justify-content-between align-items-center mb-3 p-3 rounded-3"
+                        data-status="pending">
+                        <div class="d-flex align-items-center">
+                            <div class="status-icon me-3">
+                                <i class="bi bi-clock-fill" style="color: #ffc107;"></i>
+                            </div>
+                            <div>
+                                <div class="text-light fw-semibold">Pending</div>
+                                <small class="text-muted">Menunggu</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold h6 mb-1"><?= (int) $pengajuan_pending ?></div>
+                            <?php $persentase_pending = ($pengajuan_selesai + $pengajuan_pending + $pengajuan_ditolak) > 0 ? ($pengajuan_pending / ($pengajuan_selesai + $pengajuan_pending + $pengajuan_ditolak)) * 100 : 0; ?>
+                            <div class="progress mini-progress" style="width: 80px; height: 4px;">
+                                <div class="progress-bar"
+                                    style="background-color: #ffc107; width: <?= $persentase_pending ?>%"></div>
+                            </div>
+                            <small class="text-muted"><?= number_format($persentase_pending, 1) ?>%</small>
+                        </div>
+                    </div>
+
+                    <div class="status-item modern-status-item d-flex justify-content-between align-items-center mb-3 p-3 rounded-3"
+                        data-status="ditolak">
+                        <div class="d-flex align-items-center">
+                            <div class="status-icon me-3">
+                                <i class="bi bi-x-circle-fill" style="color: #ef5350;"></i>
+                            </div>
+                            <div>
+                                <div class="text-light fw-semibold">Ditolak</div>
+                                <small class="text-muted">Tidak disetujui</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-white fw-bold h6 mb-1"><?= (int) $pengajuan_ditolak ?></div>
+                            <?php $persentase_ditolak = ($pengajuan_selesai + $pengajuan_pending + $pengajuan_ditolak) > 0 ? ($pengajuan_ditolak / ($pengajuan_selesai + $pengajuan_pending + $pengajuan_ditolak)) * 100 : 0; ?>
+                            <div class="progress mini-progress" style="width: 80px; height: 4px;">
+                                <div class="progress-bar"
+                                    style="background-color: #ef5350; width: <?= $persentase_ditolak ?>%"></div>
+                            </div>
+                            <small class="text-muted"><?= number_format($persentase_ditolak, 1) ?>%</small>
+                        </div>
+                    </div>
+
+                    <!-- Summary Footer -->
+                    <div class="status-summary mt-4 pt-3 border-top border-secondary">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="text-success fw-bold h5 mb-1"><?= $persentase_pengajuan ?>%</div>
+                                <small class="text-muted">Rate</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-warning fw-bold h5 mb-1">
+                                    <?= number_format($persentase_pending, 1) ?>%
+                                </div>
+                                <small class="text-muted">Pending</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-danger fw-bold h5 mb-1">
+                                    <?= number_format($persentase_ditolak, 1) ?>%
+                                </div>
+                                <small class="text-muted">Rejection</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -65,277 +248,351 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const monthLabels = <?= json_encode($bulanLabels) ?>;
-    const monthlyData = {
-        labels: monthLabels,
-        datasets: [{
-            label: 'Kas Masuk',
-            data: <?= json_encode($masukData) ?>,
-            backgroundColor: 'rgba(102, 192, 244, 0.8)',
-            borderColor: 'rgba(102, 192, 244, 1)',
-            borderWidth: 2,
-            borderRadius: 6,
-            fill: true,
-            tension: 0.4
-        },
-        {
-            label: 'Kas Keluar',
-            data: <?= json_encode($keluarData) ?>,
-            backgroundColor: 'rgba(239, 83, 80, 0.8)',
-            borderColor: 'rgba(239, 83, 80, 1)',
-            borderWidth: 2,
-            borderRadius: 6,
-            fill: true,
-            tension: 0.4
-        }
-        ]
-    };
 
+    // Modern Bar Chart untuk Statistik Bulanan (TETAP data keseluruhan)
     new Chart(document.getElementById('monthlyChart'), {
         type: 'bar',
-        data: monthlyData,
+        data: {
+            labels: monthLabels,
+            datasets: [{
+                label: 'Kas Masuk',
+                data: <?= json_encode($masukData) ?>,
+                backgroundColor: (context) => {
+                    const chart = context.chart;
+                    const { ctx, chartArea } = chart;
+                    if (!chartArea) return null;
+
+                    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                    gradient.addColorStop(0, 'rgba(102, 192, 244, 0.7)');
+                    gradient.addColorStop(0.7, 'rgba(102, 192, 244, 0.9)');
+                    gradient.addColorStop(1, 'rgba(74, 159, 213, 1)');
+                    return gradient;
+                },
+                borderColor: 'rgba(102, 192, 244, 1)',
+                borderWidth: 0,
+                borderRadius: 6,
+                borderSkipped: false,
+                barPercentage: 0.6,
+                categoryPercentage: 0.7
+            },
+            {
+                label: 'Kas Keluar',
+                data: <?= json_encode($keluarData) ?>,
+                backgroundColor: (context) => {
+                    const chart = context.chart;
+                    const { ctx, chartArea } = chart;
+                    if (!chartArea) return null;
+
+                    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                    gradient.addColorStop(0, 'rgba(239, 83, 80, 0.7)');
+                    gradient.addColorStop(0.7, 'rgba(239, 83, 80, 0.9)');
+                    gradient.addColorStop(1, 'rgba(211, 47, 47, 1)');
+                    return gradient;
+                },
+                borderColor: 'rgba(239, 83, 80, 1)',
+                borderWidth: 0,
+                borderRadius: 6,
+                borderSkipped: false,
+                barPercentage: 0.6,
+                categoryPercentage: 0.7
+            }]
+        },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
             plugins: {
                 legend: {
-                    position: 'top',
-                    labels: {
-                        color: '#c7d5e0'
-                    }
+                    display: false
                 },
-                title: {
-                    display: true,
-                    text: 'Statistik Kas Bulanan',
-                    color: '#c7d5e0'
+                tooltip: {
+                    backgroundColor: 'rgba(26, 26, 26, 0.95)',
+                    titleColor: '#c7d5e0',
+                    bodyColor: '#c7d5e0',
+                    borderColor: 'rgba(102, 192, 244, 0.4)',
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: true,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.dataset.label}: Rp ${context.parsed.y.toLocaleString('id-ID')}`;
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
                     grid: {
-                        color: 'rgba(199,213,224,0.1)'
+                        color: 'rgba(199,213,224,0.1)',
+                        drawBorder: false
                     },
                     ticks: {
-                        color: '#c7d5e0'
+                        color: '#8f98a0',
+                        padding: 8,
+                        callback: function (value) {
+                            return 'Rp ' + value.toLocaleString('id-ID');
+                        }
+                    },
+                    border: {
+                        display: false
                     }
                 },
                 x: {
                     grid: {
-                        color: 'rgba(199,213,224,0.1)'
+                        color: 'rgba(199,213,224,0.05)',
+                        drawBorder: false
                     },
                     ticks: {
-                        color: '#c7d5e0'
+                        color: '#8f98a0',
+                        padding: 8
+                    },
+                    border: {
+                        display: false
                     }
                 }
+            },
+            animation: {
+                duration: 1500,
+                easing: 'easeOutQuart'
             }
         }
     });
 
-    const pengajuanData = {
-        labels: ['Selesai', 'Pending', 'Ditolak'],
-        datasets: [{
-            data: [
-                <?= (int) ($pengajuan_selesai) ?>,
-                <?= (int) $pengajuan_pending ?>,
-                <?= (int) $pengajuan_ditolak ?>
-            ],
-            backgroundColor: [
-                'rgba(102, 192, 244, 0.8)',
-                'rgba(255, 193, 7, 0.8)',
-                'rgba(239, 83, 80, 0.8)'
-            ],
-            borderColor: [
-                'rgba(102, 192, 244, 1)',
-                'rgba(255, 193, 7, 1)',
-                'rgba(239, 83, 80, 1)'
-            ],
-            borderWidth: 2,
-            hoverOffset: 10
-        }]
-    };
-
+    // Modern Doughnut Chart untuk Status Pengajuan (MENGIKUTI FILTER)
     new Chart(document.getElementById('earningChart'), {
         type: 'doughnut',
-        data: pengajuanData,
+        data: {
+            labels: ['Selesai', 'Pending', 'Ditolak'],
+            datasets: [{
+                data: [
+                    <?= (int) ($pengajuan_selesai) ?>,
+                    <?= (int) $pengajuan_pending ?>,
+                    <?= (int) $pengajuan_ditolak ?>
+                ],
+                backgroundColor: [
+                    'rgba(102, 192, 244, 0.9)',
+                    'rgba(255, 193, 7, 0.9)',
+                    'rgba(239, 83, 80, 0.9)'
+                ],
+                borderColor: [
+                    'rgba(102, 192, 244, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(239, 83, 80, 1)'
+                ],
+                borderWidth: 2,
+                borderRadius: [8, 8, 8],
+                spacing: 2,
+                hoverOffset: 10
+            }]
+        },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             cutout: '70%',
             plugins: {
                 legend: {
-                    position: 'bottom',
-                    labels: {
-                        color: '#c7d5e0',
-                        padding: 15
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(26, 26, 26, 0.9)',
+                    titleColor: '#c7d5e0',
+                    bodyColor: '#c7d5e0',
+                    borderColor: 'rgba(102, 192, 244, 0.3)',
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: true,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function (context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return `${context.label}: ${context.parsed} (${percentage}%)`;
+                        }
                     }
                 }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 1200,
+                easing: 'easeOutQuart'
             }
         }
+    });
+
+    // Interaktivitas pada status items
+    document.querySelectorAll('.modern-status-item').forEach(item => {
+        item.addEventListener('mouseenter', function () {
+            const status = this.getAttribute('data-status');
+            const chart = Chart.getChart('earningChart');
+            if (chart) {
+                const dataIndex = ['selesai', 'pending', 'ditolak'].indexOf(status);
+                chart.setActiveElements([{ datasetIndex: 0, index: dataIndex }]);
+                chart.update();
+            }
+        });
+
+        item.addEventListener('mouseleave', function () {
+            const chart = Chart.getChart('earningChart');
+            if (chart) {
+                chart.setActiveElements([]);
+                chart.update();
+            }
+        });
     });
 </script>
 
 <style>
-    .bg-steam-dark {
-        background-color: rgba(42, 71, 94, 0.5);
+    /* Improved Layout Styles */
+    .summary-stats {
+        border-left: 2px solid rgba(102, 192, 244, 0.3);
+        padding-left: 1rem;
     }
 
-    .border-steam {
-        border-color: rgba(102, 192, 244, 0.2) !important;
+    .stat-item {
+        padding: 0.5rem 0;
     }
 
-    .btn-outline-steam {
-        color: #66c0f4;
-        border-color: rgba(102, 192, 244, 0.3);
+    .stat-item:not(:last-child) {
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        padding-right: 1rem;
     }
 
-    .btn-outline-steam:hover,
-    .btn-outline-steam.active {
-        background-color: rgba(102, 192, 244, 0.15);
-        color: white;
-        border-color: rgba(102, 192, 244, 0.5);
+    .overview-stats {
+        background: rgba(102, 192, 244, 0.1);
+        padding: 0.75rem;
+        border-radius: 8px;
+        border-left: 3px solid #66c0f4;
     }
 
-    .text-steam-blue {
-        color: #66c0f4;
+    .status-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 0.75rem;
     }
 
-    .card-icon {
-        width: 50px;
-        height: 50px;
+    .status-summary {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .status-summary .col-4:not(:last-child) {
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Enhanced modern status items */
+    .modern-status-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .modern-status-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .modern-status-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        border-color: rgba(102, 192, 244, 0.2);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .modern-status-item:hover::before {
+        left: 100%;
+    }
+
+    .status-icon {
+        width: 40px;
+        height: 40px;
         border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 22px;
-        background-color: rgba(102, 192, 244, 0.15);
-        color: #66c0f4;
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 1.2rem;
     }
 
-    .dashboard-card {
-        background: rgba(26, 26, 26, 0.9);
-        border-radius: 14px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    #earningCenterText {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #66c0f4;
-    }
-
-    #earningCenterText small {
-        font-size: 0.8rem;
-        color: #c7d5e0;
-    }
-
-    .stylish-btn {
-        border-radius: 10px;
-        padding: 8px 16px;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        background: rgba(255, 255, 255, 0.05);
-        color: #fff;
-    }
-
-    .stylish-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+    .mini-progress {
         background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.5);
+        border-radius: 2px;
     }
 
-    .filter-card {
-        background-color: rgba(26, 26, 26, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-        padding: 6px 10px;
-        transition: all 0.3s ease;
+    /* Enhanced bar chart styling */
+    .chart-legend .legend-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
     }
 
-    .filter-card:hover {
-        background-color: rgba(26, 26, 26, 0.8);
-        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+    /* Smooth animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    .stylish-select {
-        border-radius: 8px;
-        padding: 4px 10px;
-        font-size: 0.9rem;
-        background-color: rgba(26, 26, 26, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #fff;
-    }
-
-    .stylish-select:focus {
-        border-color: rgba(255, 255, 255, 0.5);
-        box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.2);
-    }
-
-   .border-bottom {
-    border-bottom: 2px solid rgba(255, 255, 255, 0.8) !important;
-}
-
-
-    /* Garis pada dashboard card */
     .dashboard-card {
-        border: 2px solid rgba(255, 255, 255, 0.1);
+        animation: fadeInUp 0.6s ease-out;
     }
 
-    /* Garis pada chart containers */
-    .chart-container {
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        padding: 10px;
-        background: rgba(255, 255, 255, 0.02);
+    .summary-stats,
+    .overview-stats {
+        animation: fadeInUp 0.8s ease-out;
     }
 
-    /* Garis pada filter card */
-    .filter-card {
-        border: 2px solid rgba(255, 255, 255, 0.2);
-    }
+    /* Improved responsive design */
+    @media (max-width: 768px) {
+        .summary-stats {
+            flex-direction: column;
+            gap: 1rem !important;
+            border-left: none;
+            padding-left: 0;
+        }
 
-    /* Garis pada select elements */
-    .stylish-select {
-        border: 2px solid rgba(255, 255, 255, 0.2);
-    }
+        .stat-item:not(:last-child) {
+            border-right: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-right: 0;
+            padding-bottom: 1rem;
+        }
 
-    .stylish-select:focus {
-        border: 2px solid rgba(255, 255, 255, 0.5);
-    }
+        .chart-legend {
+            flex-direction: column;
+            gap: 0.5rem !important;
+        }
 
-    /* Garis pada buttons */
-    .stylish-btn {
-        border: 2px solid rgba(255, 255, 255, 0.3);
-    }
+        .status-summary .col-4 {
+            margin-bottom: 1rem;
+        }
 
-    .stylish-btn:hover {
-        border: 2px solid rgba(255, 255, 255, 0.5);
-    }
-
-    /* Garis pada diagram lingkaran */
-    #earningChart {
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        padding: 5px;
-    }
-
-    /* Garis pemisah antara diagram */
-    .row .col-lg-8,
-    .row .col-lg-4 {
-        position: relative;
-    }
-
-    /* Optional: Tambahkan garis vertikal pemisah antara diagram */
-    @media (min-width: 992px) {
-        .row .col-lg-8:after {
-            content: '';
-            position: absolute;
-            right: -10px;
-            top: 20px;
-            bottom: 20px;
-            width: 1px;
-            background: rgba(255, 255, 255, 0.1);
+        .status-summary .col-4:not(:last-child) {
+            border-right: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
         }
     }
 </style>
