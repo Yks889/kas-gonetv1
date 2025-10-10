@@ -61,6 +61,7 @@
         border-color: #4361ee;
         box-shadow: 0 0 10px rgba(67, 97, 238, 0.6);
         background: rgba(255, 255, 255, 0.1);
+        color: #fff;
     }
 
     .btn-gradient-primary {

@@ -31,12 +31,95 @@
             <label class="text-white ms-2">baris</label>
         </div>
 
-        <!-- Search -->
-        <div class="col-md-9">
-            <div class="modern-search">
+        <!-- Search + Filter Toggle -->
+        <div class="col-md-9 d-flex align-items-center gap-2">
+            <div class="modern-search flex-grow-1 d-flex align-items-center">
                 <i class="bi bi-search"></i>
-                <input type="text" id="searchInput" class="form-control form-control-sm"
+                <input type="text" id="searchInput" class="form-control form-control-sm w-100"
                     placeholder="Cari user, keterangan, atau status...">
+            </div>
+            <button class="btn btn-outline-light stylish-filter-btn" type="button" data-bs-toggle="modal"
+                data-bs-target="#filterModal">
+                <i class="bi bi-funnel-fill me-1"></i> Filter
+            </button>
+        </div>
+
+        <!-- Modal Filter -->
+        <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content stylish-modal">
+                    <div class="modal-header stylish-modal-header">
+                        <div class="d-flex align-items-center">
+                            <div class="modal-icon me-3">
+                                <i class="bi bi-funnel-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="modal-title mb-0">Filter Kas Keluar</h5>
+                                <p class="modal-subtitle mb-0">Saring data berdasarkan periode</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body stylish-modal-body">
+                        <div class="row g-3">
+                            <!-- Filter Bulan -->
+                            <div class="col-md-6">
+                                <label for="filterMonth" class="form-label stylish-label">
+                                    <i class="bi bi-calendar-month me-2"></i> Bulan
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="filterMonth" class="form-select stylish-select">
+                                        <option value="">Semua Bulan</option>
+                                        <?php for ($m = 1; $m <= 12; $m++): ?>
+                                            <option value="<?= $m ?>">
+                                                <?= date('F', mktime(0, 0, 0, $m, 1)) ?>
+                                            </option>
+                                        <?php endfor; ?>
+                                    </select>
+                                    <i class="bi bi-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+
+                            <!-- Filter Tahun -->
+                            <div class="col-md-6">
+                                <label for="filterYear" class="form-label stylish-label">
+                                    <i class="bi bi-calendar me-2"></i> Tahun
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="filterYear" class="form-select stylish-select">
+                                        <option value="">Semua Tahun</option>
+                                        <?php $currentYear = date('Y'); ?>
+                                        <?php for ($y = $currentYear; $y >= ($currentYear - 5); $y--): ?>
+                                            <option value="<?= $y ?>"><?= $y ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                    <i class="bi bi-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Filter Options -->
+                        <div class="quick-filter-section mt-4 pt-3 border-top">
+                            <h6 class="text-light mb-3">Filter Cepat</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year="">Semua</button>
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="<?= date('n') ?>" data-year="<?= date('Y') ?>">Bulan Ini</button>
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year="<?= date('Y') ?>">Tahun Ini</button>
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year="<?= date('Y') - 1 ?>">Tahun Lalu</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer stylish-modal-footer">
+                        <button id="resetFilter" class="btn btn-outline-light stylish-reset-btn">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Reset
+                        </button>
+                        <button id="applyFilter" class="btn btn-gradient-primary stylish-apply-btn">
+                            <i class="bi bi-check-lg me-1"></i> Terapkan Filter
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -51,7 +134,7 @@
                         <th style="width: 15%;">User</th>
                         <th style="width: 15%;">Nominal</th>
                         <th>Keterangan</th>
-                        <th style="width: 15%;">Deadline</th>
+                        <th style="width: 15%;">Tanggal</th>
                         <th style="width: 12%;">Status</th>
                         <th style="width: 15%;">Aksi</th>
                     </tr>
@@ -203,6 +286,29 @@
         background: rgba(255, 255, 255, 0.1);
     }
 
+    .btn-gradient-primary {
+        background-color: #0d6efd;
+        border: 1px solid #0d6efd;
+        border-radius: 8px;
+        color: #fff;
+        font-weight: 500;
+        padding: 10px 20px;
+        transition: 0.3s ease;
+    }
+
+    .btn-gradient-primary:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+
+    .btn-add-user {
+        padding: 10px 17px;
+        font-size: 0.9rem;
+        border-radius: 10px;
+    }
+
     .text-success {
         color: #06d6a0 !important;
     }
@@ -216,12 +322,150 @@
         font-weight: 500;
     }
 
-    /* Hide pagination when not needed */
     .pagination-hidden {
         display: none !important;
     }
 
-    /* === SweetAlert2 Stylish Modal - Diperbarui === */
+    /* Styling untuk Modal Filter */
+    .stylish-modal {
+        background: linear-gradient(135deg, rgba(40, 40, 60, 0.95) 0%, rgba(30, 30, 50, 0.95) 100%);
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        overflow: hidden;
+    }
+
+    .stylish-modal-header {
+        background: #000;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.5rem;
+    }
+
+    .modal-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        background: rgba(67, 97, 238, 0.2);
+        border-radius: 12px;
+        font-size: 1.5rem;
+        color: #4361ee;
+    }
+
+    .modal-subtitle {
+        color: #aaa;
+        font-size: 0.85rem;
+    }
+
+    .stylish-modal-body {
+        padding: 1.5rem;
+        background: #2b2b2b;
+    }
+
+    .stylish-label {
+        color: #e0e0e0;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .select-wrapper {
+        position: relative;
+    }
+
+    .stylish-select {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #fff;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        appearance: none;
+    }
+
+    .stylish-select:focus {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: #4361ee;
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+        color: #fff;
+    }
+
+    .select-arrow {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+        pointer-events: none;
+    }
+
+    .quick-filter-section {
+        border-top-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .quick-filter-btn {
+        border-radius: 8px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+    }
+
+    .quick-filter-btn:hover,
+    .quick-filter-btn.active {
+        background: #4361ee;
+        border-color: #4361ee;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+    }
+
+    .stylish-modal-footer {
+        background: #1e1e1e;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.2rem 1.5rem;
+    }
+
+    .stylish-reset-btn,
+    .stylish-apply-btn {
+        border-radius: 10px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .stylish-reset-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .stylish-apply-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(13, 110, 253, 0.4);
+    }
+
+    .stylish-filter-btn {
+        border-radius: 10px;
+        padding: 0.55rem 1.1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .stylish-filter-btn:hover {
+        background: #4361ee;
+        color: #fff;
+        border-color: #4361ee;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(67, 97, 238, 0.25);
+    }
+
+    /* SweetAlert2 Stylish Modal */
     .swal2-popup.stylish-modal {
         background: linear-gradient(135deg, rgba(40, 40, 60, 0.98) 0%, rgba(30, 30, 50, 0.98) 100%);
         border: 1px solid rgba(67, 97, 238, 0.3);
@@ -233,7 +477,6 @@
         overflow: hidden;
     }
 
-    /* Header Style */
     .swal2-popup.stylish-modal .swal2-header {
         background: linear-gradient(135deg, rgba(67, 97, 238, 0.2) 0%, rgba(67, 97, 238, 0.1) 100%);
         border-bottom: 1px solid rgba(67, 97, 238, 0.3);
@@ -270,7 +513,6 @@
         margin: 0.25rem 0 0 0;
     }
 
-    /* Body Style */
     .swal2-popup.stylish-modal .swal2-html-container {
         margin: 0;
         padding: 1.5rem;
@@ -307,7 +549,6 @@
         margin-right: 0.5rem;
     }
 
-    /* Footer & Buttons */
     .swal2-popup.stylish-modal .swal2-actions {
         margin: 0;
         padding: 1rem 1.5rem 1.5rem;
@@ -345,7 +586,6 @@
         transform: translateY(-2px);
     }
 
-    /* Animasi khusus untuk modal hapus */
     @keyframes pulseWarning {
         0% {
             transform: scale(1);
@@ -365,7 +605,7 @@
     }
 </style>
 
-<!-- Script Pagination + Search -->
+<!-- Script Pagination + Search + Filter + Delete Confirmation -->
 <script>
     const rowsPerPageSelect = document.getElementById("rowsPerPage");
     const table = document.getElementById("kasKeluarTable").getElementsByTagName("tbody")[0];
@@ -414,7 +654,6 @@
         prevBtn.disabled = currentPage === 1;
         nextBtn.disabled = currentPage === totalPages || totalPages === 0;
 
-        // Sembunyikan seluruh pagination jika data kurang dari atau sama dengan rowsPerPage
         if (totalRows <= rowsPerPage) {
             paginationContainer.classList.add('pagination-hidden');
         } else {
@@ -448,7 +687,64 @@
         }
     });
 
-    document.addEventListener('DOMContentLoaded', displayTable);
+    // Filter functionality
+    document.getElementById('applyFilter').addEventListener('click', function() {
+        const month = document.getElementById('filterMonth').value;
+        const year = document.getElementById('filterYear').value;
+
+        let url = '<?= site_url('admin/kas_keluar') ?>';
+        const params = [];
+        if (month) params.push('month=' + month);
+        if (year) params.push('year=' + year);
+        if (params.length) url += '?' + params.join('&');
+
+        window.location.href = url;
+    });
+
+    document.getElementById('resetFilter').addEventListener('click', function() {
+        window.location.href = '<?= site_url('admin/kas_keluar') ?>';
+    });
+
+    // Quick filter buttons
+    document.querySelectorAll('.quick-filter-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const month = this.getAttribute('data-month');
+            const year = this.getAttribute('data-year');
+
+            document.getElementById('filterMonth').value = month;
+            document.getElementById('filterYear').value = year;
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.quick-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add active class to clicked button
+            this.classList.add('active');
+        });
+    });
+
+    // Set active class on current filter
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const month = urlParams.get('month');
+        const year = urlParams.get('year');
+
+        // Set filter values from URL
+        if (month) document.getElementById('filterMonth').value = month;
+        if (year) document.getElementById('filterYear').value = year;
+
+        // Set active class on quick filter buttons
+        document.querySelectorAll('.quick-filter-btn').forEach(button => {
+            if (button.getAttribute('data-month') === month &&
+                button.getAttribute('data-year') === year) {
+                button.classList.add('active');
+            }
+        });
+
+        // Initialize table display
+        displayTable();
+    });
 
     function confirmDelete(id, keterangan) {
         Swal.fire({
@@ -483,7 +779,7 @@
             cancelButtonText: '<i class="bi bi-x-lg me-1"></i> Batal',
             customClass: {
                 popup: 'stylish-modal',
-                header: 'd-none', // Sembunyikan header default
+                header: 'd-none',
                 title: 'swal2-title',
                 htmlContainer: 'swal2-html-container',
                 confirmButton: 'swal2-confirm',
@@ -500,7 +796,6 @@
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // Tampilkan loading sebelum redirect
                 Swal.fire({
                     title: 'Menghapus...',
                     text: 'Data sedang dihapus',

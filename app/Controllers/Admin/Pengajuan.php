@@ -17,7 +17,56 @@ class Pengajuan extends BaseController
         $model->select('pengajuan.*, users.username, kas_keluar.file_nota');
         $model->join('users', 'users.id = pengajuan.user_id');
         $model->join('kas_keluar', 'kas_keluar.pengajuan_id = pengajuan.id', 'left');
+
+        // FILTER FUNCTIONALITY
+        $filters = $this->request->getGet();
+
+        // Filter by status
+        if (!empty($filters['status'])) {
+            $model->where('pengajuan.status', $filters['status']);
+        }
+
+        // Filter by tipe
+        if (!empty($filters['tipe'])) {
+            $model->where('pengajuan.tipe', $filters['tipe']);
+        }
+
+        // Filter by bulan dan tahun
+        if (!empty($filters['month']) || !empty($filters['year'])) {
+            if (!empty($filters['month']) && !empty($filters['year'])) {
+                // Filter by bulan dan tahun spesifik
+                $firstDay = date('Y-m-01', strtotime($filters['year'] . '-' . $filters['month'] . '-01'));
+                $lastDay = date('Y-m-t', strtotime($firstDay));
+                $model->where("DATE(pengajuan.created_at) BETWEEN '$firstDay' AND '$lastDay'");
+            } elseif (!empty($filters['year'])) {
+                // Filter by tahun saja
+                $model->where('YEAR(pengajuan.created_at)', $filters['year']);
+            } elseif (!empty($filters['month'])) {
+                // Filter by bulan saja (tahun berjalan)
+                $currentYear = date('Y');
+                $firstDay = date('Y-m-01', strtotime($currentYear . '-' . $filters['month'] . '-01'));
+                $lastDay = date('Y-m-t', strtotime($firstDay));
+                $model->where("DATE(pengajuan.created_at) BETWEEN '$firstDay' AND '$lastDay'");
+            }
+        }
+
+        // Order by created_at descending (pengajuan terbaru di atas)
+        $model->orderBy('pengajuan.created_at', 'DESC');
+
         $data['pengajuan'] = $model->findAll();
+
+        // Ambil saldo kas saat ini untuk validasi di frontend
+        $kasSaldoModel = new KasSaldoModel();
+        $saldo = $kasSaldoModel->first();
+        $data['saldo_akhir'] = $saldo ? $saldo['saldo_akhir'] : 0;
+
+        // Pass filter values to view untuk menjaga state filter
+        $data['current_filters'] = [
+            'status' => $filters['status'] ?? '',
+            'tipe' => $filters['tipe'] ?? '',
+            'month' => $filters['month'] ?? '',
+            'year' => $filters['year'] ?? ''
+        ];
 
         return view('admin/pengajuan/index', $data);
     }
@@ -26,9 +75,21 @@ class Pengajuan extends BaseController
     {
         $session = session();
         $model = new PengajuanModel();
-        $model->update($id, ['status' => 'diterima']);
-
         $pengajuan = $model->find($id);
+
+        if (!$pengajuan) {
+            return redirect()->to('/admin/pengajuan')->with('error', 'Data pengajuan tidak ditemukan.');
+        }
+
+        // Validasi saldo di backend juga untuk keamanan
+        $kasSaldoModel = new KasSaldoModel();
+        $saldo = $kasSaldoModel->first();
+
+        if ($saldo && $pengajuan['nominal'] > $saldo['saldo_akhir']) {
+            return redirect()->to('/admin/pengajuan')->with('error', 'Saldo tidak mencukupi untuk menyetujui pengajuan ini.');
+        }
+
+        $model->update($id, ['status' => 'diterima']);
 
         // Simpan notifikasi
         $notifModel = new NotificationModel();
@@ -87,6 +148,12 @@ class Pengajuan extends BaseController
             return redirect()->back()->with('error', 'Data pengajuan tidak ditemukan.');
         }
 
+        // Validasi saldo di backend
+        $saldo = $kasSaldoModel->first();
+        if ($saldo && $pengajuan['nominal'] > $saldo['saldo_akhir']) {
+            return redirect()->back()->with('error', 'Saldo tidak mencukupi untuk memproses pengajuan ini.');
+        }
+
         $kasKeluar = $kasKeluarModel->where('pengajuan_id', $id)->first();
         $metode    = $pengajuan['tipe']; // uang_sendiri / minta_uang
 
@@ -104,7 +171,6 @@ class Pengajuan extends BaseController
             }
 
             // Potong saldo (selalu)
-            $saldo = $kasSaldoModel->first();
             if ($saldo) {
                 $newSaldo = $saldo['saldo_akhir'] - $pengajuan['nominal'];
                 $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
@@ -128,7 +194,6 @@ class Pengajuan extends BaseController
 
             // Kas keluar sudah ada & file nota tersedia → langsung potong saldo
             if ($kasKeluar && !empty($kasKeluar['file_nota'])) {
-                $saldo = $kasSaldoModel->first();
                 if ($saldo) {
                     $newSaldo = $saldo['saldo_akhir'] - $pengajuan['nominal'];
                     $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
@@ -166,7 +231,6 @@ class Pengajuan extends BaseController
                     ]);
 
                     // Potong saldo
-                    $saldo = $kasSaldoModel->first();
                     if ($saldo) {
                         $newSaldo = $saldo['saldo_akhir'] - $pengajuan['nominal'];
                         $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
