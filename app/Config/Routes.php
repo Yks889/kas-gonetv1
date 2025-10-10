@@ -46,7 +46,6 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
 
     $routes->get('laporan', 'Admin\Laporan::index');
 
-    // ✅ PERBAIKAN: Pindahkan routes profile ke sini (tidak nested)
     $routes->get('profile', 'Admin\Profile::index');
     $routes->post('profile/update', 'Admin\Profile::update');
     $routes->post('profile/update-password', 'Admin\Profile::updatePassword');
@@ -66,7 +65,6 @@ $routes->group('user', ['filter' => 'auth:teknisi,penagih'], function ($routes) 
     $routes->get('pengajuan/index', 'User\Pengajuan::index');
     $routes->get('pengajuan/history', 'User\Pengajuan::history');
 
-    // ✅ PERBAIKAN: Pindahkan routes profile user ke sini
     $routes->get('profile', 'User\Profile::index');
     $routes->post('profile/update', 'User\Profile::update');
     $routes->post('profile/update-password', 'User\Profile::updatePassword');

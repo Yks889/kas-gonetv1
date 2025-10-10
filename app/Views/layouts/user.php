@@ -88,10 +88,10 @@
             }
 
             .sidebar-divider {
-                height: 1px;
-                background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+                height: 2px;
+                background: linear-gradient(50deg, transparent, var(--border-color), transparent);
                 margin: 15px 25px;
-                opacity: 0.6;
+                opacity: 1;
             }
 
             .sidebar .nav-link {

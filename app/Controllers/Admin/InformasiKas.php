@@ -17,43 +17,39 @@ class InformasiKas extends BaseController
         $kasKeluarModel = new KasKeluarModel();
         $pengajuanModel = new PengajuanModel();
 
-        // Ambil filter bulan (jika ada)
+        // Ambil filter bulan (jika ada) - Hanya untuk Status Pengajuan
         $bulan = $this->request->getGet('bulan'); // nilai 1-12
 
-        // Saldo kas
+        // Saldo kas (TETAP data keseluruhan)
         $saldo = $kasSaldoModel->first();
         $data['saldo_akhir'] = $saldo ? $saldo['saldo_akhir'] : 0;
 
-        // Total Masuk
-        $kasMasukQuery = $kasMasukModel->selectSum('nominal', 'total');
-        if ($bulan) {
-            $kasMasukQuery->where('MONTH(created_at)', $bulan);
-        }
-        $total_masuk = $kasMasukQuery->first();
+        // Total Masuk (TETAP data keseluruhan)
+        $total_masuk = $kasMasukModel->selectSum('nominal', 'total')->first();
         $data['total_masuk'] = $total_masuk['total'] ?? 0;
 
-        // Total Keluar
-        $kasKeluarQuery = $kasKeluarModel->selectSum('nominal', 'total');
-        if ($bulan) {
-            $kasKeluarQuery->where('MONTH(created_at)', $bulan);
-        }
-        $total_keluar = $kasKeluarQuery->first();
+        // Total Keluar (TETAP data keseluruhan)
+        $total_keluar = $kasKeluarModel->selectSum('nominal', 'total')->first();
         $data['total_keluar'] = $total_keluar['total'] ?? 0;
 
-        // Statistik Pengajuan
+        // Statistik Pengajuan (MENGIKUTI FILTER BULAN)
         $pengajuanQuery = $pengajuanModel;
         if ($bulan) {
             $pengajuanQuery->where('MONTH(created_at)', $bulan);
         }
         $total_pengajuan = $pengajuanQuery->countAllResults(false);
 
-        $pengajuan_pending = $pengajuanModel->where('status', 'pending')
-            ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
-            ->countAllResults();
+        $pengajuan_pending = $pengajuanModel->where('status', 'pending');
+        if ($bulan) {
+            $pengajuan_pending->where('MONTH(created_at)', $bulan);
+        }
+        $pengajuan_pending = $pengajuan_pending->countAllResults();
 
-        $pengajuan_ditolak = $pengajuanModel->where('status', 'ditolak')
-            ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
-            ->countAllResults();
+        $pengajuan_ditolak = $pengajuanModel->where('status', 'ditolak');
+        if ($bulan) {
+            $pengajuan_ditolak->where('MONTH(created_at)', $bulan);
+        }
+        $pengajuan_ditolak = $pengajuan_ditolak->countAllResults();
 
         // Hitung persentase pengajuan selesai
         $pengajuan_selesai = $total_pengajuan - ($pengajuan_pending + $pengajuan_ditolak);
@@ -65,13 +61,13 @@ class InformasiKas extends BaseController
         $data['pengajuan_ditolak'] = $pengajuan_ditolak;
         $data['pengajuan_selesai'] = $pengajuan_selesai;
 
-        // Rekap Bulanan Kas Masuk
+        // Rekap Bulanan Kas Masuk (TETAP data keseluruhan 12 bulan)
         $monthlyMasuk = $kasMasukModel
             ->select("MONTH(created_at) as bulan, SUM(nominal) as total")
             ->groupBy("MONTH(created_at)")
             ->findAll();
 
-        // Rekap Bulanan Kas Keluar
+        // Rekap Bulanan Kas Keluar (TETAP data keseluruhan 12 bulan)
         $monthlyKeluar = $kasKeluarModel
             ->select("MONTH(created_at) as bulan, SUM(nominal) as total")
             ->groupBy("MONTH(created_at)")
