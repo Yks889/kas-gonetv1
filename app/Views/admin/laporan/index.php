@@ -9,6 +9,14 @@
         </h1>
     </div>
 
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success alert-dismissible fade show stylish-alert" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <?= session()->getFlashdata('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
     <!-- Table Controls -->
     <div class="row mb-3 g-2">
         <!-- Rows per page -->
@@ -23,21 +31,120 @@
             <label class="text-white ms-2">baris</label>
         </div>
 
-        <!-- Filter Role -->
-        <div class="col-md-3">
-            <select id="roleFilter" class="form-select form-select-sm modern-select">
-                <option value="">Semua Role</option>
-                <option value="admin">Admin</option>
-                <option value="user">User</option>
-            </select>
+        <!-- Search + Filter Toggle -->
+        <div class="col-md-9 d-flex align-items-center gap-2">
+            <div class="modern-search flex-grow-1 d-flex align-items-center">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" class="form-control form-control-sm w-100"
+                    placeholder="Cari berdasarkan username atau aktivitas...">
+            </div>
+            <button class="btn btn-outline-light stylish-filter-btn" type="button" data-bs-toggle="modal"
+                data-bs-target="#filterModal">
+                <i class="bi bi-funnel-fill me-1"></i> Filter
+            </button>
         </div>
 
-        <!-- Search -->
-        <div class="col-md-6">
-            <div class="modern-search">
-                <i class="bi bi-search"></i>
-                <input type="text" id="searchInput" class="form-control form-control-sm"
-                    placeholder="Cari berdasarkan username atau aktivitas...">
+        <!-- Modal Filter -->
+        <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content stylish-modal">
+                    <div class="modal-header stylish-modal-header">
+                        <div class="d-flex align-items-center">
+                            <div class="modal-icon me-3">
+                                <i class="bi bi-funnel-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="modal-title mb-0">Filter Aktivitas</h5>
+                                <p class="modal-subtitle mb-0">Saring data berdasarkan periode dan role</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body stylish-modal-body">
+                        <div class="row g-3">
+                            <!-- Filter Role -->
+                            <div class="col-md-6">
+                                <label for="filterRole" class="form-label stylish-label">
+                                    <i class="bi bi-person-badge me-2"></i> Role User
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="filterRole" class="form-select stylish-select">
+                                        <option value="">Semua Role</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="user">User</option>
+                                    </select>
+                                    <i class="bi bi-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+
+                            <!-- Filter Bulan -->
+                            <div class="col-md-6">
+                                <label for="filterMonth" class="form-label stylish-label">
+                                    <i class="bi bi-calendar-month me-2"></i> Bulan
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="filterMonth" class="form-select stylish-select">
+                                        <option value="">Semua Bulan</option>
+                                        <?php for ($m = 1; $m <= 12; $m++): ?>
+                                            <option value="<?= $m ?>">
+                                                <?= date('F', mktime(0, 0, 0, $m, 1)) ?>
+                                            </option>
+                                        <?php endfor; ?>
+                                    </select>
+                                    <i class="bi bi-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+
+                            <!-- Filter Tahun -->
+                            <div class="col-md-6">
+                                <label for="filterYear" class="form-label stylish-label">
+                                    <i class="bi bi-calendar me-2"></i> Tahun
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="filterYear" class="form-select stylish-select">
+                                        <option value="">Semua Tahun</option>
+                                        <?php $currentYear = date('Y'); ?>
+                                        <?php for ($y = $currentYear; $y >= ($currentYear - 5); $y--): ?>
+                                            <option value="<?= $y ?>"><?= $y ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                    <i class="bi bi-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+
+                            <!-- Filter Rentang Tanggal -->
+                            <div class="col-md-6">
+                                <label for="filterDateRange" class="form-label stylish-label">
+                                    <i class="bi bi-calendar-range me-2"></i> Rentang Tanggal
+                                </label>
+                                <input type="text" id="filterDateRange" class="form-control stylish-select"
+                                    placeholder="Pilih rentang tanggal...">
+                            </div>
+                        </div>
+
+                        <!-- Quick Filter Options -->
+                        <div class="quick-filter-section mt-4 pt-3 border-top">
+                            <h6 class="text-light mb-3">Filter Cepat</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-role="" data-month="" data-year="">Semua</button>
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-role="" data-month="<?= date('n') ?>" data-year="<?= date('Y') ?>">Bulan Ini</button>
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-role="" data-month="" data-year="<?= date('Y') ?>">Tahun Ini</button>
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-role="admin" data-month="" data-year="">Admin Saja</button>
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-role="user" data-month="" data-year="">User Saja</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer stylish-modal-footer">
+                        <button id="resetFilter" class="btn btn-outline-light stylish-reset-btn">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Reset
+                        </button>
+                        <button id="applyFilter" class="btn btn-gradient-primary stylish-apply-btn">
+                            <i class="bi bi-check-lg me-1"></i> Terapkan Filter
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -78,7 +185,7 @@
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-light"><?= esc($act['activity']) ?></td>
-                                <td class="text-light">
+                                <td class="text-light" data-timestamp="<?= strtotime($act['created_at']) ?>">
                                     <?= !empty($act['created_at'])
                                         ? date('d M Y H:i:s', strtotime($act['created_at']))
                                         : '-' ?>
@@ -196,6 +303,7 @@
         border-color: #4361ee;
         box-shadow: 0 0 10px rgba(67, 97, 238, 0.6);
         background: rgba(255, 255, 255, 0.1);
+        color: #fff;
     }
 
     .stylish-btn {
@@ -235,6 +343,173 @@
     .pagination-hidden {
         display: none !important;
     }
+
+    /* Styling untuk Modal Filter */
+    .stylish-modal {
+        background: linear-gradient(135deg, rgba(40, 40, 60, 0.95) 0%, rgba(30, 30, 50, 0.95) 100%);
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        overflow: hidden;
+    }
+
+    .stylish-modal-header {
+        background: #000;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.5rem;
+    }
+
+    .modal-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        background: rgba(67, 97, 238, 0.2);
+        border-radius: 12px;
+        font-size: 1.5rem;
+        color: #4361ee;
+    }
+
+    .modal-subtitle {
+        color: #aaa;
+        font-size: 0.85rem;
+    }
+
+    .stylish-modal-body {
+        padding: 1.5rem;
+        background: #2b2b2b;
+    }
+
+    .stylish-label {
+        color: #e0e0e0;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .select-wrapper {
+        position: relative;
+    }
+
+    .stylish-select {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #fff;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
+
+    .stylish-select:focus {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: #4361ee;
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+        color: #fff;
+    }
+
+    .select-arrow {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+        pointer-events: none;
+    }
+
+    .quick-filter-section {
+        border-top-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .quick-filter-btn {
+        border-radius: 8px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+    }
+
+    .quick-filter-btn:hover,
+    .quick-filter-btn.active {
+        background: #4361ee;
+        border-color: #4361ee;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+    }
+
+    .stylish-modal-footer {
+        background: #1e1e1e;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.2rem 1.5rem;
+    }
+
+    .stylish-reset-btn,
+    .stylish-apply-btn {
+        border-radius: 10px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .stylish-reset-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .stylish-apply-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(13, 110, 253, 0.4);
+    }
+
+    .stylish-filter-btn {
+        border-radius: 10px;
+        padding: 0.55rem 1.1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .stylish-filter-btn i {
+        font-size: 1rem;
+    }
+
+    .stylish-filter-btn:hover {
+        background: #4361ee;
+        color: #fff;
+        border-color: #4361ee;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(67, 97, 238, 0.25);
+    }
+
+    .stylish-alert {
+        border-radius: 12px;
+        font-weight: 500;
+    }
+
+    .btn-gradient-primary {
+        background: linear-gradient(135deg, #4361ee, #3a56d4);
+        border: none;
+        color: #fff;
+        border-radius: 10px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-gradient-primary:hover {
+        background: linear-gradient(135deg, #3a56d4, #3046c7);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+        color: #fff;
+    }
 </style>
 
 <!-- Script Pagination + Filter + Search -->
@@ -244,9 +519,14 @@
     const paginationInfo = document.getElementById("paginationInfo");
     const prevBtn = document.getElementById("prevPage");
     const nextBtn = document.getElementById("nextPage");
-    const roleFilter = document.getElementById("roleFilter");
     const searchInput = document.getElementById("searchInput");
     const paginationContainer = document.getElementById("paginationContainer");
+
+    // Filter elements
+    const filterRole = document.getElementById("filterRole");
+    const filterMonth = document.getElementById("filterMonth");
+    const filterYear = document.getElementById("filterYear");
+    const filterDateRange = document.getElementById("filterDateRange");
 
     let currentPage = 1;
     let rowsPerPage = parseInt(rowsPerPageSelect.value);
@@ -256,15 +536,37 @@
     }
 
     function filterRows() {
-        const role = roleFilter.value.toLowerCase();
         const search = searchInput.value.toLowerCase();
+        const role = filterRole.value.toLowerCase();
+        const month = filterMonth.value;
+        const year = filterYear.value;
+
         return getRows().filter(row => {
+            // Filter search
             const username = row.cells[1]?.textContent.toLowerCase() || "";
-            const roleValue = row.cells[2]?.getAttribute("data-role") || "";
             const activity = row.cells[3]?.textContent.toLowerCase() || "";
-            const matchRole = !role || roleValue === role;
             const matchSearch = username.includes(search) || activity.includes(search);
-            return matchRole && matchSearch;
+
+            // Filter role
+            const roleValue = row.cells[2]?.getAttribute("data-role") || "";
+            const matchRole = !role || roleValue === role;
+
+            // Filter date
+            const timestamp = parseInt(row.cells[4]?.getAttribute("data-timestamp") || "0");
+            let matchDate = true;
+
+            if (month && year) {
+                const rowDate = new Date(timestamp * 1000);
+                matchDate = (rowDate.getMonth() + 1 == month) && (rowDate.getFullYear() == year);
+            } else if (month) {
+                const rowDate = new Date(timestamp * 1000);
+                matchDate = (rowDate.getMonth() + 1 == month);
+            } else if (year) {
+                const rowDate = new Date(timestamp * 1000);
+                matchDate = (rowDate.getFullYear() == year);
+            }
+
+            return matchSearch && matchRole && matchDate;
         });
     }
 
@@ -297,13 +599,9 @@
         }
     }
 
+    // Event Listeners
     rowsPerPageSelect.addEventListener("change", () => {
         rowsPerPage = parseInt(rowsPerPageSelect.value);
-        currentPage = 1;
-        displayTable();
-    });
-
-    roleFilter.addEventListener("change", () => {
         currentPage = 1;
         displayTable();
     });
@@ -328,7 +626,63 @@
         }
     });
 
-    document.addEventListener('DOMContentLoaded', displayTable);
+    // Filter functionality
+    document.getElementById('applyFilter').addEventListener('click', function() {
+        displayTable();
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
+        modal.hide();
+    });
+
+    document.getElementById('resetFilter').addEventListener('click', function() {
+        filterRole.value = '';
+        filterMonth.value = '';
+        filterYear.value = '';
+        filterDateRange.value = '';
+
+        // Remove active class from all quick filter buttons
+        document.querySelectorAll('.quick-filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Add active class to "Semua" button
+        document.querySelector('.quick-filter-btn[data-role=""][data-month=""][data-year=""]').classList.add('active');
+
+        displayTable();
+    });
+
+    // Quick filter buttons
+    document.querySelectorAll('.quick-filter-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const role = this.getAttribute('data-role');
+            const month = this.getAttribute('data-month');
+            const year = this.getAttribute('data-year');
+
+            filterRole.value = role;
+            filterMonth.value = month;
+            filterYear.value = year;
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.quick-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add active class to clicked button
+            this.classList.add('active');
+        });
+    });
+
+    // Initialize date range picker (jika menggunakan library external)
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inisialisasi date range picker jika diperlukan
+        // Contoh: $(filterDateRange).daterangepicker();
+
+        // Set active class on "Semua" button by default
+        document.querySelector('.quick-filter-btn[data-role=""][data-month=""][data-year=""]').classList.add('active');
+
+        // Initialize table display
+        displayTable();
+    });
 </script>
 
 <?= $this->endSection() ?>
