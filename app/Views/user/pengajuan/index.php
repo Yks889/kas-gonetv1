@@ -3,140 +3,148 @@
 <?= $this->section('content') ?>
 
 <div class="container-fluid">
-<!-- Header -->
-<div class="d-flex justify-content-between align-items-center pb-3 mb-5 border-bottom">
-    <h1 class="h3 mb-1 text-white">
-        <i class="bi bi-clock-history me-2"></i> History Pengajuan
-    </h1>
-    <a href="<?= site_url('user/pengajuan/create') ?>" class="btn btn-gradient-primary shadow-sm btn-add-user mb-2">
-        <i class="bi bi-plus-circle me-1"></i> Tambah Pengajuan
-    </a>
-</div>
-
-<?php if (session()->getFlashdata('success')): ?>
-    <div class="alert alert-success alert-dismissible fade show stylish-alert" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        <?= session()->getFlashdata('success') ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-<?php endif; ?>
-
-<!-- Table Controls -->
-<div class="row mb-3 g-2">
-    <!-- Rows per page -->
-    <div class="col-md-3 d-flex align-items-center">
-        <label class="text-white me-2">Tampilkan</label>
-        <select id="rowsPerPage" class="form-select form-select-sm modern-select w-auto">
-            <option value="5">5</option>
-            <option value="10" selected>10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-        </select>
-        <label class="text-white ms-2">baris</label>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center pb-3 mb-5 border-bottom">
+        <h1 class="h3 mb-1 text-white">
+            <i class="bi bi-clock-history me-2"></i> History Pengajuan
+        </h1>
+        <a href="<?= site_url('user/pengajuan/create') ?>" class="btn btn-gradient-primary shadow-sm btn-add-user mb-2">
+            <i class="bi bi-plus-circle me-1"></i> Tambah Pengajuan
+        </a>
     </div>
 
-    <!-- Search + Filter Toggle -->
-    <div class="col-md-9 d-flex align-items-center gap-2">
-        <div class="modern-search flex-grow-1 d-flex align-items-center">
-            <i class="bi bi-search"></i>
-            <input type="text" id="searchInput" class="form-control form-control-sm w-100" placeholder="Cari keterangan pengajuan...">
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success alert-dismissible fade show stylish-alert" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <?= session()->getFlashdata('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-        <button class="btn btn-outline-light stylish-filter-btn" type="button" data-bs-toggle="modal" data-bs-target="#filterModal">
-            <i class="bi bi-funnel-fill me-1"></i> Filter
-        </button>
-    </div>
+    <?php endif; ?>
 
-    <!-- Modal Filter -->
-    <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content stylish-modal">
-                <div class="modal-header stylish-modal-header">
-                    <div class="d-flex align-items-center">
-                        <div class="modal-icon me-3">
-                            <i class="bi bi-funnel-fill"></i>
+    <!-- Table Controls -->
+    <div class="row mb-3 g-2">
+        <!-- Rows per page -->
+        <div class="col-md-3 d-flex align-items-center">
+            <label class="text-white me-2">Tampilkan</label>
+            <select id="rowsPerPage" class="form-select form-select-sm modern-select w-auto">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+            <label class="text-white ms-2">baris</label>
+        </div>
+
+        <!-- Search + Filter Toggle -->
+        <div class="col-md-9 d-flex align-items-center gap-2">
+            <div class="modern-search flex-grow-1 d-flex align-items-center">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" class="form-control form-control-sm w-100"
+                    placeholder="Cari keterangan pengajuan...">
+            </div>
+            <button class="btn btn-outline-light stylish-filter-btn" type="button" data-bs-toggle="modal"
+                data-bs-target="#filterModal">
+                <i class="bi bi-funnel-fill me-1"></i> Filter
+            </button>
+        </div>
+
+        <!-- Modal Filter -->
+        <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content stylish-modal">
+                    <div class="modal-header stylish-modal-header">
+                        <div class="d-flex align-items-center">
+                            <div class="modal-icon me-3">
+                                <i class="bi bi-funnel-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="modal-title mb-0">Filter Pengajuan</h5>
+                                <p class="modal-subtitle mb-0">Saring data berdasarkan periode tertentu</p>
+                            </div>
                         </div>
-                        <div>
-                            <h5 class="modal-title mb-0">Filter Pengajuan</h5>
-                            <p class="modal-subtitle mb-0">Saring data berdasarkan periode tertentu</p>
-                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
 
-                <div class="modal-body stylish-modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="filterMonth" class="form-label stylish-label">
-                                <i class="bi bi-calendar-month me-2"></i> Bulan
-                            </label>
-                            <div class="select-wrapper">
-                                <select id="filterMonth" class="form-select stylish-select">
-                                    <option value="">Semua Bulan</option>
-                                    <?php for ($m = 1; $m <= 12; $m++): ?>
-                                        <option value="<?= $m ?>" <?= (isset($_GET['month']) && $_GET['month'] == $m) ? 'selected' : '' ?>>
-                                            <?= date('F', mktime(0, 0, 0, $m, 1)) ?>
-                                        </option>
-                                    <?php endfor; ?>
-                                </select>
-                                <i class="bi bi-chevron-down select-arrow"></i>
+                    <div class="modal-body stylish-modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="filterMonth" class="form-label stylish-label">
+                                    <i class="bi bi-calendar-month me-2"></i> Bulan
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="filterMonth" class="form-select stylish-select">
+                                        <option value="">Semua Bulan</option>
+                                        <?php for ($m = 1; $m <= 12; $m++): ?>
+                                            <option value="<?= $m ?>" <?= (isset($_GET['month']) && $_GET['month'] == $m) ? 'selected' : '' ?>>
+                                                <?= date('F', mktime(0, 0, 0, $m, 1)) ?>
+                                            </option>
+                                        <?php endfor; ?>
+                                    </select>
+                                    <i class="bi bi-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="filterYear" class="form-label stylish-label">
+                                    <i class="bi bi-calendar me-2"></i> Tahun
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="filterYear" class="form-select stylish-select">
+                                        <option value="">Semua Tahun</option>
+                                        <?php $currentYear = date('Y'); ?>
+                                        <?php for ($y = $currentYear; $y >= ($currentYear - 5); $y--): ?>
+                                            <option value="<?= $y ?>" <?= (isset($_GET['year']) && $_GET['year'] == $y) ? 'selected' : '' ?>><?= $y ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                    <i class="bi bi-chevron-down select-arrow"></i>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label for="filterYear" class="form-label stylish-label">
-                                <i class="bi bi-calendar me-2"></i> Tahun
-                            </label>
-                            <div class="select-wrapper">
-                                <select id="filterYear" class="form-select stylish-select">
-                                    <option value="">Semua Tahun</option>
-                                    <?php $currentYear = date('Y'); ?>
-                                    <?php for ($y = $currentYear; $y >= ($currentYear - 5); $y--): ?>
-                                        <option value="<?= $y ?>" <?= (isset($_GET['year']) && $_GET['year'] == $y) ? 'selected' : '' ?>><?= $y ?></option>
-                                    <?php endfor; ?>
-                                </select>
-                                <i class="bi bi-chevron-down select-arrow"></i>
+                        <!-- Filter Status -->
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-12">
+                                <label for="filterStatus" class="form-label stylish-label">
+                                    <i class="bi bi-info-circle me-2"></i> Status
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="filterStatus" class="form-select stylish-select">
+                                        <option value="">Semua Status</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="diterima">Diterima</option>
+                                        <option value="ditolak">Ditolak</option>
+                                        <option value="selesai">Selesai</option>
+                                    </select>
+                                    <i class="bi bi-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Filter Options -->
+                        <div class="quick-filter-section mt-4 pt-3 border-top">
+                            <h6 class="text-light mb-3">Filter Cepat</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year=""
+                                    data-status="">Semua</button>
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn"
+                                    data-month="<?= date('n') ?>" data-year="<?= date('Y') ?>" data-status="">Bulan
+                                    Ini</button>
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month=""
+                                    data-year="<?= date('Y') ?>" data-status="">Tahun Ini</button>
+                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month=""
+                                    data-year="<?= date('Y') - 1 ?>" data-status="">Tahun Lalu</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Filter Status -->
-                    <div class="row g-3 mt-2">
-                        <div class="col-md-12">
-                            <label for="filterStatus" class="form-label stylish-label">
-                                <i class="bi bi-info-circle me-2"></i> Status
-                            </label>
-                            <div class="select-wrapper">
-                                <select id="filterStatus" class="form-select stylish-select">
-                                    <option value="">Semua Status</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="diterima">Diterima</option>
-                                    <option value="ditolak">Ditolak</option>
-                                    <option value="selesai">Selesai</option>
-                                </select>
-                                <i class="bi bi-chevron-down select-arrow"></i>
-                            </div>
-                        </div>
+                    <div class="modal-footer stylish-modal-footer">
+                        <button id="resetFilter" class="btn btn-outline-light stylish-reset-btn">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Reset
+                        </button>
+                        <button id="applyFilter" class="btn btn-gradient-primary stylish-apply-btn">
+                            <i class="bi bi-check-lg me-1"></i> Terapkan Filter
+                        </button>
                     </div>
-
-                    <!-- Quick Filter Options -->
-                    <div class="quick-filter-section mt-4 pt-3 border-top">
-                        <h6 class="text-light mb-3">Filter Cepat</h6>
-                        <div class="d-flex flex-wrap gap-2">
-                            <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year="" data-status="">Semua</button>
-                            <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="<?= date('n') ?>" data-year="<?= date('Y') ?>" data-status="">Bulan Ini</button>
-                            <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year="<?= date('Y') ?>" data-status="">Tahun Ini</button>
-                            <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year="<?= date('Y') - 1 ?>" data-status="">Tahun Lalu</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal-footer stylish-modal-footer">
-                    <button id="resetFilter" class="btn btn-outline-light stylish-reset-btn">
-                        <i class="bi bi-arrow-clockwise me-1"></i> Reset
-                    </button>
-                    <button id="applyFilter" class="btn btn-gradient-primary stylish-apply-btn">
-                        <i class="bi bi-check-lg me-1"></i> Terapkan Filter
-                    </button>
                 </div>
             </div>
         </div>
@@ -174,8 +182,8 @@
                                 <td><?= $p['deadline'] ? date('d/m/Y', strtotime($p['deadline'])) : '-' ?></td>
                                 <td>
                                     <span class="badge bg-<?=
-                                                            $p['status'] == 'diterima' ? 'success' : ($p['status'] == 'ditolak' ? 'danger' : ($p['status'] == 'selesai' ? 'warning' : 'secondary'))
-                                                            ?>">
+                                        $p['status'] == 'diterima' ? 'success' : ($p['status'] == 'ditolak' ? 'danger' : ($p['status'] == 'selesai' ? 'warning' : 'secondary'))
+                                        ?>">
                                         <?= ucfirst($p['status']) ?>
                                     </span>
                                 </td>
@@ -187,7 +195,8 @@
                                 <div class="py-4">
                                     <i class="bi bi-clock-history display-1 text-light"></i>
                                     <h5 class="mt-3">Belum ada history pengajuan</h5>
-                                    <p class="text-muted">Data pengajuan akan muncul di sini setelah Anda membuat pengajuan</p>
+                                    <p class="text-muted">Data pengajuan akan muncul di sini setelah Anda membuat pengajuan
+                                    </p>
                                 </div>
                             </td>
                         </tr>
@@ -198,7 +207,7 @@
     </div>
 
     <!-- Pagination -->
-    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" id="paginationContainer">
         <button id="prevPage" class="btn btn-sm btn-outline-light stylish-btn" disabled>
             <i class="bi bi-chevron-left"></i> Prev
         </button>
@@ -272,7 +281,7 @@
 
     .modern-search input {
         padding-left: 38px;
-        background: rgba(102, 77, 77, 0.05);
+        background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.2);
         color: #fff;
         border-radius: 12px;
@@ -280,7 +289,7 @@
     }
 
     .modern-search input::placeholder {
-        color: #fff;
+        color: #bbb;
         font-style: italic;
     }
 
@@ -328,6 +337,10 @@
         font-weight: 500;
     }
 
+    .pagination-hidden {
+        display: none !important;
+    }
+
     /* Styling untuk Modal Filter yang diperbarui */
     .stylish-modal {
         background: linear-gradient(135deg, rgba(40, 40, 60, 0.95) 0%, rgba(30, 30, 50, 0.95) 100%);
@@ -339,7 +352,6 @@
 
     .stylish-modal-header {
         background: #000;
-        /* hitam solid */
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         padding: 1.5rem;
     }
@@ -364,7 +376,6 @@
     .stylish-modal-body {
         padding: 1.5rem;
         background: #2b2b2b;
-        /* abu-abu gelap */
     }
 
     .stylish-label {
@@ -429,7 +440,6 @@
 
     .stylish-modal-footer {
         background: #1e1e1e;
-        /* abu-abu lebih gelap */
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         padding: 1.2rem 1.5rem;
     }
@@ -456,9 +466,7 @@
     .stylish-filter-btn {
         border-radius: 10px;
         padding: 0.55rem 1.1rem;
-        /* lebih tinggi dari btn-sm */
         font-size: 0.9rem;
-        /* biar konsisten */
         font-weight: 500;
         display: flex;
         align-items: center;
@@ -487,6 +495,7 @@
     const prevBtn = document.getElementById("prevPage");
     const nextBtn = document.getElementById("nextPage");
     const searchInput = document.getElementById("searchInput");
+    const paginationContainer = document.getElementById("paginationContainer");
 
     let currentPage = 1;
     let rowsPerPage = parseInt(rowsPerPageSelect.value);
@@ -528,22 +537,34 @@
 
         prevBtn.disabled = currentPage === 1;
         nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+        // Sembunyikan seluruh pagination jika data kurang dari atau sama dengan rowsPerPage
+        if (totalRows <= rowsPerPage) {
+            paginationContainer.classList.add('pagination-hidden');
+        } else {
+            paginationContainer.classList.remove('pagination-hidden');
+        }
     }
 
-    rowsPerPageSelect.addEventListener("change", function() {
-        rowsPerPage = parseInt(this.value);
+    rowsPerPageSelect.addEventListener("change", () => {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
         currentPage = 1;
         displayTable();
     });
 
-    prevBtn.addEventListener("click", function() {
+    searchInput.addEventListener("input", () => {
+        currentPage = 1;
+        displayTable();
+    });
+
+    prevBtn.addEventListener("click", () => {
         if (currentPage > 1) {
             currentPage--;
             displayTable();
         }
     });
 
-    nextBtn.addEventListener("click", function() {
+    nextBtn.addEventListener("click", () => {
         const totalPages = Math.ceil(filterRows().length / rowsPerPage);
         if (currentPage < totalPages) {
             currentPage++;
@@ -551,13 +572,8 @@
         }
     });
 
-    searchInput.addEventListener("keyup", function() {
-        currentPage = 1;
-        displayTable();
-    });
-
     // Filter functionality
-    document.getElementById('applyFilter').addEventListener('click', function() {
+    document.getElementById('applyFilter').addEventListener('click', function () {
         const month = document.getElementById('filterMonth').value;
         const year = document.getElementById('filterYear').value;
         const status = document.getElementById('filterStatus').value;
@@ -572,13 +588,13 @@
         window.location.href = url;
     });
 
-    document.getElementById('resetFilter').addEventListener('click', function() {
+    document.getElementById('resetFilter').addEventListener('click', function () {
         window.location.href = '<?= site_url('user/pengajuan') ?>';
     });
 
     // Quick filter buttons
     document.querySelectorAll('.quick-filter-btn').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const month = this.getAttribute('data-month');
             const year = this.getAttribute('data-year');
             const status = this.getAttribute('data-status');
@@ -598,7 +614,7 @@
     });
 
     // Set active class on current filter
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const urlParams = new URLSearchParams(window.location.search);
         const month = urlParams.get('month');
         const year = urlParams.get('year');
@@ -621,7 +637,7 @@
             document.querySelector('.quick-filter-btn[data-month=""][data-year=""][data-status=""]').classList.add('active');
         }
 
-        // Initial table display
+        // Initialize table display
         displayTable();
     });
 </script>

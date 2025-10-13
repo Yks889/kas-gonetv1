@@ -87,10 +87,6 @@
                         </div>
                     </div>
                     <div class="chart-actions">
-                        <small class="text-white">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Data dalam Rupiah (Keseluruhan Tahun)
-                        </small>
                     </div>
                 </div>
 
