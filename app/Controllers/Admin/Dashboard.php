@@ -20,7 +20,7 @@ class Dashboard extends BaseController
         $userModel = new UserModel();
 
         // Ambil filter bulan (jika ada)
-        $bulan = $this->request->getGet('bulan'); // nilai 1-12
+        $bulan = $this->request->getGet('bulan');
 
         // Ringkasan Kas & Pengguna
         $saldo = $kasSaldoModel->first();
@@ -39,52 +39,28 @@ class Dashboard extends BaseController
         }
         $total_keluar = $kasKeluarQuery->first();
 
-        // Pengajuan
-        $pengajuanQuery = $pengajuanModel;
-        if ($bulan) {
-            $pengajuanQuery->where('MONTH(created_at)', $bulan);
-        }
-        $total_pengajuan = $pengajuanQuery->countAllResults(false);
-
-        $total_users = $userModel->where('role !=', 'admin')->countAllResults();
-
-        $pengajuan_pending = $pengajuanModel->where('status', 'pending')
-            ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
-            ->countAllResults();
-
-        $pengajuan_ditolak = $pengajuanModel->where('status', 'ditolak')
-            ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
-            ->countAllResults();
-
-        // Data untuk tabs - DIPERBAIKI
-        $pengajuan = $pengajuanModel
+        // Pengajuan Terbaru (5 data saja)
+        $pengajuan_terbaru = $pengajuanModel
             ->select('pengajuan.*, users.username')
             ->join('users', 'users.id = pengajuan.user_id')
             ->when($bulan, fn($q) => $q->where('MONTH(pengajuan.created_at)', $bulan))
             ->orderBy('pengajuan.created_at', 'DESC')
-            ->findAll(10); // Limit to 10 records
+            ->findAll(5); // Hanya 5 data terbaru
 
-        $kas_masuk = $kasMasukModel
+        // Kas Masuk Terbaru (5 data)
+        $kas_masuk_terbaru = $kasMasukModel
             ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
             ->orderBy('created_at', 'DESC')
-            ->findAll(10);
+            ->findAll(5);
 
-        // QUERY KAS KELUAR DIPERBAIKI
-        $kas_keluar = $kasKeluarModel
+        // Kas Keluar Terbaru (5 data)
+        $kas_keluar_terbaru = $kasKeluarModel
             ->select('kas_keluar.*, pengajuan.user_id, users.username, pengajuan.keterangan as pengajuan_keterangan')
             ->join('pengajuan', 'pengajuan.id = kas_keluar.pengajuan_id', 'left')
             ->join('users', 'users.id = pengajuan.user_id', 'left')
             ->when($bulan, fn($q) => $q->where('MONTH(kas_keluar.created_at)', $bulan))
             ->orderBy('kas_keluar.created_at', 'DESC')
-            ->findAll(10);
-
-        // Jika masih error, gunakan query yang lebih sederhana:
-        // $kas_keluar = $kasKeluarModel
-        //     ->select('kas_keluar.*, pengajuan.keterangan as pengajuan_keterangan')
-        //     ->join('pengajuan', 'pengajuan.id = kas_keluar.pengajuan_id', 'left')
-        //     ->when($bulan, fn($q) => $q->where('MONTH(kas_keluar.created_at)', $bulan))
-        //     ->orderBy('kas_keluar.created_at', 'DESC')
-        //     ->findAll(10);
+            ->findAll(5);
 
         // Hitung jumlah untuk ringkasan
         $kas_masuk_count = $kasMasukModel
@@ -95,23 +71,7 @@ class Dashboard extends BaseController
             ->when($bulan, fn($q) => $q->where('MONTH(created_at)', $bulan))
             ->countAllResults();
 
-        // Kas Masuk & Keluar (filter bulan kalau ada)
-        if ($bulan) {
-            $total_masuk = $kasMasukModel
-                ->selectSum('nominal', 'total')
-                ->where('MONTH(created_at)', $bulan)
-                ->first();
-
-            $total_keluar = $kasKeluarModel
-                ->selectSum('nominal', 'total')
-                ->where('MONTH(created_at)', $bulan)
-                ->first();
-        } else {
-            $total_masuk = $kasMasukModel->selectSum('nominal', 'total')->first();
-            $total_keluar = $kasKeluarModel->selectSum('nominal', 'total')->first();
-        }
-
-        // Statistik Pengajuan (terfilter bulan kalau dipilih)
+        // Statistik Pengajuan
         if ($bulan) {
             $total_pengajuan = $pengajuanModel
                 ->where('MONTH(created_at)', $bulan)
@@ -135,19 +95,12 @@ class Dashboard extends BaseController
         // User tetap total semua
         $total_users = $userModel->where('role !=', 'admin')->countAllResults();
 
-        // Hitung persentase pengajuan selesai
-        $pengajuan_selesai = $total_pengajuan - ($pengajuan_pending + $pengajuan_ditolak);
-        $persentase_pengajuan = $total_pengajuan > 0
-            ? round(($pengajuan_selesai / $total_pengajuan) * 100)
-            : 0;
-
-        // Rekap Bulanan Kas Masuk
+        // Rekap Bulanan untuk Grafik
         $monthlyMasuk = $kasMasukModel
             ->select("MONTH(created_at) as bulan, SUM(nominal) as total")
             ->groupBy("MONTH(created_at)")
             ->findAll();
 
-        // Rekap Bulanan Kas Keluar
         $monthlyKeluar = $kasKeluarModel
             ->select("MONTH(created_at) as bulan, SUM(nominal) as total")
             ->groupBy("MONTH(created_at)")
@@ -185,11 +138,10 @@ class Dashboard extends BaseController
             'bulanLabels' => $bulanLabels,
             'masukData' => $masukDataFinal,
             'keluarData' => $keluarDataFinal,
-            'persentase_pengajuan' => $persentase_pengajuan,
             'bulanDipilih' => $bulan,
-            'pengajuan' => $pengajuan,
-            'kas_masuk' => $kas_masuk,
-            'kas_keluar' => $kas_keluar,
+            'pengajuan_terbaru' => $pengajuan_terbaru,
+            'kas_masuk_terbaru' => $kas_masuk_terbaru,
+            'kas_keluar_terbaru' => $kas_keluar_terbaru,
             'kas_masuk_count' => $kas_masuk_count,
             'kas_keluar_count' => $kas_keluar_count
         ];

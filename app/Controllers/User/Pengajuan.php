@@ -5,7 +5,8 @@ namespace App\Controllers\User;
 use App\Controllers\BaseController;
 use App\Models\PengajuanModel;
 use App\Models\KasKeluarModel;
-use App\Models\ActivityLogModel; // ✅ tambahkan
+use App\Models\ActivityLogModel;
+use App\Models\KasSaldoModel;
 
 class Pengajuan extends BaseController
 {
@@ -31,6 +32,7 @@ class Pengajuan extends BaseController
     public function store()
     {
         helper(['form']);
+
         $rules = [
             'nominal'    => 'required|numeric',
             'keterangan' => 'required',
@@ -39,14 +41,35 @@ class Pengajuan extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $session = session();
-            $pengajuanModel = new PengajuanModel();
-            $logModel       = new ActivityLogModel(); // ✅ inisialisasi log
+            $session         = session();
+            $pengajuanModel  = new PengajuanModel();
+            $logModel        = new ActivityLogModel();
+            $kasKeluarModel  = new KasKeluarModel();
+            $kasSaldoModel   = new KasSaldoModel();
 
-            // Simpan ke tabel pengajuan
+            $nominal = (float) $this->request->getVar('nominal');
+
+            // ✅ Ambil saldo terakhir dari tabel kas_saldo dengan fallback ke 0
+            $saldoData = $kasSaldoModel->orderBy('id', 'DESC')->first();
+            $saldoAdmin = $saldoData['saldo_akhir'] ?? 0;
+
+            // ✅ Pastikan hasilnya numerik
+            $saldoAdmin = (float) $saldoAdmin;
+
+            // ✅ Cegah jika saldo kosong atau tidak cukup
+            if ($saldoAdmin <= 0 || $saldoAdmin < $nominal) {
+                $session->setFlashdata(
+                    'error_saldo',
+                    'Mohon maaf, saldo saat ini tidak mencukupi untuk pengajuan sebesar Rp ' .
+                        number_format($nominal, 0, ',', '.')
+                );
+                return redirect()->to('/user/pengajuan');
+            }
+
+            // ✅ Simpan pengajuan baru
             $dataPengajuan = [
                 'user_id'    => $session->get('id'),
-                'nominal'    => $this->request->getVar('nominal'),
+                'nominal'    => $nominal,
                 'keterangan' => $this->request->getVar('keterangan'),
                 'deadline'   => $this->request->getVar('deadline'),
                 'tipe'       => $this->request->getVar('tipe'),
@@ -56,14 +79,14 @@ class Pengajuan extends BaseController
             $pengajuanModel->save($dataPengajuan);
             $pengajuanId = $pengajuanModel->getInsertID();
 
-            // ✅ Catat aktivitas pengajuan
+            // ✅ Log pengajuan baru
             $logModel->logActivity(
                 $session->get('id'),
                 'pengajuan',
-                'Membuat pengajuan baru dengan nominal Rp ' . number_format($this->request->getVar('nominal'))
+                'Membuat pengajuan baru sebesar Rp ' . number_format($nominal, 0, ',', '.')
             );
 
-            // Jika tipe uang sendiri => simpan ke kas_keluar
+            // ✅ Jika tipe = uang_sendiri → otomatis simpan ke kas_keluar
             if ($this->request->getVar('tipe') === 'uang_sendiri') {
                 $fileNota = $this->request->getFile('file_nota');
                 $fileName = null;
@@ -73,19 +96,18 @@ class Pengajuan extends BaseController
                     $fileNota->move(FCPATH . 'uploads/nota', $fileName);
                 }
 
-                $kasKeluarModel = new KasKeluarModel();
                 $kasKeluarModel->save([
                     'pengajuan_id' => $pengajuanId,
-                    'nominal'      => $this->request->getVar('nominal'),
+                    'nominal'      => $nominal,
                     'keterangan'   => $this->request->getVar('keterangan'),
                     'file_nota'    => $fileName
                 ]);
 
-                // ✅ Catat aktivitas kas keluar
+                // ✅ Log kas keluar
                 $logModel->logActivity(
                     $session->get('id'),
                     'kas_keluar',
-                    'Menggunakan uang sendiri untuk pengajuan Rp ' . number_format($this->request->getVar('nominal'))
+                    'Menggunakan uang sendiri untuk pengajuan sebesar Rp ' . number_format($nominal, 0, ',', '.')
                 );
             }
 

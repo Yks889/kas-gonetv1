@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
@@ -9,7 +10,35 @@ class Users extends BaseController
     public function index()
     {
         $model = new UserModel();
-        $data['users'] = $model->where('role !=', 'admin')->findAll();
+
+        // Ambil parameter filter dari URL
+        $month = $this->request->getGet('month');
+        $year = $this->request->getGet('year');
+
+        // Query dasar - exclude admin
+        $model->where('role !=', 'admin');
+
+        // Filter berdasarkan bulan
+        if (!empty($month) && is_numeric($month) && $month >= 1 && $month <= 12) {
+            $model->where('MONTH(created_at)', $month);
+        }
+
+        // Filter berdasarkan tahun
+        if (!empty($year) && is_numeric($year)) {
+            $model->where('YEAR(created_at)', $year);
+        }
+
+        // Urutkan berdasarkan yang terbaru
+        $model->orderBy('created_at', 'DESC');
+
+        $data['users'] = $model->findAll();
+
+        // Pass filter values ke view untuk menjaga state form
+        $data['current_filters'] = [
+            'month' => $month,
+            'year' => $year
+        ];
+
         return view('admin/users/index', $data);
     }
 
@@ -26,12 +55,11 @@ class Users extends BaseController
             'username' => 'required|min_length[3]|max_length[20]|is_unique[users.username]',
             'password' => 'required|min_length[6]|max_length[200]',
         ];
-        
+
         if ($this->validate($rules)) {
             $model = new UserModel();
             $data = [
                 'username' => $this->request->getVar('username'),
-                // lebih aman pake hash password
                 'password' => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
                 'role'     => 'user'
             ];
@@ -58,11 +86,11 @@ class Users extends BaseController
         helper(['form']);
         $model = new UserModel();
         $user = $model->find($id);
-        
+
         $rules = [
-            'username' => 'required|min_length[3]|max_length[20]|is_unique[users.username,id,'.$id.']',
+            'username' => 'required|min_length[3]|max_length[20]|is_unique[users.username,id,' . $id . ']',
         ];
-        
+
         if ($this->validate($rules)) {
             $data = [
                 'username' => $this->request->getVar('username'),
