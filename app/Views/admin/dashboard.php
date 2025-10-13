@@ -3,7 +3,7 @@
 
 <div class="container-fluid">
     <!-- Header Dashboard -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 bord">
         <div>
             <h1 class="h3 mb-2 text-white">
                 <i class="bi bi-bank me-2"></i>Dashboard Admin GoNet
@@ -57,7 +57,8 @@
                     <div class="account-info mt-3">
                         <div class="d-flex justify-content-between">
                             <span><i class="bi bi-calendar-check me-1"></i> Update Terakhir</span>
-                            <span class="text-info"><?= date('d M Y', strtotime($saldo['updated_at'] ?? date('Y-m-d'))) ?></span>
+                            <span
+                                class="text-info"><?= date('d M Y', strtotime($saldo['updated_at'] ?? date('Y-m-d'))) ?></span>
                         </div>
                         <div class="d-flex justify-content-between mt-2">
                             <span><i class="bi bi-arrow-up-circle me-1"></i> Transaksi Bulan Ini</span>
@@ -82,7 +83,8 @@
                             <div class="summary-box income">
                                 <i class="bi bi-arrow-down-circle"></i>
                                 <div class="label">Pemasukan</div>
-                                <div class="amount">Rp <?= number_format($total_masuk['total'] ?? 0, 0, ',', '.') ?></div>
+                                <div class="amount">Rp <?= number_format($total_masuk['total'] ?? 0, 0, ',', '.') ?>
+                                </div>
                                 <span class="badge bg-light text-dark"><?= $kas_masuk_count ?? 0 ?></span>
                             </div>
                         </div>
@@ -90,7 +92,8 @@
                             <div class="summary-box expense">
                                 <i class="bi bi-arrow-up-circle"></i>
                                 <div class="label">Pengeluaran</div>
-                                <div class="amount">Rp <?= number_format($total_keluar['total'] ?? 0, 0, ',', '.') ?></div>
+                                <div class="amount">Rp <?= number_format($total_keluar['total'] ?? 0, 0, ',', '.') ?>
+                                </div>
                                 <span class="badge bg-light text-dark"><?= $kas_keluar_count ?? 0 ?></span>
                             </div>
                         </div>
@@ -131,7 +134,7 @@
                         </a>
                     </div>
                     <div class="col-md-6">
-                        <a href="<?= site_url('admin/kas_keluar/create') ?>" class="quick-action-card expense">
+                        <a href="<?= site_url('admin/kas_keluar') ?>" class="quick-action-card expense">
                             <div class="action-content-wrapper">
                                 <div class="action-icon">
                                     <i class="bi bi-cash-stack"></i>
@@ -194,18 +197,18 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Transaksi Terbaru</h5>
                         <div class="transaction-filter">
-                            <select class="form-select form-select-sm stylish-select">
-                                <option>Semua Transaksi</option>
-                                <option>Kas Masuk</option>
-                                <option>Kas Keluar</option>
-                                <option>Pengajuan</option>
+                            <select class="form-select form-select-sm stylish-select" id="transactionFilter">
+                                <option value="all">Semua Transaksi</option>
+                                <option value="kas_masuk">Kas Masuk</option>
+                                <option value="kas_keluar">Kas Keluar</option>
+                                <option value="pengajuan">Pengajuan</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="transaction-list">
                         <!-- Pengajuan Terbaru -->
-                        <div class="transaction-category mb-4">
+                        <div class="transaction-category mb-4" data-type="pengajuan">
                             <h6 class="category-title mb-3">Pengajuan Terbaru</h6>
                             <?php if (empty($pengajuan_terbaru)): ?>
                                 <div class="empty-state">
@@ -216,16 +219,21 @@
                                 <?php foreach ($pengajuan_terbaru as $index => $item): ?>
                                     <div class="transaction-item">
                                         <div class="transaction-details">
-                                            <div class="transaction-icon <?= $item['tipe'] === 'uang_sendiri' ? 'expense' : 'income' ?>">
-                                                <i class="bi <?= $item['tipe'] === 'uang_sendiri' ? 'bi-arrow-up' : 'bi-arrow-down' ?>"></i>
+                                            <div
+                                                class="transaction-icon <?= $item['tipe'] === 'uang_sendiri' ? 'expense' : 'income' ?>">
+                                                <i
+                                                    class="bi <?= $item['tipe'] === 'uang_sendiri' ? 'bi-arrow-up' : 'bi-arrow-down' ?>"></i>
                                             </div>
                                             <div class="transaction-info">
-                                                <div class="transaction-description"><?= $item['username'] ?> - <?= $item['keterangan'] ?></div>
-                                                <div class="transaction-date"><?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
+                                                <div class="transaction-description"><?= $item['username'] ?> -
+                                                    <?= $item['keterangan'] ?></div>
+                                                <div class="transaction-date">
+                                                    <?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
                                             </div>
                                         </div>
                                         <div class="transaction-amount">
-                                            <div class="amount <?= $item['tipe'] === 'uang_sendiri' ? 'negative' : 'positive' ?>">
+                                            <div
+                                                class="amount <?= $item['tipe'] === 'uang_sendiri' ? 'negative' : 'positive' ?>">
                                                 Rp <?= number_format($item['nominal'], 0, ',', '.') ?>
                                             </div>
                                             <div class="transaction-status status-<?= $item['status'] ?>">
@@ -238,7 +246,7 @@
                         </div>
 
                         <!-- Kas Masuk Terbaru -->
-                        <div class="transaction-category mb-4">
+                        <div class="transaction-category mb-4" data-type="kas_masuk">
                             <h6 class="category-title mb-3">Kas Masuk Terbaru</h6>
                             <?php if (empty($kas_masuk_terbaru)): ?>
                                 <div class="empty-state">
@@ -254,7 +262,8 @@
                                             </div>
                                             <div class="transaction-info">
                                                 <div class="transaction-description"><?= $item['keterangan'] ?></div>
-                                                <div class="transaction-date"><?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
+                                                <div class="transaction-date">
+                                                    <?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
                                             </div>
                                         </div>
                                         <div class="transaction-amount">
@@ -268,7 +277,7 @@
                         </div>
 
                         <!-- Kas Keluar Terbaru -->
-                        <div class="transaction-category">
+                        <div class="transaction-category" data-type="kas_keluar">
                             <h6 class="category-title mb-3">Kas Keluar Terbaru</h6>
                             <?php if (empty($kas_keluar_terbaru)): ?>
                                 <div class="empty-state">
@@ -283,8 +292,10 @@
                                                 <i class="bi bi-arrow-up"></i>
                                             </div>
                                             <div class="transaction-info">
-                                                <div class="transaction-description"><?= $item['username'] ?? 'System' ?> - <?= $item['pengajuan_keterangan'] ?? $item['keterangan'] ?></div>
-                                                <div class="transaction-date"><?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
+                                                <div class="transaction-description"><?= $item['username'] ?? 'System' ?> -
+                                                    <?= $item['pengajuan_keterangan'] ?? $item['keterangan'] ?></div>
+                                                <div class="transaction-date">
+                                                    <?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
                                             </div>
                                         </div>
                                         <div class="transaction-amount">
@@ -328,28 +339,46 @@
             }
         });
 
+        // Filter Transaksi
+        const transactionFilter = document.getElementById('transactionFilter');
+        const transactionCategories = document.querySelectorAll('.transaction-category');
+
+        transactionFilter.addEventListener('change', function () {
+            const selectedValue = this.value;
+
+            transactionCategories.forEach(category => {
+                const categoryType = category.getAttribute('data-type');
+
+                if (selectedValue === 'all' || selectedValue === categoryType) {
+                    category.style.display = 'block';
+                } else {
+                    category.style.display = 'none';
+                }
+            });
+        });
+
         // Monthly Chart
         const monthLabels = <?= json_encode($bulanLabels) ?>;
         const monthlyData = {
             labels: monthLabels,
             datasets: [{
-                    label: 'Kas Masuk',
-                    data: <?= json_encode($masukData) ?>,
-                    backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                    borderColor: 'rgba(76, 175, 80, 1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4
-                },
-                {
-                    label: 'Kas Keluar',
-                    data: <?= json_encode($keluarData) ?>,
-                    backgroundColor: 'rgba(239, 83, 80, 0.2)',
-                    borderColor: 'rgba(239, 83, 80, 1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4
-                }
+                label: 'Kas Masuk',
+                data: <?= json_encode($masukData) ?>,
+                backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                borderColor: 'rgba(76, 175, 80, 1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            },
+            {
+                label: 'Kas Keluar',
+                data: <?= json_encode($keluarData) ?>,
+                backgroundColor: 'rgba(239, 83, 80, 0.2)',
+                borderColor: 'rgba(239, 83, 80, 1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }
             ]
         };
 
@@ -378,7 +407,7 @@
                         },
                         ticks: {
                             color: '#c7d5e0',
-                            callback: function(value) {
+                            callback: function (value) {
                                 return 'Rp ' + value.toLocaleString('id-ID');
                             }
                         }
@@ -414,11 +443,18 @@
         --border: rgba(255, 255, 255, 0.1);
     }
 
-    body {
-        background: linear-gradient(135deg, var(--dark), #1a1a2e);
-        color: var(--text);
-        min-height: 100vh;
-    }
+    html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+   background: linear-gradient(135deg, var(--dark), #1a1a2e);
+    color: #fff;
+     color: var(--text);
+    overflow-x: hidden;
+     min-height: 100vh;
+}
+
+  
 
     /* Kartu Bank */
     .bank-card {
