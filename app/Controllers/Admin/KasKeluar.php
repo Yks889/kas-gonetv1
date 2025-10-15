@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Controllers\Admin;
-
 use App\Controllers\BaseController;
 use App\Models\PengajuanModel;
 use App\Models\KasKeluarModel;
@@ -17,8 +16,32 @@ class KasKeluar extends BaseController
         $kasKeluarModel->join('pengajuan', 'pengajuan.id = kas_keluar.pengajuan_id', 'left');
         $kasKeluarModel->join('users', 'users.id = pengajuan.user_id', 'left');
 
+        // Ambil semua data untuk tabel
         $data['title'] = 'Kas Keluar';
         $data['kas_keluar'] = $kasKeluarModel->findAll();
+
+        // --- 🔹 PERBAIKAN: Sesuaikan nama variabel dengan view ---
+        // Total seluruh pengeluaran (hitung dari kas_keluar.nominal)
+        $data['total_pengeluaran'] = $kasKeluarModel
+            ->selectSum('kas_keluar.nominal')
+            ->join('pengajuan p', 'p.id = kas_keluar.pengajuan_id', 'left')
+            ->where('p.status', 'selesai') // Hanya yang status selesai
+            ->get()
+            ->getRow()->nominal ?? 0;
+
+        // Total transaksi dengan status 'selesai'
+        $data['total_selesai'] = $kasKeluarModel
+            ->join('pengajuan p2', 'p2.id = kas_keluar.pengajuan_id', 'left')
+            ->where('p2.status', 'selesai')
+            ->countAllResults();
+
+        // Total user unik yang melakukan kas keluar
+        $data['total_user'] = $kasKeluarModel
+            ->join('pengajuan p3', 'p3.id = kas_keluar.pengajuan_id', 'left')
+            ->join('users u3', 'u3.id = p3.user_id', 'left')
+            ->distinct()
+            ->select('u3.id')
+            ->countAllResults();
 
         return view('admin/kas_keluar/index', $data);
     }
