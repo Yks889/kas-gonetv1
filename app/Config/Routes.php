@@ -20,6 +20,9 @@ $routes->get('/logout', 'Auth::logout');
 $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     $routes->get('dashboard', 'Admin\Dashboard::index');
 
+    $routes->get('dashboard/get_detail/(:segment)/(:num)', 'Admin\Dashboard::get_detail/$1/$2');
+
+
     $routes->get('users', 'Admin\Users::index');
     $routes->get('users/create', 'Admin\Users::create');
     $routes->post('users/store', 'Admin\Users::store');
