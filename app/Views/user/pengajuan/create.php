@@ -87,13 +87,13 @@
                 <!-- Deadline Input -->
                 <div class="col-md-6">
                     <label for="deadline" class="form-label text-white">
-                        <i class="bi bi-calendar me-1"></i> Deadline (Opsional)
+                        <i class="bi bi-calendar me-1"></i> Tanggal
                     </label>
                     <input type="date"
                         class="form-control modern-input"
                         id="deadline"
                         name="deadline">
-                    <div class="form-text text-light">Tentukan batas waktu jika diperlukan</div>
+                    <div class="form-text text-light">Tentukan tanggal</div>
                 </div>
 
                 <!-- Field Upload Nota (hanya tampil jika uang_sendiri) -->
@@ -101,11 +101,20 @@
                     <label for="file_nota" class="form-label text-white">
                         <i class="bi bi-paperclip me-1"></i> Upload Nota/Struk
                     </label>
-                    <input type="file"
-                        class="form-control modern-input"
-                        id="file_nota"
-                        name="file_nota"
-                        accept=".jpg,.jpeg,.png,.pdf">
+
+                    <!-- Custom File Input -->
+                    <div class="custom-file-container">
+                        <input type="file"
+                            class="custom-file-input"
+                            id="file_nota"
+                            name="file_nota"
+                            accept=".jpg,.jpeg,.png,.pdf">
+                        <label for="file_nota" class="custom-file-label">
+                            <i class="bi bi-cloud-upload me-2"></i>
+                            <span class="file-text">Pilih file...</span>
+                        </label>
+                    </div>
+
                     <div class="form-text text-light">Format yang didukung: JPG, PNG, PDF (maks. 5MB)</div>
                 </div>
 
@@ -192,6 +201,77 @@
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         color: #fff !important;
     }
+
+    /* Custom File Input Styling */
+    .custom-file-container {
+        position: relative;
+        width: 100%;
+    }
+
+    .custom-file-input {
+        position: absolute;
+        left: -9999px;
+        opacity: 0;
+    }
+
+    .custom-file-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: #fff;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        min-height: 50px;
+        width: 100%;
+    }
+
+    .custom-file-label:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-1px);
+    }
+
+    .custom-file-label:active {
+        transform: translateY(0);
+    }
+
+    .file-text {
+        color: #bbb;
+        font-style: italic;
+    }
+
+    /* Style untuk ketika file dipilih */
+    .custom-file-input:focus+.custom-file-label {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+    }
+
+    .custom-file-input:valid+.custom-file-label {
+        border-color: #06d6a0;
+        background: rgba(6, 214, 160, 0.05);
+    }
+
+    .custom-file-input:valid+.custom-file-label .file-text {
+        color: #06d6a0;
+        font-weight: 500;
+    }
+
+    /* File name display */
+    .custom-file-input:valid+.custom-file-label::after {
+        content: attr(data-file-name);
+        color: #06d6a0;
+        font-weight: 500;
+    }
+
+    .custom-file-input:valid+.custom-file-label .file-text {
+        display: none;
+    }
 </style>
 
 <!-- Script Format Nominal -->
@@ -216,6 +296,7 @@
         const tipeSelect = document.getElementById('tipe');
         const uploadNotaField = document.getElementById('uploadNotaField');
         const fileInput = document.getElementById('file_nota');
+        const fileLabel = document.querySelector('.custom-file-label');
 
         function toggleNotaField() {
             if (tipeSelect.value === 'uang_sendiri') {
@@ -225,12 +306,39 @@
                 uploadNotaField.style.display = 'none';
                 fileInput.removeAttribute('required');
                 fileInput.value = '';
+                // Reset file label
+                fileLabel.querySelector('.file-text').textContent = 'Pilih file...';
+                fileLabel.removeAttribute('data-file-name');
             }
         }
+
+        // Handle file selection
+        fileInput.addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'Pilih file...';
+            fileLabel.setAttribute('data-file-name', fileName);
+            fileLabel.querySelector('.file-text').textContent = fileName;
+        });
 
         tipeSelect.addEventListener('change', toggleNotaField);
         toggleNotaField(); // panggil sekali saat load
     });
+
+    // Form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
 </script>
 
 <?= $this->endSection() ?>
