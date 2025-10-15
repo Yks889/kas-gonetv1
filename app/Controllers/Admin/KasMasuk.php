@@ -15,20 +15,21 @@ class KasMasuk extends BaseController
         $month = $this->request->getGet('month');
         $year  = $this->request->getGet('year');
 
+        // Ambil data berdasarkan filter
         if ($month && $year) {
             $data['kas_masuk'] = $model
-                ->where("MONTH(created_at) = $month")
-                ->where("YEAR(created_at) = $year")
+                ->where("MONTH(created_at)", $month)
+                ->where("YEAR(created_at)", $year)
                 ->orderBy('created_at', 'DESC')
                 ->findAll();
         } elseif ($year) {
             $data['kas_masuk'] = $model
-                ->where("YEAR(created_at) = $year")
+                ->where("YEAR(created_at)", $year)
                 ->orderBy('created_at', 'DESC')
                 ->findAll();
         } elseif ($month) {
             $data['kas_masuk'] = $model
-                ->where("MONTH(created_at) = $month")
+                ->where("MONTH(created_at)", $month)
                 ->orderBy('created_at', 'DESC')
                 ->findAll();
         } else {
@@ -37,8 +38,18 @@ class KasMasuk extends BaseController
                 ->findAll();
         }
 
+        // 🟩 Hitung total kas berdasarkan hasil filter
+        $totalKas = 0;
+        if (!empty($data['kas_masuk'])) {
+            foreach ($data['kas_masuk'] as $kas) {
+                $totalKas += $kas['nominal'];
+            }
+        }
+        $data['totalKas'] = $totalKas;
+
         return view('admin/kas_masuk/index', $data);
     }
+
 
     public function create()
     {

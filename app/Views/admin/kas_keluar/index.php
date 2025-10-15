@@ -17,6 +17,78 @@
         </div>
     <?php endif; ?>
 
+    <!-- Info Cards -->
+    <div class="row mb-4">
+        <!-- Total Pengeluaran -->
+        <div class="col-md-4 mb-3">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="card-icon me-3">
+                        <i class="bi bi-arrow-up-circle text-danger"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title text-white mb-1">Total Pengeluaran</h5>
+                        <h3 class="card-value text-danger mb-0">
+                            Rp <?= isset($total_pengeluaran) ? number_format($total_pengeluaran, 0, ',', '.') : '0' ?>
+                        </h3>
+                    </div>
+                </div>
+                <div class="card-footer mt-3 pt-3 border-top border-secondary">
+                    <small class="text-white">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Total semua pengeluaran yang telah disetujui
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Data Selesai -->
+        <div class="col-md-4 mb-3">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="card-icon me-3">
+                        <i class="bi bi-check-circle text-success"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title text-white mb-1">Data Selesai</h5>
+                        <h3 class="card-value text-success mb-0">
+                            <?= isset($total_selesai) ? number_format($total_selesai, 0, ',', '.') : '0' ?>
+                        </h3>
+                    </div>
+                </div>
+                <div class="card-footer mt-3 pt-3 border-top border-secondary">
+                    <small class="text-white">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Pengajuan yang sudah diproses dan selesai
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total User Mengajukan -->
+        <div class="col-md-4 mb-3">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="card-icon me-3">
+                        <i class="bi bi-people text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title text-white mb-1">User Mengajukan</h5>
+                        <h3 class="card-value text-warning mb-0">
+                            <?= isset($total_user) ? number_format($total_user, 0, ',', '.') : '0' ?>
+                        </h3>
+                    </div>
+                </div>
+                <div class="card-footer mt-3 pt-3 border-top border-secondary">
+                    <small class="text-white">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Jumlah user yang melakukan pengajuan
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Table Controls -->
     <div class="row mb-3 g-2">
         <!-- Rows per page -->
@@ -602,6 +674,32 @@
 
     .swal2-popup.stylish-modal .modal-icon {
         animation: pulseWarning 2s infinite;
+    }
+
+    .card-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        font-size: 1.8rem;
+    }
+
+    .card-title {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #aaa;
+    }
+
+    .card-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .card-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 </style>
 

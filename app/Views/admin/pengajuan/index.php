@@ -236,11 +236,12 @@
                                             </button>
                                         <?php elseif ($p['status'] == 'diterima'): ?>
                                             <?php if (!empty($p['file_nota'])): ?>
-                                                <a href="<?= base_url('uploads/nota/' . $p['file_nota']) ?>"
-                                                    target="_blank" class="btn btn-sm btn-outline-info stylish-btn me-1"
-                                                    title="Lihat Nota">
+                                                <!-- Tombol Lihat Rincian (menggantikan Lihat Nota) -->
+                                                <button class="btn btn-sm btn-outline-info stylish-btn me-1"
+                                                    data-bs-toggle="modal" data-bs-target="#detailModal<?= $p['id'] ?>"
+                                                    title="Lihat Rincian Pengajuan">
                                                     <i class="bi bi-eye"></i>
-                                                </a>
+                                                </button>
                                                 <?php if ($p['tipe'] === 'uang_sendiri'): ?>
                                                     <button onclick="confirmProcessUangSendiri(<?= $p['id'] ?>, '<?= esc($p['username']) ?>', 'Rp <?= number_format($p['nominal'], 0, ',', '.') ?>', '<?= esc($p['keterangan']) ?>', <?= $p['nominal'] ?>)"
                                                         class="btn btn-sm btn-outline-light stylish-btn"
@@ -266,11 +267,12 @@
                                                 </button>
                                             <?php endif; ?>
                                         <?php elseif ($p['status'] == 'selesai' && $p['file_nota']): ?>
-                                            <a href="<?= base_url('uploads/nota/' . $p['file_nota']) ?>"
-                                                target="_blank" class="btn btn-sm btn-outline-info stylish-btn"
-                                                title="Lihat Nota">
+                                            <!-- Tombol Lihat Rincian untuk status selesai -->
+                                            <button class="btn btn-sm btn-outline-info stylish-btn"
+                                                data-bs-toggle="modal" data-bs-target="#detailModal<?= $p['id'] ?>"
+                                                title="Lihat Rincian Pengajuan">
                                                 <i class="bi bi-eye"></i>
-                                            </a>
+                                            </button>
                                         <?php else: ?>
                                             <span class="text-muted small">-</span>
                                         <?php endif; ?>
@@ -278,35 +280,389 @@
                                 </td>
                             </tr>
 
-                            <!-- Modal Upload Nota -->
-                            <?php if ($p['status'] == 'diterima' && empty($p['file_nota'])): ?>
-                                <div class="modal fade" id="processModal<?= $p['id'] ?>" tabindex="-1">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header bg-light">
-                                                <h5 class="modal-title">
-                                                    <i class="bi bi-upload me-2"></i>Proses Pengajuan #<?= $p['id'] ?>
-                                                </h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <!-- Modal Detail Pengajuan (Menggantikan modal lihat nota) -->
+                            <?php if (($p['status'] == 'diterima' || $p['status'] == 'selesai') && !empty($p['file_nota'])): ?>
+                                <div class="modal fade" id="detailModal<?= $p['id'] ?>" tabindex="-1">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                        <div class="modal-content stylish-modal">
+                                            <div class="modal-header stylish-modal-header">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="modal-icon me-3">
+                                                        <i class="bi bi-info-circle-fill"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h5 class="modal-title mb-0">Rincian Pengajuan</h5>
+                                                        <p class="modal-subtitle mb-0">Detail lengkap pengajuan #<?= $p['id'] ?></p>
+                                                    </div>
+                                                </div>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                             </div>
-                                            <form method="post"
-                                                action="<?= site_url('admin/pengajuan/process/' . $p['id']) ?>"
-                                                enctype="multipart/form-data">
-                                                <div class="modal-body">
-                                                    <div class="mb-3">
-                                                        <label class="form-label fw-medium">Upload Nota/Struk</label>
-                                                        <input type="file" class="form-control" name="file_nota"
-                                                            accept=".jpg,.jpeg,.png,.pdf" required>
-                                                        <div class="form-text">
-                                                            Format: JPG, PNG, PDF (Maks. 5MB)
+                                            <div class="modal-body stylish-modal-body">
+                                                <!-- Info Pengajuan -->
+                                                <div class="info-card mb-4">
+                                                    <h6 class="section-title mb-3">
+                                                        <i class="bi bi-card-checklist me-2"></i>Data Pengajuan
+                                                    </h6>
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <div class="info-item">
+                                                                <div class="info-icon">
+                                                                    <i class="bi bi-person"></i>
+                                                                </div>
+                                                                <div class="info-content">
+                                                                    <div class="info-label">User</div>
+                                                                    <div class="info-value"><?= esc($p['username']) ?></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="info-item">
+                                                                <div class="info-icon">
+                                                                    <i class="bi bi-cash-coin"></i>
+                                                                </div>
+                                                                <div class="info-content">
+                                                                    <div class="info-label">Nominal</div>
+                                                                    <div class="info-value text-success">Rp <?= number_format($p['nominal'], 0, ',', '.') ?></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <div class="info-item">
+                                                                <div class="info-icon">
+                                                                    <i class="bi bi-chat-left-text"></i>
+                                                                </div>
+                                                                <div class="info-content">
+                                                                    <div class="info-label">Keterangan</div>
+                                                                    <div class="info-value"><?= esc($p['keterangan']) ?></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="info-item">
+                                                                <div class="info-icon">
+                                                                    <i class="bi bi-tag"></i>
+                                                                </div>
+                                                                <div class="info-content">
+                                                                    <div class="info-label">Tipe</div>
+                                                                    <div class="info-value">
+                                                                        <?php if ($p['tipe'] === 'uang_sendiri'): ?>
+                                                                            <span class="badge bg-info">Uang Sendiri</span>
+                                                                        <?php else: ?>
+                                                                            <span class="badge bg-primary">Minta Admin</span>
+                                                                        <?php endif; ?>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="info-item">
+                                                                <div class="info-icon">
+                                                                    <i class="bi bi-calendar"></i>
+                                                                </div>
+                                                                <div class="info-content">
+                                                                    <div class="info-label">Tanggal Pengajuan</div>
+                                                                    <div class="info-value"><?= date('d/m/Y', strtotime($p['created_at'])) ?></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="info-item">
+                                                                <div class="info-icon">
+                                                                    <i class="bi bi-hourglass"></i>
+                                                                </div>
+                                                                <div class="info-content">
+                                                                    <div class="info-label">Status</div>
+                                                                    <div class="info-value">
+                                                                        <?php
+                                                                        $status = strtolower($p['status']);
+                                                                        $badge = [
+                                                                            'pending' => 'bg-warning text-dark',
+                                                                            'diterima' => 'bg-success',
+                                                                            'ditolak' => 'bg-danger',
+                                                                            'selesai' => 'bg-primary'
+                                                                        ];
+                                                                        ?>
+                                                                        <span class="badge <?= $badge[$status] ?? 'bg-secondary' ?>">
+                                                                            <?= ucfirst($p['status']) ?>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="info-item">
+                                                                <div class="info-icon">
+                                                                    <i class="bi bi-calendar-check"></i>
+                                                                </div>
+                                                                <div class="info-content">
+                                                                    <div class="info-label">Deadline</div>
+                                                                    <div class="info-value"><?= $p['deadline'] ? date('d/m/Y', strtotime($p['deadline'])) : '-' ?></div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-outline-secondary"
-                                                        data-bs-dismiss="modal">Batal</button>
-                                                    <button type="submit" class="btn btn-primary">
-                                                        <i class="bi bi-check-lg me-1"></i>Proses
+
+                                                <!-- File Nota -->
+                                                <div class="file-section">
+                                                    <h6 class="section-title mb-3">
+                                                        <i class="bi bi-file-earmark-text me-2"></i>File Nota
+                                                    </h6>
+                                                    <div class="file-preview-card">
+                                                        <div class="preview-header">
+                                                            <div class="file-info">
+                                                                <div class="file-icon">
+                                                                    <?php
+                                                                    $fileExtension = pathinfo($p['file_nota'], PATHINFO_EXTENSION);
+                                                                    $iconClass = 'bi-file-earmark-text';
+                                                                    if (in_array(strtolower($fileExtension), ['jpg', 'jpeg', 'png', 'gif'])) {
+                                                                        $iconClass = 'bi-file-image';
+                                                                    } elseif (strtolower($fileExtension) === 'pdf') {
+                                                                        $iconClass = 'bi-file-pdf';
+                                                                    }
+                                                                    ?>
+                                                                    <i class="bi <?= $iconClass ?>"></i>
+                                                                </div>
+                                                                <div class="file-details">
+                                                                    <div class="file-name"><?= $p['file_nota'] ?></div>
+                                                                    <div class="file-type"><?= strtoupper($fileExtension) ?> File</div>
+                                                                </div>
+                                                            </div>
+                                                            <a href="<?= base_url('uploads/nota/' . $p['file_nota']) ?>"
+                                                                target="_blank"
+                                                                class="btn btn-outline-light btn-sm stylish-btn">
+                                                                <i class="bi bi-download me-1"></i> Download
+                                                            </a>
+                                                        </div>
+                                                        <div class="preview-content mt-3">
+                                                            <?php if (in_array(strtolower($fileExtension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
+                                                                <!-- Preview Gambar -->
+                                                                <div class="image-preview">
+                                                                    <img src="<?= base_url('uploads/nota/' . $p['file_nota']) ?>"
+                                                                        alt="Nota Pengajuan"
+                                                                        class="img-fluid rounded"
+                                                                        style="max-height: 400px; object-fit: contain;">
+                                                                </div>
+                                                            <?php elseif (strtolower($fileExtension) === 'pdf'): ?>
+                                                                <!-- Preview PDF (Embed) -->
+                                                                <div class="pdf-preview">
+                                                                    <iframe src="<?= base_url('uploads/nota/' . $p['file_nota']) ?>"
+                                                                        width="100%"
+                                                                        height="400"
+                                                                        style="border: none; border-radius: 8px;">
+                                                                        Browser Anda tidak mendukung preview PDF.
+                                                                        <a href="<?= base_url('uploads/nota/' . $p['file_nota']) ?>" target="_blank">
+                                                                            Download file
+                                                                        </a>
+                                                                    </iframe>
+                                                                </div>
+                                                            <?php else: ?>
+                                                                <!-- File tidak dapat dipreview -->
+                                                                <div class="no-preview text-center py-4">
+                                                                    <i class="bi bi-file-earmark-text display-4 text-muted mb-3"></i>
+                                                                    <p class="text-muted">Preview tidak tersedia untuk file ini</p>
+                                                                    <a href="<?= base_url('uploads/nota/' . $p['file_nota']) ?>"
+                                                                        target="_blank"
+                                                                        class="btn btn-outline-light stylish-btn">
+                                                                        <i class="bi bi-download me-1"></i> Download File
+                                                                    </a>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer stylish-modal-footer">
+                                                <button type="button" class="btn btn-outline-light stylish-reset-btn" data-bs-dismiss="modal">
+                                                    <i class="bi bi-x-lg me-1"></i> Tutup
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Modal Upload Nota (Tetap sama) -->
+                            <?php if ($p['status'] == 'diterima' && empty($p['file_nota'])): ?>
+                                <div class="modal fade" id="processModal<?= $p['id'] ?>" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content stylish-modal">
+                                            <div class="modal-header stylish-modal-header">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="modal-icon me-3">
+                                                        <i class="bi bi-cloud-upload-fill"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h5 class="modal-title mb-0">Upload Nota Pengajuan</h5>
+                                                        <p class="modal-subtitle mb-0">Lengkapi dokumen untuk pengajuan #<?= $p['id'] ?></p>
+                                                    </div>
+                                                </div>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form method="post" action="<?= site_url('admin/pengajuan/process/' . $p['id']) ?>" enctype="multipart/form-data">
+                                                <div class="modal-body stylish-modal-body">
+                                                    <!-- Info Pengajuan -->
+                                                    <div class="info-card mb-4">
+                                                        <h6 class="section-title mb-3">
+                                                            <i class="bi bi-info-circle me-2"></i>Detail Pengajuan
+                                                        </h6>
+                                                        <div class="row g-3">
+                                                            <div class="col-md-6">
+                                                                <div class="info-item">
+                                                                    <div class="info-icon">
+                                                                        <i class="bi bi-person"></i>
+                                                                    </div>
+                                                                    <div class="info-content">
+                                                                        <div class="info-label">User</div>
+                                                                        <div class="info-value"><?= esc($p['username']) ?></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="info-item">
+                                                                    <div class="info-icon">
+                                                                        <i class="bi bi-cash-coin"></i>
+                                                                    </div>
+                                                                    <div class="info-content">
+                                                                        <div class="info-label">Nominal</div>
+                                                                        <div class="info-value text-success">Rp <?= number_format($p['nominal'], 0, ',', '.') ?></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="info-item">
+                                                                    <div class="info-icon">
+                                                                        <i class="bi bi-chat-left-text"></i>
+                                                                    </div>
+                                                                    <div class="info-content">
+                                                                        <div class="info-label">Keterangan</div>
+                                                                        <div class="info-value"><?= esc($p['keterangan']) ?></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="info-item">
+                                                                    <div class="info-icon">
+                                                                        <i class="bi bi-tag"></i>
+                                                                    </div>
+                                                                    <div class="info-content">
+                                                                        <div class="info-label">Tipe</div>
+                                                                        <div class="info-value">
+                                                                            <?php if ($p['tipe'] === 'uang_sendiri'): ?>
+                                                                                <span class="badge bg-info">Uang Sendiri</span>
+                                                                            <?php else: ?>
+                                                                                <span class="badge bg-primary">Minta Admin</span>
+                                                                            <?php endif; ?>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="info-item">
+                                                                    <div class="info-icon">
+                                                                        <i class="bi bi-calendar"></i>
+                                                                    </div>
+                                                                    <div class="info-content">
+                                                                        <div class="info-label">Tanggal</div>
+                                                                        <div class="info-value"><?= date('d/m/Y', strtotime($p['created_at'])) ?></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Upload Section -->
+                                                    <div class="upload-section">
+                                                        <h6 class="section-title mb-3">
+                                                            <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload Dokumen
+                                                        </h6>
+
+                                                        <div class="file-upload-area" id="uploadArea<?= $p['id'] ?>">
+                                                            <div class="upload-placeholder">
+                                                                <i class="bi bi-cloud-upload display-4 mb-3 upload-icon"></i>
+                                                                <h6 class="upload-title">Drop file here or click to upload</h6>
+                                                                <p class="upload-subtitle">Format: JPG, PNG, PDF (Maks. 5MB)</p>
+                                                                <div class="upload-features">
+                                                                    <span class="feature-badge">
+                                                                        <i class="bi bi-check-lg me-1"></i>Secure
+                                                                    </span>
+                                                                    <span class="feature-badge">
+                                                                        <i class="bi bi-check-lg me-1"></i>Fast
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <input type="file" class="file-input" name="file_nota"
+                                                                accept=".jpg,.jpeg,.png,.pdf" required
+                                                                id="fileInput<?= $p['id'] ?>">
+                                                        </div>
+
+                                                        <!-- File Preview -->
+                                                        <div class="file-preview mt-3 d-none" id="filePreview<?= $p['id'] ?>">
+                                                            <div class="preview-card">
+                                                                <div class="preview-icon">
+                                                                    <i class="bi bi-file-earmark-text"></i>
+                                                                </div>
+                                                                <div class="preview-info flex-grow-1">
+                                                                    <div class="file-name text-light fw-medium"></div>
+                                                                    <div class="file-size text-muted small"></div>
+                                                                    <div class="file-status text-success small">
+                                                                        <i class="bi bi-check-circle-fill me-1"></i>Ready to upload
+                                                                    </div>
+                                                                </div>
+                                                                <button type="button" class="btn btn-sm btn-outline-danger remove-file" title="Remove file">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Upload Progress -->
+                                                        <div class="upload-progress mt-3 d-none" id="uploadProgress<?= $p['id'] ?>">
+                                                            <div class="progress-bar-container">
+                                                                <div class="progress-info d-flex justify-content-between mb-2">
+                                                                    <span class="progress-status">Uploading...</span>
+                                                                    <span class="progress-percent">0%</span>
+                                                                </div>
+                                                                <div class="progress-bar">
+                                                                    <div class="progress-fill"></div>
+                                                                </div>
+                                                                <div class="progress-details mt-2 text-center">
+                                                                    <small class="text-muted">Please wait while we process your file</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Information Box -->
+                                                    <div class="info-box mt-4">
+                                                        <div class="info-box-header">
+                                                            <i class="bi bi-info-circle-fill me-2"></i>
+                                                            <span class="fw-medium">Informasi Penting</span>
+                                                        </div>
+                                                        <div class="info-box-content">
+                                                            <ul class="info-list">
+                                                                <li>
+                                                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                                                    Pastikan file nota jelas dan terbaca
+                                                                </li>
+                                                                <li>
+                                                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                                                    File akan diverifikasi sebelum diproses
+                                                                </li>
+                                                                <li>
+                                                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                                                    Proses mungkin memakan waktu beberapa menit
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal-footer stylish-modal-footer">
+                                                    <button type="button" class="btn btn-outline-light stylish-reset-btn" data-bs-dismiss="modal">
+                                                        <i class="bi bi-arrow-left me-1"></i> Kembali
+                                                    </button>
+                                                    <button type="submit" class="btn btn-gradient-primary stylish-apply-btn" id="submitBtn<?= $p['id'] ?>" disabled>
+                                                        <i class="bi bi-cloud-upload me-1"></i> Upload & Proses
                                                     </button>
                                                 </div>
                                             </form>
@@ -345,7 +701,7 @@
     </div>
 </div>
 
-<!-- Styling tambahan -->
+<!-- Styling tambahan untuk modal rincian -->
 <style>
     .dashboard-card {
         background: rgba(26, 26, 26, 0.9);
@@ -805,24 +1161,614 @@
     }
 
     .btn-gradient-primary {
-        background-color: #0d6efd;
-        border: 1px solid #0d6efd;
-        border-radius: 8px;
+        background: linear-gradient(135deg, #4361ee, #3a56d4);
+        border: none;
+        border-radius: 10px;
         color: #fff;
         font-weight: 500;
         padding: 10px 20px;
-        transition: 0.3s ease;
+        transition: all 0.3s ease;
     }
 
     .btn-gradient-primary:hover {
-        background-color: #0b5ed7;
-        border-color: #0a58ca;
+        background: linear-gradient(135deg, #3a56d4, #2f45b8);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+    }
+
+    /* ==================== */
+    /* STYLING MODAL UPLOAD */
+    /* ==================== */
+
+    /* Section Title */
+    .section-title {
+        color: #66c0f4;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Info Card */
+    .info-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-icon {
+        width: 36px;
+        height: 36px;
+        background: rgba(67, 97, 238, 0.1);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: #4361ee;
+        font-size: 1.1rem;
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-label {
+        color: #aaa;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        color: #fff;
+        font-size: 0.95rem;
+        font-weight: 400;
+    }
+
+    /* Upload Section */
+    .upload-section {
+        margin-top: 2rem;
+    }
+
+    .file-upload-area {
+        border: 2px dashed rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(255, 255, 255, 0.02);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .file-upload-area:hover {
+        border-color: #4361ee;
+        background: rgba(67, 97, 238, 0.05);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(67, 97, 238, 0.15);
+    }
+
+    .file-upload-area.dragover {
+        border-color: #06d6a0;
+        background: rgba(6, 214, 160, 0.08);
+        transform: scale(1.02);
+    }
+
+    .file-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .upload-placeholder {
+        pointer-events: none;
+    }
+
+    .upload-icon {
+        color: #666;
+        transition: all 0.3s ease;
+    }
+
+    .file-upload-area:hover .upload-icon {
+        color: #4361ee;
+        transform: translateY(-5px);
+    }
+
+    .upload-title {
+        color: #fff;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .upload-subtitle {
+        color: #888;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .upload-features {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .feature-badge {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        color: #aaa;
+        display: flex;
+        align-items: center;
+    }
+
+    .feature-badge i {
+        font-size: 0.7rem;
+        color: #06d6a0;
+    }
+
+    /* File Preview */
+    .file-preview {
+        animation: slideInDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .preview-card {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 1.25rem;
+        gap: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .preview-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+    }
+
+    .preview-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #4361ee, #4cc9f0);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .preview-info {
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    .file-name {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .file-size {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .file-status {
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .file-status i {
+        font-size: 0.7rem;
+    }
+
+    .remove-file {
+        border-radius: 8px;
+        padding: 0.5rem 0.6rem;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .remove-file:hover {
+        background: #dc3545;
+        border-color: #dc3545;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    /* Upload Progress */
+    .upload-progress {
+        animation: fadeIn 0.4s ease;
+    }
+
+    .progress-bar-container {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+
+    .progress-info {
+        margin-bottom: 1rem;
+    }
+
+    .progress-status {
+        color: #fff;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .progress-percent {
+        color: #06d6a0;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #06d6a0, #4cc9f0);
+        border-radius: 4px;
+        width: 0%;
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .progress-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        animation: shimmer 2s infinite;
+    }
+
+    .progress-details {
+        margin-top: 0.75rem;
+    }
+
+    /* Information Box */
+    .info-box {
+        background: rgba(255, 193, 7, 0.05);
+        border: 1px solid rgba(255, 193, 7, 0.15);
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+
+    .info-box-header {
+        color: #ffc107;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .info-box-content {
+        color: #ffd166;
+    }
+
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .info-list li {
+        padding: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+
+    .info-list li i {
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+
+    /* Animations */
+    @keyframes shimmer {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Badge styling dalam modal */
+    .modal .badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+    }
+
+    /* Styling khusus untuk modal rincian */
+    .file-section {
+        margin-top: 2rem;
+    }
+
+    .file-preview-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .preview-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .file-info {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+    }
+
+    .file-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #4361ee, #4cc9f0);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+
+    .file-details {
+        flex-grow: 1;
+    }
+
+    .file-name {
+        color: #fff;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .file-type {
+        color: #aaa;
+        font-size: 0.85rem;
+    }
+
+    .preview-content {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .image-preview {
+        text-align: center;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .pdf-preview {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .no-preview {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 2rem;
     }
 </style>
 
 <script>
+    // ===========================
+    // FILE UPLOAD FUNCTIONALITY (Tetap sama)
+    // ===========================
+
+    function initFileUploadModal(modalId) {
+        const uploadArea = document.getElementById(`uploadArea${modalId}`);
+        const fileInput = document.getElementById(`fileInput${modalId}`);
+        const filePreview = document.getElementById(`filePreview${modalId}`);
+        const fileName = filePreview.querySelector('.file-name');
+        const fileSize = filePreview.querySelector('.file-size');
+        const removeBtn = filePreview.querySelector('.remove-file');
+        const uploadProgress = document.getElementById(`uploadProgress${modalId}`);
+        const progressFill = uploadProgress.querySelector('.progress-fill');
+        const progressPercent = uploadProgress.querySelector('.progress-percent');
+        const progressStatus = uploadProgress.querySelector('.progress-status');
+        const submitBtn = document.getElementById(`submitBtn${modalId}`);
+
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            uploadArea.classList.add('dragover');
+        }
+
+        function unhighlight() {
+            uploadArea.classList.remove('dragover');
+        }
+
+        // Handle file drop
+        uploadArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        // Handle file input change
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+                if (!validTypes.includes(file.type)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Format tidak didukung',
+                        text: 'Hanya file JPG, PNG, dan PDF yang diperbolehkan.',
+                        confirmButtonText: 'Mengerti',
+                        background: '#1e1e1e',
+                        color: '#fff'
+                    });
+                    return;
+                }
+
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File terlalu besar',
+                        text: 'Ukuran file maksimal 5MB.',
+                        confirmButtonText: 'Mengerti',
+                        background: '#1e1e1e',
+                        color: '#fff'
+                    });
+                    return;
+                }
+
+                // Show file preview
+                showFilePreview(file);
+            }
+        }
+
+        function showFilePreview(file) {
+            const fileSizeFormatted = formatFileSize(file.size);
+
+            fileName.textContent = file.name;
+            fileSize.textContent = fileSizeFormatted;
+
+            filePreview.classList.remove('d-none');
+            uploadProgress.classList.add('d-none');
+            submitBtn.disabled = false;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Remove file
+        removeBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            filePreview.classList.add('d-none');
+            uploadProgress.classList.add('d-none');
+            submitBtn.disabled = true;
+        });
+
+        // Initialize submit button as disabled
+        submitBtn.disabled = true;
+    }
+
+    // Initialize file upload for each modal when shown
+    document.addEventListener('DOMContentLoaded', function() {
+        const modals = document.querySelectorAll('[id^="processModal"]');
+        modals.forEach(modal => {
+            const modalId = modal.id.replace('processModal', '');
+            initFileUploadModal(modalId);
+        });
+    });
+
+    // ===========================
+    // EXISTING FUNCTIONALITY (Tetap sama)
+    // ===========================
+
     const rowsPerPageSelect = document.getElementById("rowsPerPage");
     const table = document.getElementById("pengajuanTable").getElementsByTagName("tbody")[0];
     const paginationInfo = document.getElementById("paginationInfo");
@@ -914,7 +1860,7 @@
     });
 
     // ===========================
-    // FILTER FUNCTIONALITY
+    // FILTER FUNCTIONALITY (Tetap sama)
     // ===========================
     document.getElementById('applyFilter').addEventListener('click', function() {
         const status = document.getElementById('filterStatus').value;
@@ -994,7 +1940,7 @@
     });
 
     // ===========================
-    // FUNGSI POST DINAMIS
+    // FUNGSI POST DINAMIS (Tetap sama)
     // ===========================
     function postToProcess(id) {
         const form = document.createElement('form');
@@ -1004,7 +1950,7 @@
         form.submit();
     }
 
-    // Konfirmasi Approve dengan Validasi Saldo
+    // Konfirmasi Approve dengan Validasi Saldo (Tetap sama)
     function confirmApprove(id, username, nominal, keterangan, tipe, nominalAngka) {
         // CEK SALDO TERLEBIH DAHULU
         if (nominalAngka > saldoAkhir) {
@@ -1152,7 +2098,7 @@
         });
     }
 
-    // Konfirmasi Reject
+    // Konfirmasi Reject (Tetap sama)
     function confirmReject(id, username, nominal, keterangan) {
         Swal.fire({
             html: `
@@ -1224,7 +2170,7 @@
         });
     }
 
-    // Konfirmasi Process untuk Uang Sendiri
+    // Konfirmasi Process untuk Uang Sendiri (Tetap sama)
     function confirmProcessUangSendiri(id, username, nominal, keterangan, nominalAngka) {
         // CEK SALDO JUGA SAAT PROCESS
         if (nominalAngka > saldoAkhir) {
