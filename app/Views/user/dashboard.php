@@ -2,213 +2,217 @@
 <?= $this->section('content') ?>
 
 <div class="container-fluid">
-    <!-- Header -->
-    <div class="row align-items-center mb-4">
-        <div class="col-md-12">
-            <h1 class="h3 mb-0 text-white">Dashboard User</h1>
-            <p class="text-light mb-0">Ringkasan pengajuan dan statistik akun Anda</p>
+    <!-- Header Dashboard -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2 text-white">
+                <i class="bi bi-person me-2"></i>Dashboard User GoNet
+            </h1>
+            <p class="mb-0 text-light">Ringkasan pengajuan dan statistik akun Anda</p>
         </div>
     </div>
 
     <!-- Ringkasan Pengajuan -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
-            <div class="dashboard-card h-100 p-4">
-                <div class="d-flex align-items-center">
-                    <div class="card-icon"><i class="bi bi-list-check"></i></div>
-                    <div class="ms-3">
-                        <h6 class="text-steam-blue mb-1">Total Pengajuan</h6>
-                        <h3 class="text-white mb-0"><?= $total_pengajuan ?></h3>
+            <div class="bank-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon"><i class="bi bi-list-check"></i></div>
+                        <div class="ms-3">
+                            <h6 class="text-muted mb-1">Total Pengajuan</h6>
+                            <h3 class="text-white mb-0"><?= $total_pengajuan ?></h3>
+                        </div>
                     </div>
-                </div>
-                <div class="mt-3">
-                    <span class="badge bg-primary bg-opacity-25 text-primary">
-                        <i class="bi bi-file-earmark-text me-1"></i> Semua pengajuan
-                    </span>
+                    <div class="mt-3">
+                        <span class="badge bg-primary bg-opacity-25 text-primary">
+                            <i class="bi bi-file-earmark-text me-1"></i> Semua pengajuan
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="col-md-3 mb-3">
-            <div class="dashboard-card h-100 p-4">
-                <div class="d-flex align-items-center">
-                    <div class="card-icon"><i class="bi bi-check-circle"></i></div>
-                    <div class="ms-3">
-                        <h6 class="text-steam-blue mb-1">Diterima</h6>
-                        <h3 class="text-white mb-0"><?= $pengajuan_diterima ?></h3>
+            <div class="bank-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon"><i class="bi bi-check-circle"></i></div>
+                        <div class="ms-3">
+                            <h6 class="text-muted mb-1">Diterima</h6>
+                            <h3 class="text-white mb-0"><?= $pengajuan_diterima ?></h3>
+                        </div>
                     </div>
-                </div>
-                <div class="mt-3">
-                    <span class="badge bg-success bg-opacity-25 text-success">
-                        <i class="bi bi-check-lg me-1"></i> Pengajuan disetujui
-                    </span>
+                    <div class="mt-3">
+                        <span class="badge bg-success bg-opacity-25 text-success">
+                            <i class="bi bi-check-lg me-1"></i> Pengajuan disetujui
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="col-md-3 mb-3">
-            <div class="dashboard-card h-100 p-4">
-                <div class="d-flex align-items-center">
-                    <div class="card-icon"><i class="bi bi-clock-history"></i></div>
-                    <div class="ms-3">
-                        <h6 class="text-steam-blue mb-1">Pending</h6>
-                        <h3 class="text-white mb-0"><?= $pengajuan_pending ?></h3>
+            <div class="bank-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon"><i class="bi bi-clock-history"></i></div>
+                        <div class="ms-3">
+                            <h6 class="text-muted mb-1">Pending</h6>
+                            <h3 class="text-white mb-0"><?= $pengajuan_pending ?></h3>
+                        </div>
                     </div>
-                </div>
-                <div class="mt-3">
-                    <span class="badge bg-warning bg-opacity-25 text-warning">
-                        <i class="bi bi-hourglass-split me-1"></i> Menunggu persetujuan
-                    </span>
+                    <div class="mt-3">
+                        <span class="badge bg-warning bg-opacity-25 text-warning">
+                            <i class="bi bi-hourglass-split me-1"></i> Menunggu persetujuan
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="col-md-3 mb-3">
-            <div class="dashboard-card h-100 p-4">
-                <div class="d-flex align-items-center">
-                    <div class="card-icon"><i class="bi bi-x-circle"></i></div>
-                    <div class="ms-3">
-                        <h6 class="text-steam-blue mb-1">Ditolak</h6>
-                        <h3 class="text-white mb-0"><?= $pengajuan_ditolak ?></h3>
+            <div class="bank-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon"><i class="bi bi-x-circle"></i></div>
+                        <div class="ms-3">
+                            <h6 class="text-muted mb-1">Ditolak</h6>
+                            <h3 class="text-white mb-0"><?= $pengajuan_ditolak ?></h3>
+                        </div>
                     </div>
-                </div>
-                <div class="mt-3">
-                    <span class="badge bg-danger bg-opacity-25 text-danger">
-                        <i class="bi bi-exclamation-triangle me-1"></i> Pengajuan ditolak
-                    </span>
+                    <div class="mt-3">
+                        <span class="badge bg-danger bg-opacity-25 text-danger">
+                            <i class="bi bi-exclamation-triangle me-1"></i> Pengajuan ditolak
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Konten Utama - Status Pengajuan & Aksi Cepat (UKURAN DIKECILKAN) -->
-    <div class="row mb-4">
-        <!-- Status Pengajuan -->
-        <div class="col-lg-4 mb-4">
-            <div class="dashboard-card h-100 p-3">
-                <h5 class="text-steam-blue mb-3">Status Pengajuan</h5>
-                <div class="d-flex justify-content-center align-items-center position-relative" style="height: 180px;">
-                    <canvas id="statusChart"></canvas>
-                    <div id="statusCenterText" class="position-absolute text-center">
-                        <h4 class="text-white mb-0">
-                            <?= $total_pengajuan > 0 ? round(($pengajuan_diterima / $total_pengajuan) * 100, 1) : 0 ?>%
-                        </h4>
-                        <small class="text-light">Diterima</small>
-                    </div>
-                </div>
-            </div>
-        </div>
+   
 
         <!-- Aksi Cepat -->
-        <div class="col-lg-4 mb-4">
-            <div class="dashboard-card h-100 p-3">
-                <h5 class="text-steam-blue mb-3">Aksi Cepat</h5>
-                <div class="row g-2">
-                    <!-- Kotak kiri atas -->
-                    <div class="col-md-6">
-                        <a href="<?= site_url('user/pengajuan') ?>"
-                            class="btn btn-info text-light w-100 h-100 py-3 d-flex flex-column align-items-center justify-content-center stylish-btn">
-                            <i class="bi bi-list-ul  display-5 mb-1"></i>
-                            <span class="text-center">Lihat Pengajuan</span>
-                        </a>
-                    </div>
+        <div class="col-lg-8 mb-4">
+            <div class="card-body d-flex flex-column bg-transparent p-0">
+                <div class="quick-actions-grid">
+                    <div class="row g-3">
+                        <!-- Baris Pertama - 2 Kartu -->
+                        <div class="col-md-6">
+                            <a href="<?= site_url('user/pengajuan/create') ?>" class="quick-action-card create">
+                                <div class="action-content-wrapper">
+                                    <div class="action-icon">
+                                        <i class="bi bi-plus-circle"></i>
+                                    </div>
+                                    <div class="action-content">
+                                        <div class="action-title">Ajukan Kas Baru</div>
+                                        <div class="action-desc">Buat pengajuan dana baru</div>
+                                    </div>
+                                </div>
+                                <div class="action-indicator">
+                                    <span class="action-badge">Baru</span>
+                                    <i class="bi bi-arrow-right action-arrow"></i>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="<?= site_url('user/pengajuan') ?>" class="quick-action-card pengajuan">
+                                <div class="action-content-wrapper">
+                                    <div class="action-icon">
+                                        <i class="bi bi-list-ul"></i>
+                                    </div>
+                                    <div class="action-content">
+                                        <div class="action-title">Lihat Pengajuan</div>
+                                        <div class="action-desc">Kelola semua pengajuan Anda</div>
+                                    </div>
+                                </div>
+                                <div class="action-indicator">
+                                    <span class="action-badge"><?= $total_pengajuan ?> Total</span>
+                                    <i class="bi bi-arrow-right action-arrow"></i>
+                                </div>
+                            </a>
+                        </div>
 
-                    <!-- Kotak kanan atas -->
-                    <div class="col-md-6">
-                        <a href="<?= site_url('user/profile') ?>"
-                            class="btn btn-success w-100 h-100 py-3 d-flex flex-column align-items-center justify-content-center stylish-btn">
-                            <i class="bi bi-person display-5 mb-1"></i>
-                            <span class="text-center">Profil Saya</span>
-                        </a>
-                    </div>
-
-                    <!-- Kotak besar bawah -->
-                    <div class="col-md-12 mt-3">
-                        <a href="<?= site_url('user/pengajuan/create') ?>"
-                            class="btn btn-primary w-100 h-100 py-3 d-flex flex-column align-items-center justify-content-center stylish-btn">
-                            <i class="bi bi-plus-circle display-5 mb-1"></i>
-                            <span class="text-center">Ajukan Kas Baru</span>
-                        </a>
+                        <!-- Baris Kedua - Kartu Profil Saya yang Panjang -->
+                        <div class="col-12">
+                            <a href="<?= site_url('user/profile') ?>" class="quick-action-card profile full-width">
+                                <div class="action-content-wrapper">
+                                    <div class="action-icon">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <div class="action-content">
+                                        <div class="action-title">Profil Saya</div>
+                                        <div class="action-desc">Kelola informasi akun dan preferensi Anda</div>
+                                    </div>
+                                </div>
+                                <div class="action-indicator">
+                                    <span class="action-badge">Update</span>
+                                    <i class="bi bi-arrow-right action-arrow"></i>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    
 </div>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Data untuk chart status pengajuan
-    const statusData = {
-        labels: ['Diterima', 'Pending', 'Ditolak'],
-        datasets: [{
-            data: [
-                <?= (int) $pengajuan_diterima ?>,
-                <?= (int) $pengajuan_pending ?>,
-                <?= (int) $pengajuan_ditolak ?>
-            ],
-            backgroundColor: [
-                'rgba(102, 192, 244, 0.8)',
-                'rgba(255, 193, 7, 0.8)',
-                'rgba(239, 83, 80, 0.8)'
-            ],
-            borderColor: [
-                'rgba(102, 192, 244, 1)',
-                'rgba(255, 193, 7, 1)',
-                'rgba(239, 83, 80, 1)'
-            ],
-            borderWidth: 2,
-            hoverOffset: 10
-        }]
-    };
 
-    new Chart(document.getElementById('statusChart'), {
-        type: 'doughnut',
-        data: statusData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        color: '#c7d5e0',
-                        padding: 10,
-                        font: {
-                            size: 11
-                        }
-                    }
-                }
-            }
-        }
-    });
-</script>
 
 <style>
-    .bg-steam-dark {
-        background-color: rgba(42, 71, 94, 0.5);
+    :root {
+        --primary: #1a73e8;
+        --primary-dark: #0d47a1;
+        --secondary: #6c757d;
+        --success: #4caf50;
+        --danger: #f44336;
+        --warning: #ff9800;
+        --info: #2196f3;
+        --dark: #121212;
+        --dark-light: #1e1e1e;
+        --text: #fff;
+        --text-muted: #b0b0b0;
+        --border: rgba(255, 255, 255, 0.1);
     }
 
-    .border-steam {
-        border-color: rgba(102, 192, 244, 0.2) !important;
+    /* Kartu Bank */
+    .bank-card {
+        background: var(--dark-light);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border);
+        padding: 24px;
+        transition: .3s;
+        color: var(--text);
+        height: 100%;
     }
 
-    .btn-outline-steam {
-        color: #66c0f4;
-        border-color: rgba(102, 192, 244, 0.3);
+    .bank-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
     }
 
-    .btn-outline-steam:hover,
-    .btn-outline-steam.active {
-        background-color: rgba(102, 192, 244, 0.15);
-        color: white;
-        border-color: rgba(102, 192, 244, 0.5);
+    /* Dashboard Card untuk Diagram Donat */
+    .dashboard-card {
+        background: linear-gradient(145deg, rgba(33, 33, 33, 0.9), rgba(26, 26, 26, 0.9));
+        border-radius: 16px;
+        box-shadow:
+            0 4px 20px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
 
     .text-steam-blue {
-        color: #66c0f4;
+        color: #66c0f4 !important;
     }
 
     .card-icon {
@@ -223,115 +227,397 @@
         color: #66c0f4;
     }
 
-    .dashboard-card {
-        background: rgba(26, 26, 26, 0.9);
-        border-radius: 14px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    /* Modern Donut Container - Diperbesar */
+    .modern-donut-container {
+        background: linear-gradient(145deg, rgba(26, 26, 26, 0.7), rgba(40, 40, 40, 0.7));
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.05),
+            0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .percentage-display {
+        background: rgba(26, 26, 26, 0.8);
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    #statusCenterText {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #66c0f4;
+    .percentage-display h2 {
+        font-size: 2rem;
+        font-weight: 700;
     }
 
-    #statusCenterText small {
-        font-size: 0.7rem;
-        color: #c7d5e0;
+    .percentage-display small {
+        font-size: 0.8rem;
     }
 
-    .stylish-btn {
-        border-radius: 10px;
-        padding: 10px;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+    /* AKSI CEPAT */
+    .quick-actions-grid {
+        flex: 1;
+    }
+
+    .quick-action-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        background: var(--dark-light);
+        border-radius: 12px;
         text-decoration: none;
+        color: var(--text);
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+        height: 100%;
+        min-height: 100px;
+    }
+
+    /* Kartu Profil Saya yang Panjang */
+    .quick-action-card.full-width {
+        min-height: 100px;
+        width: 100%;
+    }
+
+    .quick-action-card:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-3px);
+        border-color: rgba(255, 255, 255, 0.2);
+        text-decoration: none;
+        color: var(--text);
+    }
+
+    .action-content-wrapper {
+        display: flex;
+        align-items: center;
+        flex: 1;
+    }
+
+    .quick-action-card .action-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .quick-action-card.create .action-icon {
+        background: rgba(76, 175, 80, 0.15);
+        color: var(--success);
+        border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .quick-action-card.pengajuan .action-icon {
+        background: rgba(33, 150, 243, 0.15);
+        color: var(--info);
+        border: 1px solid rgba(33, 150, 243, 0.3);
+    }
+
+    .quick-action-card.profile .action-icon {
+        background: rgba(255, 152, 0, 0.15);
+        color: var(--warning);
+        border: 1px solid rgba(255, 152, 0, 0.3);
+    }
+
+    .quick-action-card:hover .action-icon {
+        transform: scale(1.1);
+    }
+
+    .action-content {
+        flex: 1;
+    }
+
+    .action-title {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 4px;
+        color: var(--text);
+    }
+
+    .action-desc {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        line-height: 1.4;
+    }
+
+    .action-indicator {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .action-badge {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-muted);
+    }
+
+    .action-arrow {
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .quick-action-card:hover .action-arrow {
+        transform: translateX(4px);
+        color: var(--text);
+    }
+
+    /* Daftar Transaksi */
+    .transaction-category {
+        margin-bottom: 25px;
+    }
+
+    .category-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text);
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .transaction-list .transaction-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s;
+    }
+
+    .transaction-list .transaction-item:hover {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .transaction-list .transaction-item:last-child {
+        border-bottom: none;
+    }
+
+    .transaction-details {
+        display: flex;
+        align-items: center;
+    }
+
+    .transaction-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        font-size: 1rem;
+    }
+
+    .transaction-icon.income {
+        background: rgba(76, 175, 80, 0.15);
+        color: var(--success);
+        border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .transaction-icon.expense {
+        background: rgba(239, 83, 80, 0.15);
+        color: var(--danger);
+        border: 1px solid rgba(239, 83, 80, 0.3);
+    }
+
+    .transaction-icon.pending {
+        background: rgba(255, 152, 0, 0.15);
+        color: var(--warning);
+        border: 1px solid rgba(255, 152, 0, 0.3);
+    }
+
+    .transaction-info {
+        flex: 1;
+    }
+
+    .transaction-description {
+        font-weight: 500;
         font-size: 0.9rem;
     }
 
-    .stylish-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+    .transaction-date {
+        font-size: 0.8rem;
+        color: var(--text-muted);
     }
 
-    .stylish-btn i {
-        font-size: 2rem;
-    }
-
-    .stylish-btn span {
-        font-size: 0.95rem;
+    .amount {
         font-weight: 600;
     }
 
-    .filter-card {
-        background-color: rgba(26, 26, 26, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-        padding: 6px 10px;
+    .amount.positive {
+        color: var(--success);
+    }
+
+    .amount.negative {
+        color: var(--danger);
+    }
+
+    .amount.warning {
+        color: var(--warning);
+    }
+
+    .transaction-status {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        margin-top: 4px;
+        display: inline-block;
+    }
+
+    .status-diterima {
+        background: rgba(76, 175, 80, 0.2);
+        color: var(--success);
+    }
+
+    .status-ditolak {
+        background: rgba(239, 83, 80, 0.2);
+        color: var(--danger);
+    }
+
+    .status-pending {
+        background: rgba(255, 152, 0, 0.2);
+        color: var(--warning);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 30px;
+        color: var(--text-muted);
+    }
+
+    .empty-state i {
+        font-size: 2rem;
+        opacity: .5;
+        margin-bottom: 6px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .quick-action-card {
+            min-height: 90px;
+            padding: 16px;
+        }
+
+        .quick-action-card.full-width {
+            min-height: 90px;
+        }
+
+        .quick-action-card .action-icon {
+            width: 44px;
+            height: 44px;
+            font-size: 1.3rem;
+            margin-right: 12px;
+        }
+
+        .transaction-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .transaction-amount {
+            margin-top: 8px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .percentage-display {
+            width: 100px;
+            height: 100px;
+        }
+
+        .percentage-display h2 {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .quick-action-card {
+            flex-direction: column;
+            text-align: center;
+            padding: 20px 16px;
+        }
+
+        .quick-action-card.full-width {
+            flex-direction: row;
+            text-align: left;
+        }
+
+        .action-content-wrapper {
+            flex-direction: column;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .quick-action-card.full-width .action-content-wrapper {
+            flex-direction: row;
+            text-align: left;
+            margin-bottom: 0;
+        }
+
+        .quick-action-card .action-icon {
+            margin-right: 0;
+            margin-bottom: 8px;
+        }
+
+        .quick-action-card.full-width .action-icon {
+            margin-right: 16px;
+            margin-bottom: 0;
+        }
+
+        .action-indicator {
+            flex-direction: row;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .quick-action-card.full-width .action-indicator {
+            width: auto;
+        }
+
+        .modern-donut-container {
+            padding: 1rem;
+        }
+
+        .percentage-display {
+            width: 80px;
+            height: 80px;
+        }
+
+        .percentage-display h2 {
+            font-size: 1.25rem;
+        }
+    }
+
+    .btn-outline-light {
+        border-radius: 8px;
         transition: all 0.3s ease;
     }
 
-    .filter-card:hover {
-        background-color: rgba(26, 26, 26, 0.8);
-        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
-    }
-
-    .stylish-select {
-        border-radius: 8px;
-        padding: 4px 10px;
-        font-size: 0.9rem;
-        background-color: rgba(26, 26, 26, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #fff;
-    }
-
-    .stylish-select:focus {
-        border-color: rgba(255, 255, 255, 0.5);
-        box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.2);
-    }
-
-    /* Supaya isi card tetap rapi */
-    .dashboard-card {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        word-wrap: break-word;
-        overflow: hidden;
-        /* cegah isi keluar */
-    }
-
-    /* Ikon di kiri dan teks di kanan biar tetap fleksibel */
-    .dashboard-card .d-flex {
-        flex-wrap: wrap;
-        /* biar kalau sempit, teks turun */
-    }
-
-    /* Batasi ukuran teks supaya tidak melebihi container */
-    .dashboard-card h3,
-    .dashboard-card h6,
-    .dashboard-card span {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        /* teks panjang dipotong dengan "..." */
-    }
-
-    /* Kalau layar kecil, teks jangan dipotong, biar turun ke bawah */
-    @media (max-width: 576px) {
-        .dashboard-card {
-            padding: 1.2rem;
-            /* agak longgar di HP */
-        }
-
-        .dashboard-card h3 {
-            font-size: 1.4rem;
-            /* biar angka tidak terlalu besar */
-        }
-
-        .dashboard-card h6 {
-            font-size: 0.9rem;
-        }
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
     }
 </style>
 
