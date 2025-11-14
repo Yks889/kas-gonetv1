@@ -208,7 +208,7 @@
                         <th>Keterangan</th>
                         <th style="width: 15%;">Tanggal</th>
                         <th style="width: 12%;">Status</th>
-                        <th style="width: 15%;">Aksi</th>
+                        <th style="width: 18%;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -222,34 +222,273 @@
                                     Rp <?= isset($row['nominal']) ? number_format($row['nominal'], 0, ',', '.') : '-' ?>
                                 </td>
                                 <td class="text-light"><?= esc($row['keterangan'] ?? '-') ?></td>
-                                <td><?= !empty($row['deadline']) ? date('d/m/Y', strtotime($row['deadline'])) : '-' ?></td>
+                                <td><?= !empty($row['confirm_at']) ? date('d/m/Y H:i', strtotime($row['confirm_at'])) : '-' ?></td>
                                 <td data-status="<?= strtolower($row['status'] ?? '') ?>">
                                     <?php
                                     $status = strtolower($row['status'] ?? '');
-                                    $badgeClass = match ($status) {
-                                        'pending' => 'secondary',
-                                        'diterima' => 'success',
-                                        'ditolak' => 'danger',
-                                        'selesai' => 'warning text-dark',
-                                        default => 'secondary'
-                                    };
+                                    $badge = [
+                                        'pending'    => 'bg-warning text-dark',
+                                        'diterima'   => 'bg-success',
+                                        'ditolak'    => 'bg-danger',
+                                        'selesai'    => 'bg-primary'
+                                    ];
                                     ?>
-                                    <span class="badge rounded-pill bg-<?= $badgeClass ?>">
+                                    <span class="badge <?= $badge[$status] ?? 'bg-secondary' ?>">
                                         <?= ucfirst($row['status'] ?? '-') ?>
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="<?= site_url('admin/kas_keluar/edit/' . $row['pengajuan_id']) ?>"
-                                        class="btn btn-sm btn-outline-light stylish-btn" title="Edit Data">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </a>
-                                    <a href="javascript:void(0);"
-                                        onclick="confirmDelete(<?= $row['pengajuan_id'] ?>, '<?= esc($row['keterangan']) ?>')"
-                                        class="btn btn-sm btn-outline-danger stylish-btn" title="Hapus Data">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
+                                    <div class="d-flex justify-content-center gap-1">
+                                        <!-- Tombol Detail -->
+                                        <button class="btn btn-sm btn-outline-info stylish-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#detailModal<?= $row['pengajuan_id'] ?>"
+                                            title="Lihat Detail">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+
+                                        <!-- Tombol Edit -->
+                                        <a href="<?= site_url('admin/kas_keluar/edit/' . $row['pengajuan_id']) ?>"
+                                            class="btn btn-sm btn-outline-light stylish-btn" title="Edit Data">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
+
+                            <!-- Modal Detail untuk setiap data -->
+                            <div class="modal fade" id="detailModal<?= $row['pengajuan_id'] ?>" tabindex="-1">
+                                <div class="modal-dialog modal-lg modal-dialog-centered">
+                                    <div class="modal-content stylish-modal">
+                                        <div class="modal-header stylish-modal-header">
+                                            <div class="d-flex align-items-center">
+                                                <div class="modal-icon me-3">
+                                                    <i class="bi bi-receipt-cutoff"></i>
+                                                </div>
+                                                <div>
+                                                    <h5 class="modal-title mb-0">Detail Kas Keluar</h5>
+                                                    <p class="modal-subtitle mb-0">ID: #<?= $row['pengajuan_id'] ?></p>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body stylish-modal-body">
+                                            <!-- Info Pengajuan -->
+                                            <div class="info-card mb-4">
+                                                <h6 class="section-title mb-3">
+                                                    <i class="bi bi-card-checklist me-2"></i>Informasi Pengeluaran
+                                                </h6>
+                                                <div class="row g-3">
+                                                    <!-- Baris 1: User dan Nominal -->
+                                                    <div class="col-md-6">
+                                                        <div class="info-item">
+                                                            <div class="info-icon">
+                                                                <i class="bi bi-person-circle"></i>
+                                                            </div>
+                                                            <div class="info-content">
+                                                                <div class="info-label">Pengaju</div>
+                                                                <div class="info-value fw-semibold"><?= esc($row['username'] ?? '-') ?></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="info-item">
+                                                            <div class="info-icon">
+                                                                <i class="bi bi-currency-dollar"></i>
+                                                            </div>
+                                                            <div class="info-content">
+                                                                <div class="info-label">Nominal</div>
+                                                                <div class="info-value text-danger fw-bold">Rp <?= isset($row['nominal']) ? number_format($row['nominal'], 0, ',', '.') : '-' ?></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Baris 2: Status dan Tanggal Konfirmasi -->
+                                                    <div class="col-md-6">
+                                                        <div class="info-item">
+                                                            <div class="info-icon">
+                                                                <i class="bi bi-hourglass"></i>
+                                                            </div>
+                                                            <div class="info-content">
+                                                                <div class="info-label">Status</div>
+                                                                <div class="info-value">
+                                                                    <?php
+                                                                    $status = strtolower($row['status'] ?? '');
+                                                                    $badge = [
+                                                                        'pending'   => 'bg-warning text-dark',
+                                                                        'diterima'  => 'bg-success',
+                                                                        'ditolak'   => 'bg-danger',
+                                                                        'selesai'   => 'bg-primary'
+                                                                    ];
+                                                                    ?>
+                                                                    <span class="badge <?= $badge[$status] ?? 'bg-secondary' ?>">
+                                                                        <i class="bi 
+                                                <?= $status == 'pending' ? 'bi-clock' : ($status == 'diterima' ? 'bi-check-circle' : ($status == 'ditolak' ? 'bi-x-circle' : ($status == 'selesai' ? 'bi-check-all' : 'bi-dash-circle'))) ?> me-1">
+                                                                        </i>
+                                                                        <?= ucfirst($row['status'] ?? '-') ?>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="info-item">
+                                                            <div class="info-icon">
+                                                                <i class="bi bi-calendar-check"></i>
+                                                            </div>
+                                                            <div class="info-content">
+                                                                <div class="info-label">Tanggal Konfirmasi</div>
+                                                                <div class="info-value">
+                                                                    <?php if (!empty($row['confirm_at'])): ?>
+                                                                        <?= date('d/m/Y H:i', strtotime($row['confirm_at'])) ?>
+                                                                    <?php else: ?>
+                                                                        <span class="text-muted">-</span>
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Baris 3: Keterangan (Full Width) -->
+                                                    <div class="col-12">
+                                                        <div class="info-item">
+                                                            <div class="info-icon">
+                                                                <i class="bi bi-chat-left-text"></i>
+                                                            </div>
+                                                            <div class="info-content">
+                                                                <div class="info-label">Keterangan</div>
+                                                                <div class="info-value">
+                                                                    <?php if (!empty($row['keterangan'])): ?>
+                                                                        <?= esc($row['keterangan']) ?>
+                                                                    <?php else: ?>
+                                                                        <span class="text-muted">-</span>
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Baris 4: File Nota (jika ada) -->
+                                                    <?php if (!empty($row['file_nota'])): ?>
+                                                        <div class="col-12">
+                                                            <div class="info-item">
+                                                                <div class="info-icon">
+                                                                    <i class="bi bi-paperclip"></i>
+                                                                </div>
+                                                                <div class="info-content">
+                                                                    <div class="info-label">File Nota</div>
+                                                                    <div class="info-value">
+                                                                        <a href="<?= base_url('uploads/nota/' . $row['file_nota']) ?>"
+                                                                            target="_blank"
+                                                                            class="btn btn-sm btn-primary stylish-btn">
+                                                                            <i class="bi bi-download me-1"></i> Unduh Nota
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+
+                                            <!-- File Nota Preview (jika ada) -->
+                                            <?php if (!empty($row['file_nota'])): ?>
+                                                <div class="file-section">
+                                                    <h6 class="section-title mb-3">
+                                                        <i class="bi bi-file-earmark-text me-2"></i>Preview Nota
+                                                    </h6>
+                                                    <div class="file-preview-card">
+                                                        <div class="preview-header">
+                                                            <div class="file-info">
+                                                                <div class="file-icon">
+                                                                    <?php
+                                                                    $fileExtension = pathinfo($row['file_nota'], PATHINFO_EXTENSION);
+                                                                    $iconClass = 'bi-file-earmark-text';
+                                                                    $fileType = 'Dokumen';
+
+                                                                    if (in_array(strtolower($fileExtension), ['jpg', 'jpeg', 'png', 'gif'])) {
+                                                                        $iconClass = 'bi-file-image';
+                                                                        $fileType = 'Gambar';
+                                                                    } elseif (strtolower($fileExtension) === 'pdf') {
+                                                                        $iconClass = 'bi-file-pdf';
+                                                                        $fileType = 'PDF';
+                                                                    }
+                                                                    ?>
+                                                                    <i class="bi <?= $iconClass ?>"></i>
+                                                                </div>
+                                                                <div class="file-details">
+                                                                    <div class="file-name fw-semibold"><?= $row['file_nota'] ?></div>
+                                                                    <div class="file-type text-muted small"><?= $fileType ?> • <?= strtoupper($fileExtension) ?></div>
+                                                                </div>
+                                                            </div>
+                                                            <a href="<?= base_url('uploads/nota/' . $row['file_nota']) ?>"
+                                                                target="_blank"
+                                                                class="btn btn-primary btn-sm stylish-btn">
+                                                                <i class="bi bi-download me-1"></i> Unduh
+                                                            </a>
+                                                        </div>
+                                                        <div class="preview-content mt-3">
+                                                            <?php if (in_array(strtolower($fileExtension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
+                                                                <!-- Preview Gambar -->
+                                                                <div class="image-preview text-center">
+                                                                    <img src="<?= base_url('uploads/nota/' . $row['file_nota']) ?>"
+                                                                        alt="Nota Pengeluaran"
+                                                                        class="img-fluid rounded shadow-sm"
+                                                                        style="max-height: 400px; object-fit: contain;"
+                                                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                                    <div class="no-preview text-center py-4" style="display: none;">
+                                                                        <i class="bi bi-file-image display-4 text-muted mb-3"></i>
+                                                                        <p class="text-muted">Gambar tidak dapat dimuat</p>
+                                                                        <a href="<?= base_url('uploads/nota/' . $row['file_nota']) ?>"
+                                                                            target="_blank"
+                                                                            class="btn btn-outline-primary btn-sm">
+                                                                            Lihat File
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            <?php elseif (strtolower($fileExtension) === 'pdf'): ?>
+                                                                <!-- Preview PDF (Embed) -->
+                                                                <div class="pdf-preview position-relative">
+                                                                    <iframe src="<?= base_url('uploads/nota/' . $row['file_nota']) ?>#view=fitH"
+                                                                        width="100%"
+                                                                        height="400"
+                                                                        style="border: none; border-radius: 8px;"
+                                                                        class="shadow-sm">
+                                                                        Browser Anda tidak mendukung preview PDF.
+                                                                    </iframe>
+                                                                    <div class="position-absolute top-50 start-50 translate-middle opacity-0 hover-opacity-100 transition-opacity">
+                                                                        <a href="<?= base_url('uploads/nota/' . $row['file_nota']) ?>"
+                                                                            target="_blank"
+                                                                            class="btn btn-primary">
+                                                                            Buka di Tab Baru
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            <?php else: ?>
+                                                                <!-- File tidak dapat dipreview -->
+                                                                <div class="no-preview text-center py-4">
+                                                                    <i class="bi bi-file-earmark-text display-4 text-muted mb-3"></i>
+                                                                    <p class="text-muted">Preview tidak tersedia untuk file ini</p>
+                                                                    <a href="<?= base_url('uploads/nota/' . $row['file_nota']) ?>"
+                                                                        target="_blank"
+                                                                        class="btn btn-primary">
+                                                                        <i class="bi bi-download me-1"></i> Unduh File
+                                                                    </a>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="modal-footer stylish-modal-footer">
+                                            <button type="button" class="btn btn-secondary stylish-reset-btn" data-bs-dismiss="modal">
+                                                <i class="bi bi-x-lg me-1"></i> Tutup
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         <?php endforeach ?>
                     <?php else: ?>
                         <tr>
@@ -257,7 +496,7 @@
                                 <div class="py-4">
                                     <i class="bi bi-cash-stack display-1 text-light"></i>
                                     <h5 class="mt-3">Belum ada data kas keluar</h5>
-                                    <p class="text-muted">Data kas keluar akan muncul di sini setelah ditambahkan</p>
+                                    <p class="text-light">Data kas keluar akan muncul di sini setelah ditambahkan</p>
                                 </div>
                             </td>
                         </tr>
@@ -279,7 +518,7 @@
     </div>
 </div>
 
-<!-- Styling tambahan -->
+<!-- Tambahkan CSS untuk modal detail -->
 <style>
     .dashboard-card {
         background: rgba(26, 26, 26, 0.9);
@@ -345,6 +584,7 @@
         color: #fff;
         border-radius: 12px;
         transition: all 0.3s ease;
+        color: #fff;
     }
 
     .modern-search input::placeholder {
@@ -356,6 +596,7 @@
         border-color: #4361ee;
         box-shadow: 0 0 10px rgba(67, 97, 238, 0.6);
         background: rgba(255, 255, 255, 0.1);
+        color: #fff;
     }
 
     .btn-gradient-primary {
@@ -537,143 +778,143 @@
         box-shadow: 0 4px 8px rgba(67, 97, 238, 0.25);
     }
 
-    /* SweetAlert2 Stylish Modal */
-    .swal2-popup.stylish-modal {
-        background: linear-gradient(135deg, rgba(40, 40, 60, 0.98) 0%, rgba(30, 30, 50, 0.98) 100%);
-        border: 1px solid rgba(67, 97, 238, 0.3);
-        border-radius: 16px;
-        padding: 0;
-        color: #fff;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(15px);
-        overflow: hidden;
+    /* CSS untuk modal detail */
+    .section-title {
+        color: #66c0f4;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
     }
 
-    .swal2-popup.stylish-modal .swal2-header {
-        background: linear-gradient(135deg, rgba(67, 97, 238, 0.2) 0%, rgba(67, 97, 238, 0.1) 100%);
-        border-bottom: 1px solid rgba(67, 97, 238, 0.3);
-        margin: 0;
-        padding: 1.5rem 1.5rem 1rem;
+    .info-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
     }
 
-    .swal2-popup.stylish-modal .modal-icon {
+    .info-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-icon {
+        width: 36px;
+        height: 36px;
+        background: rgba(67, 97, 238, 0.1);
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 50px;
-        height: 50px;
-        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-        border-radius: 12px;
         margin-right: 1rem;
-    }
-
-    .swal2-popup.stylish-modal .modal-icon i {
-        color: #fff;
-        font-size: 1.5rem;
-    }
-
-    .swal2-popup.stylish-modal .swal2-title {
-        color: #fff;
-        font-size: 1.3rem;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .swal2-popup.stylish-modal .modal-subtitle {
-        color: #aaa;
-        font-size: 0.9rem;
-        margin: 0.25rem 0 0 0;
-    }
-
-    .swal2-popup.stylish-modal .swal2-html-container {
-        margin: 0;
-        padding: 1.5rem;
-        color: #e0e0e0;
-        font-size: 1rem;
-        line-height: 1.5;
-    }
-
-    .swal2-popup.stylish-modal .info-highlight {
-        background: rgba(255, 107, 107, 0.1);
-        border: 1px solid rgba(255, 107, 107, 0.3);
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
-        margin: 1rem 0;
-        display: flex;
-        align-items: center;
-    }
-
-    .swal2-popup.stylish-modal .info-highlight i {
-        color: #ff6b6b;
-        margin-right: 0.5rem;
+        color: #4361ee;
         font-size: 1.1rem;
     }
 
-    .swal2-popup.stylish-modal .warning-text {
-        color: #ffd166;
+    .info-content {
+        flex: 1;
+    }
+
+    .info-label {
+        color: #aaa;
         font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        color: #fff;
+        font-size: 0.95rem;
+        font-weight: 400;
+    }
+
+    .file-section {
+        margin-top: 2rem;
+    }
+
+    .file-preview-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .preview-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .file-info {
         display: flex;
         align-items: center;
-        margin-top: 0.5rem;
+        flex-grow: 1;
     }
 
-    .swal2-popup.stylish-modal .warning-text i {
-        margin-right: 0.5rem;
-    }
-
-    .swal2-popup.stylish-modal .swal2-actions {
-        margin: 0;
-        padding: 1rem 1.5rem 1.5rem;
-        gap: 0.75rem;
-    }
-
-    .swal2-popup.stylish-modal .swal2-confirm {
-        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-        border: none;
+    .file-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #4361ee, #4cc9f0);
         border-radius: 10px;
-        padding: 0.6rem 1.5rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin-right: 1rem;
     }
 
-    .swal2-popup.stylish-modal .swal2-confirm:hover {
-        background: linear-gradient(135deg, #ff5252, #e53935);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+    .file-details {
+        flex-grow: 1;
     }
 
-    .swal2-popup.stylish-modal .swal2-cancel {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+    .file-name {
         color: #fff;
-        border-radius: 10px;
-        padding: 0.6rem 1.5rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
     }
 
-    .swal2-popup.stylish-modal .swal2-cancel:hover {
-        background: rgba(255, 255, 255, 0.12);
-        border-color: rgba(255, 255, 255, 0.3);
-        transform: translateY(-2px);
+    .file-type {
+        color: #aaa;
+        font-size: 0.85rem;
     }
 
-    @keyframes pulseWarning {
-        0% {
-            transform: scale(1);
-        }
-
-        50% {
-            transform: scale(1.05);
-        }
-
-        100% {
-            transform: scale(1);
-        }
+    .preview-content {
+        border-radius: 8px;
+        overflow: hidden;
     }
 
-    .swal2-popup.stylish-modal .modal-icon {
-        animation: pulseWarning 2s infinite;
+    .image-preview {
+        text-align: center;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .pdf-preview {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .no-preview {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 2rem;
     }
 
     .card-icon {
@@ -699,11 +940,11 @@
     }
 
     .card-footer {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-top-color: rgba(255, 255, 255, 0.2) !important;
     }
 </style>
 
-<!-- Script Pagination + Search + Filter + Delete Confirmation -->
+<!-- Script Pagination + Search + Filter -->
 <script>
     const rowsPerPageSelect = document.getElementById("rowsPerPage");
     const table = document.getElementById("kasKeluarTable").getElementsByTagName("tbody")[0];
@@ -843,70 +1084,6 @@
         // Initialize table display
         displayTable();
     });
-
-    function confirmDelete(id, keterangan) {
-        Swal.fire({
-            html: `
-                <div class="swal2-custom">
-                    <div class="d-flex align-items-center">
-                        <div class="modal-icon me-3">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                        </div>
-                        <div>
-                            <div class="swal2-title">Hapus Data Kas Keluar</div>
-                            <div class="modal-subtitle">Konfirmasi penghapusan permanen</div>
-                        </div>
-                    </div>
-
-                    <div class="swal2-html-container mt-3">
-                        <p>Apakah Anda yakin ingin menghapus data dengan keterangan:</p>
-                        <div class="info-highlight">
-                            <i class="bi bi-info-circle"></i>
-                            <span class="fw-bold">${keterangan}</span>
-                        </div>
-                        <div class="warning-text">
-                            <i class="bi bi-exclamation-circle"></i>
-                            <span>Data ini tidak dapat dikembalikan setelah dihapus.</span>
-                        </div>
-                    </div>
-                </div>
-            `,
-            showCancelButton: true,
-            focusConfirm: false,
-            confirmButtonText: '<i class="bi bi-check-lg me-1"></i> Ya, Hapus',
-            cancelButtonText: '<i class="bi bi-x-lg me-1"></i> Batal',
-            customClass: {
-                popup: 'stylish-modal',
-                header: 'd-none',
-                title: 'swal2-title',
-                htmlContainer: 'swal2-html-container',
-                confirmButton: 'swal2-confirm',
-                cancelButton: 'swal2-cancel'
-            },
-            buttonsStyling: false,
-            showClass: {
-                popup: 'swal2-noanimation',
-                backdrop: 'swal2-noanimation'
-            },
-            hideClass: {
-                popup: '',
-                backdrop: ''
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Menghapus...',
-                    text: 'Data sedang dihapus',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading()
-                    }
-                });
-
-                window.location.href = "<?= site_url('admin/kas_keluar/delete/') ?>" + id;
-            }
-        });
-    }
 </script>
 
 <?= $this->endSection() ?>

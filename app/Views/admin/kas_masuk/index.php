@@ -21,31 +21,50 @@
         </div>
     <?php endif; ?>
 
-    <!-- Total Kas Masuk Card -->
+    <!-- Info Cards -->
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="dashboard-card total-kas-card p-4">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <div class="d-flex align-items-center">
-                            <div class="total-kas-icon me-3">
-                                <i class="bi bi-wallet2"></i>
-                            </div>
-                            <div>
-                                <h3 class="total-kas-title mb-1">Total Kas Masuk</h3>
-                                <p class="total-kas-subtitle mb-0">Total semua pemasukan kas</p>
-                            </div>
-                        </div>
+        <!-- Total Kas Masuk -->
+        <div class="col-md-4 mb-3">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="card-icon me-3">
+                        <i class="bi bi-arrow-down-circle text-success"></i>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <h2 class="total-kas-amount mb-0">
-                            Rp <?= number_format($totalKas ?? 0, 0, ',', '.') ?>
-                        </h2>
-                        <div class="total-kas-badge">
-                            <i class="bi bi-arrow-up-circle-fill me-1"></i>
-                            Pemasukan
-                        </div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title text-white mb-1">Total Kas Masuk</h5>
+                        <h3 class="card-value text-success mb-0">
+                            Rp <?= isset($totalKas) ? number_format($totalKas, 0, ',', '.') : '0' ?>
+                        </h3>
                     </div>
+                </div>
+                <div class="card-footer mt-3 pt-3 border-top border-secondary">
+                    <small class="text-white">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Total semua pemasukan kas
+                    </small>
+                </div>
+            </div>
+        </div>
+ 
+        <!-- Total Data Pengajuan -->
+        <div class="col-md-4 mb-3">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="card-icon me-3">
+                        <i class="bi bi-file-earmark-text text-info"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title text-white mb-1">Total Data Pengajuan</h5>
+                        <h3 class="card-value text-info mb-0">
+                            <?= isset($total_pengajuan) ? number_format($total_pengajuan, 0, ',', '.') : '0' ?>
+                        </h3>
+                    </div>
+                </div>
+                <div class="card-footer mt-3 pt-3 border-top border-secondary">
+                    <small class="text-white">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Total seluruh data pengajuan
+                    </small>
                 </div>
             </div>
         </div>
@@ -201,7 +220,7 @@
                                 <div class="py-4">
                                     <i class="bi bi-cash-stack display-1 text-light"></i>
                                     <h5 class="mt-3">Belum ada data kas masuk</h5>
-                                    <p class="text-muted">Data kas masuk akan muncul di sini setelah ditambahkan</p>
+                                    <p class="text-light">Data kas masuk akan muncul di sini setelah ditambahkan</p>
                                 </div>
                             </td>
                         </tr>
@@ -233,75 +252,26 @@
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
     }
 
-    /* Total Kas Card Styles */
-    .total-kas-card {
-        background: linear-gradient(135deg, rgba(67, 97, 238, 0.15) 0%, rgba(6, 214, 160, 0.15) 100%);
-        border: 1px solid rgba(67, 97, 238, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .total-kas-card::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200px;
-        height: 200px;
-        background: radial-gradient(circle, rgba(67, 97, 238, 0.1) 0%, transparent 70%);
-        border-radius: 50%;
-    }
-
-    .total-kas-card::after {
-        content: '';
-        position: absolute;
-        bottom: -30%;
-        left: -30%;
-        width: 150px;
-        height: 150px;
-        background: radial-gradient(circle, rgba(6, 214, 160, 0.1) 0%, transparent 70%);
-        border-radius: 50%;
-    }
-
-    .total-kas-icon {
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, #4361ee, #06d6a0);
-        border-radius: 12px;
+    .card-icon {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
-        color: white;
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        font-size: 1.8rem;
     }
 
-    .total-kas-title {
-        color: #fff;
-        font-weight: 600;
-        font-size: 1.1rem;
-    }
-
-    .total-kas-subtitle {
-        color: #aaa;
+    .card-title {
         font-size: 0.9rem;
-    }
-
-    .total-kas-amount {
-        color: #06d6a0;
-        font-weight: 700;
-        font-size: 2rem;
-        text-shadow: 0 2px 10px rgba(6, 214, 160, 0.3);
-    }
-
-    .total-kas-badge {
-        display: inline-block;
-        background: rgba(6, 214, 160, 0.2);
-        color: #06d6a0;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
         font-weight: 500;
-        border: 1px solid rgba(6, 214, 160, 0.3);
+        color: #aaa;
+    }
+
+    .card-value {
+        font-size: 1.8rem;
+        font-weight: 700;
     }
 
     .table thead {

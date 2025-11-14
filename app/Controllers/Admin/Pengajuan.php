@@ -6,8 +6,8 @@ use App\Controllers\BaseController;
 use App\Models\PengajuanModel;
 use App\Models\KasKeluarModel;
 use App\Models\KasSaldoModel;
-use App\Models\NotificationModel;
 use App\Models\ActivityLogModel;
+use App\Models\UserModel;
 
 class Pengajuan extends BaseController
 {
@@ -34,15 +34,12 @@ class Pengajuan extends BaseController
         // Filter by bulan dan tahun
         if (!empty($filters['month']) || !empty($filters['year'])) {
             if (!empty($filters['month']) && !empty($filters['year'])) {
-                // Filter by bulan dan tahun spesifik
                 $firstDay = date('Y-m-01', strtotime($filters['year'] . '-' . $filters['month'] . '-01'));
                 $lastDay = date('Y-m-t', strtotime($firstDay));
                 $model->where("DATE(pengajuan.created_at) BETWEEN '$firstDay' AND '$lastDay'");
             } elseif (!empty($filters['year'])) {
-                // Filter by tahun saja
                 $model->where('YEAR(pengajuan.created_at)', $filters['year']);
             } elseif (!empty($filters['month'])) {
-                // Filter by bulan saja (tahun berjalan)
                 $currentYear = date('Y');
                 $firstDay = date('Y-m-01', strtotime($currentYear . '-' . $filters['month'] . '-01'));
                 $lastDay = date('Y-m-t', strtotime($firstDay));
@@ -50,22 +47,50 @@ class Pengajuan extends BaseController
             }
         }
 
-        // Order by created_at descending (pengajuan terbaru di atas)
+        // Urutkan data terbaru
         $model->orderBy('pengajuan.created_at', 'DESC');
-
         $data['pengajuan'] = $model->findAll();
 
-        // Ambil saldo kas saat ini untuk validasi di frontend
+        // ==================================================
+        // 🔹 Tambahan untuk INFO CARDS
+        // ==================================================
+        $pengajuanModel = new PengajuanModel();
+
+        // Total seluruh pengajuan
+        $data['total_nominal'] = $pengajuanModel
+            ->selectSum('nominal')
+            ->where('status', 'selesai')
+            ->get()
+            ->getRow()
+            ->nominal ?? 0;
+
+        // Total pending
+        $data['total_pending'] = $pengajuanModel->where('status', 'pending')->countAllResults();
+
+        // Total selesai
+        $data['total_selesai'] = $pengajuanModel->where('status', 'selesai')->countAllResults();
+
+        // Total user unik yang pernah mengajukan
+        $userModel = new UserModel();
+        $data['total_user'] = $userModel
+            ->select('users.id')
+            ->join('pengajuan', 'pengajuan.user_id = users.id', 'inner')
+            ->distinct()
+            ->countAllResults();
+
+        // ==================================================
+        // Ambil saldo kas
+        // ==================================================
         $kasSaldoModel = new KasSaldoModel();
         $saldo = $kasSaldoModel->first();
         $data['saldo_akhir'] = $saldo ? $saldo['saldo_akhir'] : 0;
 
-        // Pass filter values to view untuk menjaga state filter
+        // Kirim nilai filter saat ini ke view
         $data['current_filters'] = [
             'status' => $filters['status'] ?? '',
-            'tipe' => $filters['tipe'] ?? '',
-            'month' => $filters['month'] ?? '',
-            'year' => $filters['year'] ?? ''
+            'tipe'   => $filters['tipe'] ?? '',
+            'month'  => $filters['month'] ?? '',
+            'year'   => $filters['year'] ?? ''
         ];
 
         return view('admin/pengajuan/index', $data);
@@ -91,13 +116,6 @@ class Pengajuan extends BaseController
 
         $model->update($id, ['status' => 'diterima']);
 
-        // Simpan notifikasi
-        $notifModel = new NotificationModel();
-        $notifModel->save([
-            'user_id' => $pengajuan['user_id'],
-            'message' => 'Pengajuan kas Anda telah disetujui.'
-        ]);
-
         // Simpan aktivitas log
         $activityLog = new ActivityLogModel();
         $activityLog->logActivity(
@@ -116,13 +134,6 @@ class Pengajuan extends BaseController
         $model->update($id, ['status' => 'ditolak']);
 
         $pengajuan = $model->find($id);
-
-        // Simpan notifikasi
-        $notifModel = new NotificationModel();
-        $notifModel->save([
-            'user_id' => $pengajuan['user_id'],
-            'message' => 'Pengajuan kas Anda ditolak.'
-        ]);
 
         // Simpan aktivitas log
         $activityLog = new ActivityLogModel();
@@ -148,7 +159,6 @@ class Pengajuan extends BaseController
             return redirect()->back()->with('error', 'Data pengajuan tidak ditemukan.');
         }
 
-        // Validasi saldo di backend
         $saldo = $kasSaldoModel->first();
         if ($saldo && $pengajuan['nominal'] > $saldo['saldo_akhir']) {
             return redirect()->back()->with('error', 'Saldo tidak mencukupi untuk memproses pengajuan ini.');
@@ -170,13 +180,17 @@ class Pengajuan extends BaseController
                 ]);
             }
 
-            // Potong saldo (selalu)
+            // Potong saldo
             if ($saldo) {
                 $newSaldo = $saldo['saldo_akhir'] - $pengajuan['nominal'];
                 $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
             }
 
-            $pengajuanModel->update($id, ['status' => 'selesai']);
+            // ✅ Tambahkan update confirm_at
+            $pengajuanModel->update($id, [
+                'status'     => 'selesai',
+                'confirm_at' => date('Y-m-d H:i:s')
+            ]);
 
             $activityLog->logActivity(
                 $session->get('id'),
@@ -192,16 +206,18 @@ class Pengajuan extends BaseController
         // ============================
         if ($metode === 'minta_uang') {
 
-            // Kas keluar sudah ada & file nota tersedia → langsung potong saldo
             if ($kasKeluar && !empty($kasKeluar['file_nota'])) {
                 if ($saldo) {
                     $newSaldo = $saldo['saldo_akhir'] - $pengajuan['nominal'];
                     $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
                 }
 
-                $pengajuanModel->update($id, ['status' => 'selesai']);
+                // ✅ Tambahkan update confirm_at
+                $pengajuanModel->update($id, [
+                    'status'     => 'selesai',
+                    'confirm_at' => date('Y-m-d H:i:s')
+                ]);
 
-                // Log aktivitas
                 $activityLog->logActivity(
                     $session->get('id'),
                     'pengajuan diproses',
@@ -211,7 +227,6 @@ class Pengajuan extends BaseController
                 return redirect()->back()->with('success', 'Pengajuan selesai & saldo dipotong (minta uang).');
             }
 
-            // Belum ada file nota → wajib upload
             helper(['form']);
             $rules = [
                 'file_nota' => 'uploaded[file_nota]|max_size[file_nota,1024]|ext_in[file_nota,jpg,jpeg,png,pdf]'
@@ -230,15 +245,17 @@ class Pengajuan extends BaseController
                         'file_nota'    => $newName
                     ]);
 
-                    // Potong saldo
                     if ($saldo) {
                         $newSaldo = $saldo['saldo_akhir'] - $pengajuan['nominal'];
                         $kasSaldoModel->update($saldo['id'], ['saldo_akhir' => $newSaldo]);
                     }
 
-                    $pengajuanModel->update($id, ['status' => 'selesai']);
+                    // ✅ Tambahkan update confirm_at juga di sini
+                    $pengajuanModel->update($id, [
+                        'status'     => 'selesai',
+                        'confirm_at' => date('Y-m-d H:i:s')
+                    ]);
 
-                    // Log aktivitas
                     $activityLog->logActivity(
                         $session->get('id'),
                         'pengajuan diproses',
@@ -253,5 +270,53 @@ class Pengajuan extends BaseController
         }
 
         return redirect()->back()->with('warning', 'Pengajuan masih dalam proses, tunggu nota untuk potong saldo.');
+    }
+
+    public function cancel($id)
+    {
+        $session = session();
+        $model = new PengajuanModel();
+        $pengajuan = $model->find($id);
+
+        if (!$pengajuan) {
+            return redirect()->to('/admin/pengajuan')->with('error', 'Data pengajuan tidak ditemukan.');
+        }
+
+        // Hanya pengajuan yang sudah diterima yang bisa dibatalkan
+        if ($pengajuan['status'] !== 'diterima') {
+            return redirect()->to('/admin/pengajuan')->with('warning', 'Hanya pengajuan dengan status "diterima" yang bisa dibatalkan.');
+        }
+
+        // Ubah status menjadi dibatalkan
+        $model->update($id, [
+            'status' => 'dibatalkan',
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        // Hapus kas_keluar terkait (jika ada)
+        $kasKeluarModel = new KasKeluarModel();
+        $kasKeluar = $kasKeluarModel->where('pengajuan_id', $id)->first();
+        if ($kasKeluar) {
+            $kasKeluarModel->delete($kasKeluar['id']);
+        }
+
+        // Kembalikan saldo (jika sudah terpotong sebelumnya)
+        $kasSaldoModel = new KasSaldoModel();
+        $saldo = $kasSaldoModel->first();
+        if ($saldo && $pengajuan['nominal'] > 0) {
+            $kasSaldoModel->update($saldo['id'], [
+                'saldo_akhir' => $saldo['saldo_akhir'] + $pengajuan['nominal']
+            ]);
+        }
+
+        // Simpan log aktivitas
+        $activityLog = new ActivityLogModel();
+        $activityLog->logActivity(
+            $session->get('id'),
+            'pengajuan dibatalkan',
+            'Membatalkan pengajuan ID ' . $id
+        );
+
+        return redirect()->to('/admin/pengajuan')->with('success', 'Pengajuan berhasil dibatalkan.');
     }
 }

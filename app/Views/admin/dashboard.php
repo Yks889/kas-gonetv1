@@ -21,9 +21,9 @@
                         style="width: auto;">
                         <option value="">-- Pilih Bulan --</option>
                         <?php foreach ($bulanLabels as $i => $label): ?>
-                                <option value="<?= $i + 1 ?>" <?= (isset($_GET['bulan']) && $_GET['bulan'] == $i + 1) ? 'selected' : '' ?>>
-                                    <?= $label ?>
-                                </option>
+                            <option value="<?= $i + 1 ?>" <?= (isset($_GET['bulan']) && $_GET['bulan'] == $i + 1) ? 'selected' : '' ?>>
+                                <?= $label ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                     <button id="applyFilter" class="btn btn-gradient-primary btn-sm">
@@ -92,7 +92,7 @@
                             <div class="summary-box expense">
                                 <i class="bi bi-arrow-up-circle"></i>
                                 <div class="label">Pengeluaran</div>
-                                <div class="amount">Rp <?= number_format($total_keluar['total'] ?? 0, 0, ',', '.') ?>
+                                <div class="amount">Rp <?= isset($total_pengeluaran) ? number_format($total_pengeluaran, 0, ',', '.') : '0' ?>
                                 </div>
                                 <span class="badge bg-light text-dark"><?= $kas_keluar_count ?? 0 ?></span>
                             </div>
@@ -211,40 +211,40 @@
                         <div class="transaction-category mb-4" data-type="pengajuan">
                             <h6 class="category-title mb-3">Pengajuan Terbaru</h6>
                             <?php if (empty($pengajuan_terbaru)): ?>
-                                    <div class="empty-state">
-                                        <i class="bi bi-inbox"></i>
-                                        <p>Tidak ada data pengajuan</p>
-                                    </div>
+                                <div class="empty-state">
+                                    <i class="bi bi-inbox"></i>
+                                    <p>Tidak ada data pengajuan</p>
+                                </div>
                             <?php else: ?>
-                                    <?php foreach ($pengajuan_terbaru as $index => $item): ?>
-                                            <div class="transaction-item clickable" 
-                                                 data-type="pengajuan" 
-                                                 data-id="<?= $item['id'] ?>"
-                                                 onclick="showDetailPopup(this)">
-                                                <div class="transaction-details">
-                                                    <div
-                                                        class="transaction-icon <?= $item['tipe'] === 'uang_sendiri' ? 'expense' : 'income' ?>">
-                                                        <i
-                                                            class="bi <?= $item['tipe'] === 'uang_sendiri' ? 'bi-arrow-up' : 'bi-arrow-down' ?>"></i>
-                                                    </div>
-                                                    <div class="transaction-info">
-                                                        <div class="transaction-description"><?= $item['username'] ?> -
-                                                            <?= $item['keterangan'] ?></div>
-                                                        <div class="transaction-date">
-                                                            <?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
-                                                    </div>
-                                                </div>
-                                                <div class="transaction-amount">
-                                                    <div
-                                                        class="amount <?= $item['tipe'] === 'uang_sendiri' ? 'negative' : 'positive' ?>">
-                                                        Rp <?= number_format($item['nominal'], 0, ',', '.') ?>
-                                                    </div>
-                                                    <div class="transaction-status status-<?= $item['status'] ?>">
-                                                        <?= ucfirst($item['status']) ?>
-                                                    </div>
-                                                </div>
+                                <?php foreach ($pengajuan_terbaru as $index => $item): ?>
+                                    <div class="transaction-item clickable"
+                                        data-type="pengajuan"
+                                        data-id="<?= $item['id'] ?>"
+                                        onclick="showDetailPopup(this)">
+                                        <div class="transaction-details">
+                                            <div
+                                                class="transaction-icon <?= $item['tipe'] === 'uang_sendiri' ? 'expense' : 'income' ?>">
+                                                <i
+                                                    class="bi <?= $item['tipe'] === 'uang_sendiri' ? 'bi-arrow-up' : 'bi-arrow-down' ?>"></i>
                                             </div>
-                                    <?php endforeach; ?>
+                                            <div class="transaction-info">
+                                                <div class="transaction-description"><?= $item['username'] ?> -
+                                                    <?= $item['keterangan'] ?></div>
+                                                <div class="transaction-date">
+                                                    <?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
+                                            </div>
+                                        </div>
+                                        <div class="transaction-amount">
+                                            <div
+                                                class="amount <?= $item['tipe'] === 'uang_sendiri' ? 'negative' : 'positive' ?>">
+                                                Rp <?= number_format($item['nominal'], 0, ',', '.') ?>
+                                            </div>
+                                            <div class="transaction-status status-<?= $item['status'] ?>">
+                                                <?= ucfirst($item['status']) ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
 
@@ -252,33 +252,33 @@
                         <div class="transaction-category mb-4" data-type="kas_masuk">
                             <h6 class="category-title mb-3">Kas Masuk Terbaru</h6>
                             <?php if (empty($kas_masuk_terbaru)): ?>
-                                    <div class="empty-state">
-                                        <i class="bi bi-inbox"></i>
-                                        <p>Tidak ada data kas masuk</p>
-                                    </div>
+                                <div class="empty-state">
+                                    <i class="bi bi-inbox"></i>
+                                    <p>Tidak ada data kas masuk</p>
+                                </div>
                             <?php else: ?>
-                                    <?php foreach ($kas_masuk_terbaru as $i => $item): ?>
-                                            <div class="transaction-item clickable" 
-                                                 data-type="kas_masuk" 
-                                                 data-id="<?= $item['id'] ?>"
-                                                 onclick="showDetailPopup(this)">
-                                                <div class="transaction-details">
-                                                    <div class="transaction-icon income">
-                                                        <i class="bi bi-arrow-down"></i>
-                                                    </div>
-                                                    <div class="transaction-info">
-                                                        <div class="transaction-description"><?= $item['keterangan'] ?></div>
-                                                        <div class="transaction-date">
-                                                            <?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
-                                                    </div>
-                                                </div>
-                                                <div class="transaction-amount">
-                                                    <div class="amount positive">
-                                                        Rp <?= number_format($item['nominal'], 0, ',', '.') ?>
-                                                    </div>
-                                                </div>
+                                <?php foreach ($kas_masuk_terbaru as $i => $item): ?>
+                                    <div class="transaction-item clickable"
+                                        data-type="kas_masuk"
+                                        data-id="<?= $item['id'] ?>"
+                                        onclick="showDetailPopup(this)">
+                                        <div class="transaction-details">
+                                            <div class="transaction-icon income">
+                                                <i class="bi bi-arrow-down"></i>
                                             </div>
-                                    <?php endforeach; ?>
+                                            <div class="transaction-info">
+                                                <div class="transaction-description"><?= $item['keterangan'] ?></div>
+                                                <div class="transaction-date">
+                                                    <?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
+                                            </div>
+                                        </div>
+                                        <div class="transaction-amount">
+                                            <div class="amount positive">
+                                                Rp <?= number_format($item['nominal'], 0, ',', '.') ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
 
@@ -286,34 +286,34 @@
                         <div class="transaction-category" data-type="kas_keluar">
                             <h6 class="category-title mb-3">Kas Keluar Terbaru</h6>
                             <?php if (empty($kas_keluar_terbaru)): ?>
-                                    <div class="empty-state">
-                                        <i class="bi bi-inbox"></i>
-                                        <p>Tidak ada data kas keluar</p>
-                                    </div>
+                                <div class="empty-state">
+                                    <i class="bi bi-inbox"></i>
+                                    <p>Tidak ada data kas keluar</p>
+                                </div>
                             <?php else: ?>
-                                    <?php foreach ($kas_keluar_terbaru as $i => $item): ?>
-                                            <div class="transaction-item clickable" 
-                                                 data-type="kas_keluar" 
-                                                 data-id="<?= $item['id'] ?>"
-                                                 onclick="showDetailPopup(this)">
-                                                <div class="transaction-details">
-                                                    <div class="transaction-icon expense">
-                                                        <i class="bi bi-arrow-up"></i>
-                                                    </div>
-                                                    <div class="transaction-info">
-                                                        <div class="transaction-description"><?= $item['username'] ?? 'System' ?> -
-                                                            <?= $item['pengajuan_keterangan'] ?? $item['keterangan'] ?></div>
-                                                        <div class="transaction-date">
-                                                            <?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
-                                                    </div>
-                                                </div>
-                                                <div class="transaction-amount">
-                                                    <div class="amount negative">
-                                                        Rp <?= number_format($item['nominal'], 0, ',', '.') ?>
-                                                    </div>
-                                                </div>
+                                <?php foreach ($kas_keluar_terbaru as $i => $item): ?>
+                                    <div class="transaction-item clickable"
+                                        data-type="kas_keluar"
+                                        data-id="<?= $item['id'] ?>"
+                                        onclick="showDetailPopup(this)">
+                                        <div class="transaction-details">
+                                            <div class="transaction-icon expense">
+                                                <i class="bi bi-arrow-up"></i>
                                             </div>
-                                    <?php endforeach; ?>
+                                            <div class="transaction-info">
+                                                <div class="transaction-description"><?= $item['username'] ?? 'System' ?> -
+                                                    <?= $item['pengajuan_keterangan'] ?? $item['keterangan'] ?></div>
+                                                <div class="transaction-date">
+                                                    <?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></div>
+                                            </div>
+                                        </div>
+                                        <div class="transaction-amount">
+                                            <div class="amount negative">
+                                                Rp <?= number_format($item['nominal'], 0, ',', '.') ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -370,7 +370,7 @@
         const transactionFilter = document.getElementById('transactionFilter');
         const transactionCategories = document.querySelectorAll('.transaction-category');
 
-        transactionFilter.addEventListener('change', function () {
+        transactionFilter.addEventListener('change', function() {
             const selectedValue = this.value;
 
             transactionCategories.forEach(category => {
@@ -389,7 +389,7 @@
     function showDetailPopup(element) {
         const type = element.getAttribute('data-type');
         const id = element.getAttribute('data-id');
-        
+
         // Tampilkan loading
         document.getElementById('detailContent').innerHTML = `
             <div class="text-center py-4">
@@ -399,11 +399,11 @@
                 <p class="mt-2">Memuat data...</p>
             </div>
         `;
-        
+
         // Tampilkan modal
         const modal = new bootstrap.Modal(document.getElementById('detailModal'));
         modal.show();
-        
+
         // Load data via AJAX
         fetch(`<?= site_url('admin/dashboard/get_detail/') ?>${type}/${id}`)
             .then(response => response.json())
@@ -447,7 +447,8 @@
         --border: rgba(255, 255, 255, 0.1);
     }
 
-    html, body {
+    html,
+    body {
         margin: 0;
         padding: 0;
         height: 100%;

@@ -57,22 +57,6 @@
                     <div class="form-text text-light">Masukkan nominal maksimal Rp 5.000.000.000</div>
                 </div>
 
-                <!-- Deadline Input -->
-                <div class="col-md-6">
-                    <label for="deadline" class="form-label text-white">
-                        <i class="bi bi-calendar me-1"></i> Deadline
-                    </label>
-                    <input type="date"
-                        class="form-control modern-input <?= (isset($validation) && $validation->hasError('deadline')) ? 'is-invalid' : '' ?>"
-                        id="deadline"
-                        name="deadline"
-                        value="<?= old('deadline', $pengajuan['deadline']) ?>">
-                    <div class="invalid-feedback">
-                        <?= isset($validation) ? $validation->getError('deadline') : 'Format tanggal tidak valid' ?>
-                    </div>
-                    <div class="form-text text-light">Tentukan batas waktu pengajuan</div>
-                </div>
-
                 <!-- Keterangan Input -->
                 <div class="col-12">
                     <label for="keterangan" class="form-label text-white">
