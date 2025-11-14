@@ -41,57 +41,57 @@
     <div class="row">
         <!-- Statistik Bulanan (TETAP data keseluruhan) -->
         <div class="col-lg-8 mb-4">
-            <div class="dashboard-card h-100 p-4">
+            <div class="dashboard-card h-100">
                 <!-- Header dengan Summary -->
-                <div class="row mb-4">
-                    <div class="col">
-                        <h5 class="text-steam-blue mb-2">Statistik Bulanan
-                        </h5>
-                        <div class="summary-stats d-flex gap-4">
-                            <div class="stat-item">
-                                <div class="text-white small">Total Kas Masuk</div>
-                                <div class="text-success fw-bold h6 mb-0">
-                                    Rp <?= number_format(array_sum($masukData), 0, ',', '.') ?>
+                <div class="p-4 border-bottom border-secondary">
+                    <div class="row">
+                        <div class="col">
+                            <h5 class="text-steam-blue mb-2">Statistik Bulanan</h5>
+                            <div class="summary-stats d-flex gap-4">
+                                <div class="stat-item">
+                                    <div class="text-white small">Total Kas Masuk</div>
+                                    <div class="text-success fw-bold h6 mb-0">
+                                        Rp <?= number_format(array_sum($masukData), 0, ',', '.') ?>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="text-white small">Total Kas Keluar</div>
+                                    <div class="text-danger fw-bold h6 mb-0">
+                                        Rp <?= number_format(array_sum($keluarData), 0, ',', '.') ?>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="text-white small">Saldo Bersih</div>
+                                    <div class="text-white fw-bold h6 mb-0">
+                                        Rp
+                                        <?= number_format(array_sum($masukData) - array_sum($keluarData), 0, ',', '.') ?>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="stat-item">
-                                <div class="text-white small">Total Kas Keluar</div>
-                                <div class="text-danger fw-bold h6 mb-0">
-                                    Rp <?= number_format(array_sum($keluarData), 0, ',', '.') ?>
+                        </div>
+                    </div>
+
+                    <!-- Chart Legend -->
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="chart-legend d-flex gap-4">
+                            <div class="legend-item d-flex align-items-center">
+                                <div class="legend-color me-2"
+                                    style="width: 16px; height: 16px; background: linear-gradient(135deg, #7ef29d, #43a047); border-radius: 4px;">
                                 </div>
+                                <small class="text-light">Kas Masuk</small>
                             </div>
-                            <div class="stat-item">
-                                <div class="text-white small">Saldo Bersih</div>
-                                <div class="text-white fw-bold h6 mb-0">
-                                    Rp <?= number_format(array_sum($masukData) - array_sum($keluarData), 0, ',', '.') ?>
+                            <div class="legend-item d-flex align-items-center">
+                                <div class="legend-color me-2"
+                                    style="width: 16px; height: 16px; background: linear-gradient(135deg, #ef5350, #d32f2f); border-radius: 4px;">
                                 </div>
+                                <small class="text-light">Kas Keluar</small>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Chart Legend -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="chart-legend d-flex gap-4">
-                        <div class="legend-item d-flex align-items-center">
-                            <div class="legend-color me-2"
-                                style="width: 16px; height: 16px; background: linear-gradient(135deg, #66c0f4, #4a9fd5); border-radius: 4px;">
-                            </div>
-                            <small class="text-light">Kas Masuk</small>
-                        </div>
-                        <div class="legend-item d-flex align-items-center">
-                            <div class="legend-color me-2"
-                                style="width: 16px; height: 16px; background: linear-gradient(135deg, #ef5350, #d32f2f); border-radius: 4px;">
-                            </div>
-                            <small class="text-light">Kas Keluar</small>
-                        </div>
-                    </div>
-                    <div class="chart-actions">
-                    </div>
-                </div>
-
-                <!-- Chart Container -->
-                <div class="chart-container" style="height: 350px;">
+                <!-- Chart Container - Diperbaiki dengan padding yang lebih kecil dan tinggi yang optimal -->
+                <div class="chart-container-expanded p-3" style="height: 380px;">
                     <canvas id="monthlyChart"></canvas>
                 </div>
             </div>
@@ -259,17 +259,22 @@
                     if (!chartArea) return null;
 
                     const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                    gradient.addColorStop(0, 'rgba(102, 192, 244, 0.7)');
-                    gradient.addColorStop(0.7, 'rgba(102, 192, 244, 0.9)');
-                    gradient.addColorStop(1, 'rgba(74, 159, 213, 1)');
+                    gradient.addColorStop(0, 'rgba(102, 244, 102, 0.7)');   // hijau muda di bawah
+                    gradient.addColorStop(0.7, 'rgba(76, 175, 80, 0.9)');   // hijau tengah
+                    gradient.addColorStop(1, 'rgba(56, 142, 60, 1)');       // hijau tua di atas
                     return gradient;
                 },
-                borderColor: 'rgba(102, 192, 244, 1)',
+                borderColor: 'rgba(76, 175, 80, 1)', // hijau utama
                 borderWidth: 0,
-                borderRadius: 6,
+                borderRadius: {
+                    topLeft: 8,
+                    topRight: 8,
+                    bottomLeft: 0,
+                    bottomRight: 0
+                },
                 borderSkipped: false,
-                barPercentage: 0.6,
-                categoryPercentage: 0.7
+                barPercentage: 0.7,
+                categoryPercentage: 0.8
             },
             {
                 label: 'Kas Keluar',
@@ -287,10 +292,15 @@
                 },
                 borderColor: 'rgba(239, 83, 80, 1)',
                 borderWidth: 0,
-                borderRadius: 6,
+                borderRadius: {
+                    topLeft: 8,
+                    topRight: 8,
+                    bottomLeft: 0,
+                    bottomRight: 0
+                },
                 borderSkipped: false,
-                barPercentage: 0.6,
-                categoryPercentage: 0.7
+                barPercentage: 0.7,
+                categoryPercentage: 0.8
             }]
         },
         options: {
@@ -314,6 +324,7 @@
                     cornerRadius: 8,
                     displayColors: true,
                     usePointStyle: true,
+                    boxPadding: 6,
                     callbacks: {
                         label: function (context) {
                             return `${context.dataset.label}: Rp ${context.parsed.y.toLocaleString('id-ID')}`;
@@ -326,13 +337,23 @@
                     beginAtZero: true,
                     grid: {
                         color: 'rgba(199,213,224,0.1)',
-                        drawBorder: false
+                        drawBorder: false,
+                        drawTicks: false
                     },
                     ticks: {
                         color: '#8f98a0',
                         padding: 8,
+                        font: {
+                            size: 11
+                        },
                         callback: function (value) {
-                            return 'Rp ' + value.toLocaleString('id-ID');
+                            if (value >= 1000000) {
+                                return 'Rp ' + (value / 1000000).toFixed(1) + 'Jt';
+                            }
+                            if (value >= 1000) {
+                                return 'Rp ' + (value / 1000).toFixed(0) + 'Rb';
+                            }
+                            return 'Rp ' + value;
                         }
                     },
                     border: {
@@ -342,11 +363,16 @@
                 x: {
                     grid: {
                         color: 'rgba(199,213,224,0.05)',
-                        drawBorder: false
+                        drawBorder: false,
+                        drawTicks: false
                     },
                     ticks: {
                         color: '#8f98a0',
-                        padding: 8
+                        padding: 8,
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        }
                     },
                     border: {
                         display: false
@@ -381,30 +407,32 @@
                     'rgba(255, 193, 7, 1)',
                     'rgba(239, 83, 80, 1)'
                 ],
-                borderWidth: 2,
-                borderRadius: [8, 8, 8],
-                spacing: 2,
-                hoverOffset: 10
+                borderWidth: 3,
+                borderRadius: [12, 12, 12],
+                spacing: 4,
+                hoverOffset: 15,
+                hoverBorderWidth: 4
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '70%',
+            cutout: '75%',
             plugins: {
                 legend: {
                     display: false
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(26, 26, 26, 0.9)',
+                    backgroundColor: 'rgba(26, 26, 26, 0.95)',
                     titleColor: '#c7d5e0',
                     bodyColor: '#c7d5e0',
-                    borderColor: 'rgba(102, 192, 244, 0.3)',
+                    borderColor: 'rgba(102, 192, 244, 0.4)',
                     borderWidth: 1,
                     padding: 12,
                     cornerRadius: 8,
                     displayColors: true,
                     usePointStyle: true,
+                    boxPadding: 6,
                     callbacks: {
                         label: function (context) {
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
@@ -538,6 +566,76 @@
         border-radius: 4px;
     }
 
+    /* PERBAIKAN: Chart container untuk diagram batang yang lebih optimal */
+    .chart-container-expanded {
+        position: relative;
+        background: linear-gradient(145deg, rgba(26, 26, 26, 0.7), rgba(40, 40, 40, 0.7));
+        border-radius: 0 0 12px 12px;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.05),
+            0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-top: none;
+        height: 380px !important;
+        padding: 1rem !important;
+    }
+
+    /* Memastikan canvas chart memenuhi container */
+    .chart-container-expanded canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .modern-donut-container {
+        background: linear-gradient(145deg, rgba(26, 26, 26, 0.7), rgba(40, 40, 40, 0.7));
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.05),
+            0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .percentage-display {
+        background: rgba(26, 26, 26, 0.8);
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* PERBAIKAN: Layout dashboard card untuk diagram batang */
+    .dashboard-card {
+        background: linear-gradient(145deg, rgba(33, 33, 33, 0.9), rgba(26, 26, 26, 0.9));
+        border-radius: 16px;
+        box-shadow:
+            0 4px 20px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Header dipisah dari chart container */
+    .dashboard-card .p-4.border-bottom {
+        flex-shrink: 0;
+    }
+
+    /* Chart container mengisi sisa ruang */
+    .chart-container-expanded {
+        flex: 1;
+        min-height: 0;
+        /* Penting untuk flexbox di beberapa browser */
+    }
+
     /* Smooth animations */
     @keyframes fadeInUp {
         from {
@@ -551,13 +649,40 @@
         }
     }
 
+    @keyframes slideInFromLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInFromRight {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
     .dashboard-card {
         animation: fadeInUp 0.6s ease-out;
     }
 
-    .summary-stats,
+    .summary-stats {
+        animation: slideInFromLeft 0.8s ease-out;
+    }
+
     .overview-stats {
-        animation: fadeInUp 0.8s ease-out;
+        animation: slideInFromRight 0.8s ease-out;
     }
 
     /* Improved responsive design */
@@ -590,6 +715,53 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding-bottom: 1rem;
         }
+
+        .percentage-display {
+            width: 80px;
+            height: 80px;
+        }
+
+        .percentage-display h2 {
+            font-size: 1.5rem;
+        }
+
+        /* Responsive height untuk chart */
+        .chart-container-expanded {
+            height: 300px !important;
+        }
+    }
+
+    /* Enhanced visual effects */
+    .dashboard-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg,
+                transparent,
+                rgba(102, 192, 244, 0.4),
+                transparent);
+    }
+
+    /* Custom scrollbar for webkit browsers */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(26, 26, 26, 0.8);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(102, 192, 244, 0.6);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(102, 192, 244, 0.8);
     }
 </style>
 

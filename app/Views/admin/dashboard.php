@@ -62,11 +62,11 @@
                         </div>
                         <div class="d-flex justify-content-between mt-2">
                             <span><i class="bi bi-arrow-up-circle me-1"></i> Transaksi Bulan Ini</span>
-                            <span class="text-warning"><?= ($kas_masuk_count ?? 0) + ($kas_keluar_count ?? 0) ?></span>
+                            <span class="text-white"><?= ($kas_masuk_count ?? 0) + ($kas_keluar_count ?? 0) ?></span>
                         </div>
                         <div class="d-flex justify-content-between mt-2">
                             <span><i class="bi bi-person-check me-1"></i> User Aktif</span>
-                            <span class="text-success"><?= $total_users ?? 0 ?></span>
+                            <span class="text-white"><?= $total_users ?? 0 ?></span>
                         </div>
                     </div>
                 </div>

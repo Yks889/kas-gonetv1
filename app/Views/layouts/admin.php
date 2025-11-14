@@ -19,135 +19,124 @@
         <!-- SweetAlert2 -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
         <style>
             :root {
-                --primary-color: #4da3ff;
-                --secondary-color: #ff6b6b;
-                --bg-dark: #0f0f0f;
-                --bg-card: #141414;
-                --bg-hover: #1f1f1f;
-                --border-color: #2c2c2c;
-                --text-primary: #ffffff;
-                --text-secondary: #aaaaaa;
-                --gradient-primary: linear-gradient(135deg, #4361ee, #4cc9f0);
-                --gradient-card: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-                --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.1);
-                --shadow-medium: 0 6px 20px rgba(0, 0, 0, 0.15);
-                --shadow-glow: 0 0 20px rgba(77, 163, 255, 0.3);
+                --primary-color: #3b82f6;
+                --primary-light: #60a5fa;
+                --primary-dark: #2563eb;
+                --secondary-color: #64748b;
+                --accent-color: #10b981;
+                --bg-dark: #0f172a;
+                --bg-card: #1e293b;
+                --bg-hover: #334155;
+                --border-color: #334155;
+                --text-primary: #f1f5f9;
+                --text-secondary: #cbd5e1;
+                --text-muted: #94a3b8;
+                --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+                --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+                --border-radius: 8px;
+                --transition: all 0.2s ease;
             }
 
             body {
-                font-family: 'Montserrat', sans-serif;
+                font-family: 'Inter', sans-serif;
                 background-color: var(--bg-dark);
                 color: var(--text-primary);
                 margin: 0;
                 overflow-x: hidden;
+                line-height: 1.6;
+                font-weight: 400;
             }
 
-            /* Sidebar Modern */
+            /* Sidebar Simple */
             .sidebar {
-                width: 280px;
+                width: 250px;
                 background: var(--bg-card);
                 position: fixed;
                 top: 0;
                 left: 0;
                 bottom: 0;
-                padding: 25px 0;
+                padding: 20px 0;
                 border-right: 1px solid var(--border-color);
                 display: flex;
                 flex-direction: column;
-                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: var(--transition);
                 z-index: 1000;
-                box-shadow: 2px 0 20px rgba(0, 0, 0, 0.3);
             }
 
             .sidebar .logo {
-                font-size: 1.4rem;
-                font-weight: 700;
-                padding: 0 25px;
-                margin-bottom: 35px;
+                font-size: 1.3rem;
+                font-weight: 600;
+                padding: 0 20px;
+                margin-bottom: 30px;
                 color: var(--text-primary);
                 display: flex;
                 align-items: center;
-                gap: 12px;
-                transition: all 0.3s ease;
+                gap: 10px;
             }
 
             .sidebar .logo img {
-                transition: transform 0.3s ease;
-            }
-
-            .sidebar .logo:hover img {
-                transform: scale(1.05);
+                height: 35px;
+                width: auto;
             }
 
             .sidebar-divider {
-                height: 2px;
-                background: linear-gradient(50deg, transparent, var(--border-color), transparent);
-                margin: 15px 25px;
-                opacity: 1;
+                height: 1px;
+                background: var(--border-color);
+                margin: 15px 20px;
             }
 
+            /* Navigation Items */
             .sidebar .nav-link {
                 color: var(--text-secondary);
-                padding: 14px 20px;
+                padding: 12px 20px;
                 display: flex;
                 align-items: center;
-                gap: 14px;
-                font-size: 0.95rem;
+                gap: 12px;
+                font-size: 0.9rem;
                 font-weight: 500;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                border-radius: 12px;
-                margin: 4px 15px;
-                position: relative;
-                overflow: hidden;
-            }
-
-            .sidebar .nav-link::before {
-                content: '';
-                position: absolute;
-                left: 0;
-                top: 0;
-                height: 100%;
-                width: 3px;
-                background: var(--primary-color);
-                transform: scaleY(0);
-                transition: transform 0.3s ease;
-                border-radius: 0 4px 4px 0;
+                transition: var(--transition);
+                border-radius: 6px;
+                margin: 2px 15px;
             }
 
             .sidebar .nav-link i {
-                font-size: 1.3rem;
-                color: var(--text-secondary);
-                transition: all 0.3s ease;
-                width: 24px;
+                font-size: 1.2rem;
+                color: var(--text-muted);
+                transition: var(--transition);
+                width: 20px;
                 text-align: center;
             }
 
-            .sidebar .nav-link.active,
+            /* Hover Effects - Simple */
             .sidebar .nav-link:hover {
-                background: var(--bg-hover);
                 color: var(--text-primary);
-                transform: translateX(5px);
-                box-shadow: var(--shadow-light);
+                background: var(--bg-hover);
             }
 
-            .sidebar .nav-link.active::before,
-            .sidebar .nav-link:hover::before {
-                transform: scaleY(1);
-            }
-
-            .sidebar .nav-link.active i,
             .sidebar .nav-link:hover i {
                 color: var(--primary-color);
-                transform: scale(1.1);
             }
 
-            /* Header Modern */
+            .sidebar .nav-link.active {
+                color: var(--text-primary);
+                background: var(--primary-color);
+            }
+
+            .sidebar .nav-link.active i {
+                color: var(--text-primary);
+            }
+
+            /* Header Simple */
             .main-header {
                 position: fixed;
                 top: 0;
-                left: 280px;
+                left: 250px;
                 right: 0;
                 height: 70px;
                 background: var(--bg-card);
@@ -157,89 +146,67 @@
                 justify-content: space-between;
                 padding: 0 30px;
                 z-index: 999;
-                backdrop-filter: blur(10px);
-                transition: all 0.3s ease;
             }
 
             .main-header .title {
-                font-size: 1.3rem;
+                font-size: 1.25rem;
                 font-weight: 600;
                 color: var(--text-primary);
-                background: var(--gradient-primary);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
             }
 
             /* Content Area */
             .main-content {
-                margin-left: 280px;
+                margin-left: 250px;
                 padding: 30px;
                 min-height: 100vh;
-                transition: all 0.3s ease;
+                transition: var(--transition);
+                background: var(--bg-dark);
             }
 
-            /* ========== MODERN PROFILE SECTION - DIPERBAIKI ========== */
+            /* Profile Section */
             .sidebar-profile {
                 margin-top: auto;
-                padding: 20px 15px 20px;
+                padding: 15px 15px 20px;
                 border-top: 1px solid var(--border-color);
-                background: rgba(0, 0, 0, 0.2);
-                backdrop-filter: blur(10px);
             }
 
             .profile-card {
-                background: var(--gradient-card);
-                border-radius: 12px;
-                padding: 15px;
-                margin: 0 10px 12px 10px;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                transition: all 0.3s ease;
-                box-shadow: var(--shadow-light);
-                height: 70px;
+                background: var(--bg-card);
+                border-radius: var(--border-radius);
+                padding: 12px;
+                margin: 0 10px 10px 10px;
+                border: 1px solid var(--border-color);
+                transition: var(--transition);
                 display: flex;
                 align-items: center;
             }
 
             .profile-card:hover {
-                transform: translateX(5px);
-                box-shadow: var(--shadow-medium);
-                border-color: var(--primary-color);
+                background: var(--bg-hover);
             }
 
             .profile-avatar {
-                width: 45px;
-                height: 45px;
+                width: 40px;
+                height: 40px;
                 border-radius: 50%;
                 object-fit: cover;
-                box-shadow: var(--shadow-glow);
-                transition: all 0.3s ease;
-                flex-shrink: 0;
+                border: 2px solid var(--border-color);
             }
 
             .profile-avatar-placeholder {
-                width: 45px;
-                height: 45px;
+                width: 40px;
+                height: 40px;
                 border-radius: 50%;
-                background: var(--gradient-primary);
+                background: var(--primary-color);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 color: white;
-                border: 2px solid rgba(255, 255, 255, 0.2);
-                box-shadow: var(--shadow-glow);
-                transition: all 0.3s ease;
-                flex-shrink: 0;
-            }
-
-            .profile-card:hover .profile-avatar,
-            .profile-card:hover .profile-avatar-placeholder {
-                transform: scale(1.05);
-                border-color: #4cc9f0;
+                border: 2px solid var(--border-color);
             }
 
             .profile-avatar-placeholder i {
-                font-size: 1.3rem;
+                font-size: 1.1rem;
             }
 
             .profile-info {
@@ -250,178 +217,79 @@
 
             .profile-name {
                 font-weight: 600;
-                font-size: 0.9rem;
+                font-size: 0.85rem;
                 color: var(--text-primary);
                 margin-bottom: 2px;
                 line-height: 1.2;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
             }
 
             .profile-role {
-                font-size: 0.7rem;
-                color: var(--text-secondary);
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
+                font-size: 0.75rem;
+                color: var(--text-muted);
                 line-height: 1.2;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
             }
 
             .profile-link {
                 display: block;
                 text-decoration: none;
                 color: inherit;
-                transition: all 0.3s ease;
             }
 
-            /* Modern Logout Button - DIPERBAIKI */
+            /* Logout Button */
             .logout-btn {
                 display: flex;
                 align-items: center;
-                gap: 12px;
-                padding: 14px 18px;
-                color: var(--secondary-color);
-                border-radius: 12px;
-                transition: all 0.3s ease;
+                gap: 10px;
+                padding: 12px 20px;
+                color: var(--text-secondary);
+                border-radius: 6px;
+                transition: var(--transition);
                 text-decoration: none;
-                font-size: 0.95rem;
+                font-size: 0.9rem;
                 font-weight: 500;
                 margin: 0 10px;
-                background: rgba(255, 107, 107, 0.05);
-                border: 1px solid transparent;
-                height: 50px;
             }
 
             .logout-btn:hover {
-                background: rgba(255, 107, 107, 0.1);
-                color: #ff8e8e;
-                border-color: rgba(255, 107, 107, 0.3);
-                transform: translateX(5px);
-                box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+                color: #ef4444;
+                background: rgba(239, 68, 68, 0.1);
             }
 
             .logout-btn i {
-                font-size: 1.3rem;
-                transition: transform 0.3s ease;
+                font-size: 1.2rem;
             }
 
-            .logout-btn:hover i {
-                transform: translateX(2px);
-            }
-
-            .logout-btn {
-                position: relative;
-                overflow: hidden;
-            }
-
-            .logout-btn::before {
-                content: '';
-                position: absolute;
-                left: 0;
-                top: 0;
-                height: 100%;
-                width: 4px;
-                background: var(--secondary-color);
-                transform: scaleY(0);
-                transition: transform 0.3s ease;
-                border-radius: 0 4px 4px 0;
-            }
-
-            .logout-btn:hover::before {
-                transform: scaleY(1);
-            }
-
-            .logout-btn:hover i {
-                color: var(--secondary-color);
-                transform: scale(1.1);
-            }
-
-            /* Floating Button untuk Kembali ke Dashboard - DIKANAN BAWAH */
+            /* Floating Button */
             .floating-btn {
                 position: fixed;
                 right: 25px;
                 bottom: 25px;
-                width: 60px;
-                height: 60px;
-                background: var(--gradient-primary);
+                width: 50px;
+                height: 50px;
+                background: var(--primary-color);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 color: white;
-                font-size: 1.5rem;
-                box-shadow: var(--shadow-medium);
+                font-size: 1.2rem;
+                box-shadow: var(--shadow-md);
                 cursor: pointer;
                 z-index: 1000;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: var(--transition);
                 border: none;
-                overflow: hidden;
-            }
-
-            .floating-btn::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(135deg, #4cc9f0, #4361ee);
-                border-radius: 50%;
-                z-index: -1;
-                transition: opacity 0.3s ease;
             }
 
             .floating-btn:hover {
-                transform: translateY(-5px) scale(1.05);
-                box-shadow: var(--shadow-glow);
+                background: var(--primary-dark);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-lg);
             }
 
-            .floating-btn:active {
-                transform: translateY(-2px) scale(0.98);
-            }
-
-            .floating-btn i {
-                transition: transform 0.3s ease;
-            }
-
-            .floating-btn:hover i {
-                transform: scale(1.1);
-            }
-
-            /* Tooltip untuk floating button */
-            .floating-btn::after {
-                content: 'Kembali ke Dashboard';
-                position: absolute;
-                right: 70px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: var(--bg-card);
-                color: var(--text-primary);
-                padding: 8px 12px;
-                border-radius: 8px;
-                font-size: 0.8rem;
-                white-space: nowrap;
-                opacity: 0;
-                pointer-events: none;
-                transition: all 0.3s ease;
-                border: 1px solid var(--border-color);
-                box-shadow: var(--shadow-medium);
-            }
-
-            .floating-btn:hover::after {
-                opacity: 1;
-                right: 75px;
-            }
-
-            /* Class untuk menyembunyikan floating button di dashboard */
             .floating-btn.hidden {
                 opacity: 0;
                 visibility: hidden;
                 transform: scale(0.8);
-                pointer-events: none;
             }
 
             /* Responsive Design */
@@ -452,32 +320,12 @@
                     z-index: 1001;
                     background: var(--primary-color);
                     border: none;
-                    border-radius: 10px;
-                    width: 45px;
-                    height: 45px;
+                    border-radius: 6px;
+                    width: 40px;
+                    height: 40px;
                     color: white;
-                    font-size: 1.2rem;
+                    font-size: 1.1rem;
                     cursor: pointer;
-                    box-shadow: var(--shadow-medium);
-                }
-
-                /* Responsive adjustments untuk floating button */
-                .floating-btn {
-                    right: 20px;
-                    bottom: 20px;
-                    width: 55px;
-                    height: 55px;
-                    font-size: 1.3rem;
-                }
-
-                /* Sembunyikan tooltip di mobile */
-                .floating-btn::after {
-                    display: none;
-                }
-
-                /* Animasi untuk hidden state di mobile */
-                .floating-btn.hidden {
-                    transform: scale(0.7);
                 }
             }
 
@@ -497,36 +345,85 @@
                 bottom: 0;
                 background: rgba(0, 0, 0, 0.5);
                 z-index: 999;
-                backdrop-filter: blur(5px);
             }
 
             .sidebar-overlay.active {
                 display: block;
             }
 
-            /* Smooth animations */
-            .sidebar,
-            .main-content,
-            .main-header {
-                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Content Cards */
+            .content-card {
+                background: var(--bg-card);
+                border-radius: var(--border-radius);
+                padding: 20px;
+                margin-bottom: 20px;
+                border: 1px solid var(--border-color);
+                box-shadow: var(--shadow-sm);
             }
 
-            /* Scrollbar styling */
-            .sidebar::-webkit-scrollbar {
-                width: 6px;
+            /* Table Styling */
+            .table-modern {
+                background: var(--bg-card);
+                border-radius: var(--border-radius);
+                overflow: hidden;
+                border: 1px solid var(--border-color);
             }
 
-            .sidebar::-webkit-scrollbar-track {
-                background: transparent;
+            .table-modern th {
+                background: rgba(59, 130, 246, 0.1);
+                color: var(--text-primary);
+                font-weight: 600;
+                border-bottom: 1px solid var(--border-color);
+                padding: 15px;
             }
 
-            .sidebar::-webkit-scrollbar-thumb {
-                background: var(--border-color);
-                border-radius: 3px;
+            .table-modern td {
+                padding: 12px 15px;
+                border-bottom: 1px solid var(--border-color);
+                color: var(--text-secondary);
             }
 
-            .sidebar::-webkit-scrollbar-thumb:hover {
+            .table-modern tr:last-child td {
+                border-bottom: none;
+            }
+
+            .table-modern tr:hover td {
+                background: rgba(59, 130, 246, 0.05);
+            }
+
+            /* Button Styling */
+            .btn-modern {
+                border-radius: 6px;
+                padding: 10px 20px;
+                font-weight: 500;
+                transition: var(--transition);
+                border: none;
+            }
+
+            .btn-primary-modern {
                 background: var(--primary-color);
+                color: white;
+            }
+
+            .btn-primary-modern:hover {
+                background: var(--primary-dark);
+            }
+
+            /* Form Styling */
+            .form-control-modern {
+                background: var(--bg-card);
+                border: 1px solid var(--border-color);
+                border-radius: 6px;
+                color: var(--text-primary);
+                padding: 10px 15px;
+                transition: var(--transition);
+            }
+
+            .form-control-modern:focus {
+                background: var(--bg-card);
+                border-color: var(--primary-color);
+                color: var(--text-primary);
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
             }
         </style>
     </head>
@@ -543,7 +440,7 @@
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="logo">
-                <img src="<?= base_url('uploads/logo.png') ?>" alt="Logo" style="height: 45px; width: auto;">
+                <img src="<?= base_url('uploads/logo.png') ?>" alt="Logo">
                 <span>Kas - GoNet</span>
             </div>
 
@@ -559,13 +456,13 @@
                 </li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'users' ? 'active' : '' ?>"
                         href="<?= site_url('admin/users') ?>">
-                        <i class="bi bi-person-badge"></i>
+                        <i class="bi bi-people"></i>
                         <span>Manajemen User</span>
                     </a>
                 </li>
                 <li><a class="nav-link <?= service('uri')->getSegment(2) === 'laporan' ? 'active' : '' ?>"
                         href="<?= site_url('admin/laporan') ?>">
-                        <i class="bi bi-journal-text"></i>
+                        <i class="bi bi-activity"></i>
                         <span>Aktivitas User</span>
                     </a>
                 </li>
@@ -598,15 +495,14 @@
                 </li>
             </ul>
 
-            <!-- Profile & Logout Section - DIPERBAIKI -->
+            <!-- Profile & Logout Section -->
             <div class="sidebar-profile">
                 <!-- Profile Card -->
                 <?php
                 $userModel = new \App\Models\UserModel();
                 $sidebarUser = $userModel->find(session()->get('id'));
                 ?>
-                <a class="profile-link <?= service('uri')->getSegment(2) === 'profile' ? 'active' : '' ?>"
-                    href="<?= site_url(session()->get('role') === 'admin' ? 'admin/profile' : 'user/profile') ?>">
+                <a class="profile-link" href="<?= site_url('admin/profile') ?>">
                     <div class="profile-card">
                         <div class="d-flex align-items-center w-100">
                             <div class="flex-shrink-0">
@@ -636,16 +532,14 @@
                 </a>
             </div>
         </div>
-
         <!-- Main Content -->
         <main class="main-content">
             <?= $this->renderSection('content') ?>
         </main>
 
         <!-- Floating Button untuk kembali ke Dashboard -->
-        <!-- Button akan disembunyikan jika berada di halaman dashboard -->
         <button class="floating-btn <?= service('uri')->getSegment(2) === 'dashboard' ? 'hidden' : '' ?>"
-            id="floatingDashboardBtn" title="Kembali ke Dashboard">
+            id="floatingDashboardBtn">
             <i class="bi bi-house-door"></i>
         </button>
 
@@ -667,7 +561,7 @@
                         currentPath.endsWith('/admin/');
                 }
 
-                // Update visibility floating button berdasarkan halaman
+                // Update visibility floating button
                 function updateFloatingButtonVisibility() {
                     if (isDashboardPage()) {
                         floatingDashboardBtn.classList.add('hidden');
@@ -714,17 +608,7 @@
                     };
                 });
 
-                // Photo upload forms
-                const photoForms = document.querySelectorAll('form[action*="update-photo"]');
-                photoForms.forEach(form => {
-                    form.addEventListener('submit', function (e) {
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1500);
-                    });
-                });
-
-                // Add resize listener for responsive behavior
+                // Add resize listener
                 window.addEventListener('resize', function () {
                     if (window.innerWidth > 768) {
                         sidebar.classList.remove('mobile-open');
@@ -735,9 +619,6 @@
 
                 // Update visibility saat pertama kali load
                 updateFloatingButtonVisibility();
-
-                // Update visibility saat navigasi (untuk SPA-like behavior)
-                window.addEventListener('popstate', updateFloatingButtonVisibility);
             });
         </script>
     </body>
