@@ -42,11 +42,14 @@ class Dashboard extends BaseController
         $total_masuk = $kasMasukQuery->first();
 
         // Total Keluar
-        $kasKeluarQuery = $this->kasKeluarModel->selectSum('nominal', 'total');
-        if ($bulan) {
-            $kasKeluarQuery->where('MONTH(created_at)', $bulan);
-        }
-        $total_keluar = $kasKeluarQuery->first();
+        $totalQuery = clone $this->kasKeluarModel;
+        $data['total_pengeluaran'] = $totalQuery
+            ->selectSum('kas_keluar.nominal')
+            ->join('pengajuan p', 'p.id = kas_keluar.pengajuan_id', 'left')
+            ->where('p.status', 'selesai')
+            ->get()
+            ->getRow()
+            ->nominal ?? 0;
 
         // Pengajuan Terbaru (5 data saja)
         $pengajuan_terbaru = $this->pengajuanModel
@@ -139,7 +142,7 @@ class Dashboard extends BaseController
         $data = [
             'saldo' => $saldo,
             'total_masuk' => $total_masuk,
-            'total_keluar' => $total_keluar,
+            'total_pengeluaran' => $data['total_pengeluaran'],
             'total_pengajuan' => $total_pengajuan,
             'total_users' => $total_users,
             'pengajuan_pending' => $pengajuan_pending,

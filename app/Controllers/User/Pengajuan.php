@@ -36,7 +36,6 @@ class Pengajuan extends BaseController
         $rules = [
             'nominal'    => 'required|numeric',
             'keterangan' => 'required',
-            'deadline'   => 'permit_empty|valid_date',
             'tipe'       => 'required'
         ];
 
@@ -49,12 +48,9 @@ class Pengajuan extends BaseController
 
             $nominal = (float) $this->request->getVar('nominal');
 
-            // ✅ Ambil saldo terakhir dari tabel kas_saldo dengan fallback ke 0
+            // ✅ Ambil saldo terakhir dari tabel kas_saldo
             $saldoData = $kasSaldoModel->orderBy('id', 'DESC')->first();
-            $saldoAdmin = $saldoData['saldo_akhir'] ?? 0;
-
-            // ✅ Pastikan hasilnya numerik
-            $saldoAdmin = (float) $saldoAdmin;
+            $saldoAdmin = (float) ($saldoData['saldo_akhir'] ?? 0);
 
             // ✅ Cegah jika saldo kosong atau tidak cukup
             if ($saldoAdmin <= 0 || $saldoAdmin < $nominal) {
@@ -66,14 +62,14 @@ class Pengajuan extends BaseController
                 return redirect()->to('/user/pengajuan');
             }
 
-            // ✅ Simpan pengajuan baru
+            // ✅ Simpan pengajuan baru tanpa deadline, tambah confirm_at (null)
             $dataPengajuan = [
                 'user_id'    => $session->get('id'),
                 'nominal'    => $nominal,
                 'keterangan' => $this->request->getVar('keterangan'),
-                'deadline'   => $this->request->getVar('deadline'),
                 'tipe'       => $this->request->getVar('tipe'),
-                'status'     => 'pending'
+                'status'     => 'pending',
+                'confirm_at' => null // waktu konfirmasi nanti oleh admin
             ];
 
             $pengajuanModel->save($dataPengajuan);

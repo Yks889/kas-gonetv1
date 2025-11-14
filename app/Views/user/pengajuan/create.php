@@ -84,18 +84,6 @@
                     <div class="form-text text-light">Jelaskan secara detail alasan dan tujuan pengajuan kas</div>
                 </div>
 
-                <!-- Deadline Input -->
-                <div class="col-md-6">
-                    <label for="deadline" class="form-label text-white">
-                        <i class="bi bi-calendar me-1"></i> Tanggal
-                    </label>
-                    <input type="date"
-                        class="form-control modern-input"
-                        id="deadline"
-                        name="deadline">
-                    <div class="form-text text-light">Tentukan tanggal</div>
-                </div>
-
                 <!-- Field Upload Nota (hanya tampil jika uang_sendiri) -->
                 <div class="col-md-6" id="uploadNotaField" style="display: none;">
                     <label for="file_nota" class="form-label text-white">

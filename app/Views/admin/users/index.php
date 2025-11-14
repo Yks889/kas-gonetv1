@@ -47,80 +47,80 @@
                 <i class="bi bi-funnel-fill me-1"></i> Filter
             </button>
         </div>
+    </div>
 
-        <!-- Modal Filter -->
-        <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content stylish-modal">
-                    <div class="modal-header stylish-modal-header">
-                        <div class="d-flex align-items-center">
-                            <div class="modal-icon me-3">
-                                <i class="bi bi-funnel-fill"></i>
-                            </div>
-                            <div>
-                                <h5 class="modal-title mb-0">Filter User</h5>
-                                <p class="modal-subtitle mb-0">Saring data berdasarkan periode</p>
-                            </div>
+    <!-- Modal Filter -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content stylish-modal">
+                <div class="modal-header stylish-modal-header">
+                    <div class="d-flex align-items-center">
+                        <div class="modal-icon me-3">
+                            <i class="bi bi-funnel-fill"></i>
                         </div>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        <div>
+                            <h5 class="modal-title mb-0">Filter User</h5>
+                            <p class="modal-subtitle mb-0">Saring data berdasarkan periode</p>
+                        </div>
                     </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
 
-                    <div class="modal-body stylish-modal-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="filterMonth" class="form-label stylish-label">
-                                    <i class="bi bi-calendar-month me-2"></i> Bulan
-                                </label>
-                                <div class="select-wrapper">
-                                    <select id="filterMonth" class="form-select stylish-select">
-                                        <option value="">Semua Bulan</option>
-                                        <?php for ($m = 1; $m <= 12; $m++): ?>
-                                            <option value="<?= $m ?>" <?= (isset($_GET['month']) && $_GET['month'] == $m) ? 'selected' : '' ?>>
-                                                <?= date('F', mktime(0, 0, 0, $m, 1)) ?>
-                                            </option>
-                                        <?php endfor; ?>
-                                    </select>
-                                    <i class="bi bi-chevron-down select-arrow"></i>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="filterYear" class="form-label stylish-label">
-                                    <i class="bi bi-calendar me-2"></i> Tahun
-                                </label>
-                                <div class="select-wrapper">
-                                    <select id="filterYear" class="form-select stylish-select">
-                                        <option value="">Semua Tahun</option>
-                                        <?php $currentYear = date('Y'); ?>
-                                        <?php for ($y = $currentYear; $y >= ($currentYear - 5); $y--): ?>
-                                            <option value="<?= $y ?>" <?= (isset($_GET['year']) && $_GET['year'] == $y) ? 'selected' : '' ?>><?= $y ?></option>
-                                        <?php endfor; ?>
-                                    </select>
-                                    <i class="bi bi-chevron-down select-arrow"></i>
-                                </div>
+                <div class="modal-body stylish-modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="filterMonth" class="form-label stylish-label">
+                                <i class="bi bi-calendar-month me-2"></i> Bulan
+                            </label>
+                            <div class="select-wrapper">
+                                <select id="filterMonth" class="form-select stylish-select">
+                                    <option value="">Semua Bulan</option>
+                                    <?php for ($m = 1; $m <= 12; $m++): ?>
+                                        <option value="<?= $m ?>" <?= (isset($_GET['month']) && $_GET['month'] == $m) ? 'selected' : '' ?>>
+                                            <?= date('F', mktime(0, 0, 0, $m, 1)) ?>
+                                        </option>
+                                    <?php endfor; ?>
+                                </select>
+                                <i class="bi bi-chevron-down select-arrow"></i>
                             </div>
                         </div>
 
-                        <!-- Quick Filter Options -->
-                        <div class="quick-filter-section mt-4 pt-3 border-top">
-                            <h6 class="text-light mb-3">Filter Cepat</h6>
-                            <div class="d-flex flex-wrap gap-2">
-                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year="">Semua</button>
-                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="<?= date('n') ?>" data-year="<?= date('Y') ?>">Bulan Ini</button>
-                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year="<?= date('Y') ?>">Tahun Ini</button>
-                                <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year="<?= date('Y') - 1 ?>">Tahun Lalu</button>
+                        <div class="col-md-6">
+                            <label for="filterYear" class="form-label stylish-label">
+                                <i class="bi bi-calendar me-2"></i> Tahun
+                            </label>
+                            <div class="select-wrapper">
+                                <select id="filterYear" class="form-select stylish-select">
+                                    <option value="">Semua Tahun</option>
+                                    <?php $currentYear = date('Y'); ?>
+                                    <?php for ($y = $currentYear; $y >= ($currentYear - 5); $y--): ?>
+                                        <option value="<?= $y ?>" <?= (isset($_GET['year']) && $_GET['year'] == $y) ? 'selected' : '' ?>><?= $y ?></option>
+                                    <?php endfor; ?>
+                                </select>
+                                <i class="bi bi-chevron-down select-arrow"></i>
                             </div>
                         </div>
                     </div>
 
-                    <div class="modal-footer stylish-modal-footer">
-                        <button id="resetFilter" class="btn btn-outline-light stylish-reset-btn">
-                            <i class="bi bi-arrow-clockwise me-1"></i> Reset
-                        </button>
-                        <button id="applyFilter" class="btn btn-gradient-primary stylish-apply-btn">
-                            <i class="bi bi-check-lg me-1"></i> Terapkan Filter
-                        </button>
+                    <!-- Quick Filter Options -->
+                    <div class="quick-filter-section mt-4 pt-3 border-top">
+                        <h6 class="text-light mb-3">Filter Cepat</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year="">Semua</button>
+                            <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="<?= date('n') ?>" data-year="<?= date('Y') ?>">Bulan Ini</button>
+                            <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year="<?= date('Y') ?>">Tahun Ini</button>
+                            <button class="btn btn-sm btn-outline-light quick-filter-btn" data-month="" data-year="<?= date('Y') - 1 ?>">Tahun Lalu</button>
+                        </div>
                     </div>
+                </div>
+
+                <div class="modal-footer stylish-modal-footer">
+                    <button id="resetFilter" class="btn btn-outline-light stylish-reset-btn">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Reset
+                    </button>
+                    <button id="applyFilter" class="btn btn-gradient-primary stylish-apply-btn">
+                        <i class="bi bi-check-lg me-1"></i> Terapkan Filter
+                    </button>
                 </div>
             </div>
         </div>

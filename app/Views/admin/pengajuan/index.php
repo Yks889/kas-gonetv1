@@ -25,6 +25,100 @@
         </div>
     <?php endif; ?>
 
+    <!-- Info Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="card-icon me-3">
+                        <i class="bi bi-cash-stack text-success"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title text-white mb-1">Total Nominal</h5>
+                        <h3 class="card-value text-success mb-0">
+                            Rp <?= isset($total_nominal) ? number_format($total_nominal, 0, ',', '.') : '0' ?>
+                        </h3>
+                    </div>
+                </div>
+                <div class="card-footer mt-3 pt-3 border-top border-secondary">
+                    <small class="text-white">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Total seluruh nominal pengajuan
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pengajuan Pending -->
+        <div class="col-md-3 mb-3">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="card-icon me-3">
+                        <i class="bi bi-clock-history text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title text-white mb-1">Menunggu</h5>
+                        <h3 class="card-value text-warning mb-0">
+                            <?= isset($total_pending) ? number_format($total_pending, 0, ',', '.') : '0' ?>
+                        </h3>
+                    </div>
+                </div>
+                <div class="card-footer mt-3 pt-3 border-top border-secondary">
+                    <small class="text-white">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Pengajuan menunggu persetujuan
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pengajuan Selesai -->
+        <div class="col-md-3 mb-3">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="card-icon me-3">
+                        <i class="bi bi-check-circle text-primary"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title text-white mb-1">Selesai</h5>
+                        <h3 class="card-value text-primary mb-0">
+                            <?= isset($total_selesai) ? number_format($total_selesai, 0, ',', '.') : '0' ?>
+                        </h3>
+                    </div>
+                </div>
+                <div class="card-footer mt-3 pt-3 border-top border-secondary">
+                    <small class="text-white">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Pengajuan yang disetujui
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total User Mengajukan -->
+        <div class="col-md-3 mb-3">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center">
+                    <div class="card-icon me-3">
+                        <i class="bi bi-people text-white"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title text-white mb-1">User Mengajukan</h5>
+                        <h3 class="card-value text-white mb-0">
+                            <?= isset($total_user) ? number_format($total_user, 0, ',', '.') : '0' ?>
+                        </h3>
+                    </div>
+                </div>
+                <div class="card-footer mt-3 pt-3 border-top border-secondary">
+                    <small class="text-white">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Jumlah user yang melakukan pengajuan
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Table Controls -->
     <div class="row mb-3 g-2">
         <!-- Rows per page -->
@@ -204,26 +298,30 @@
                                         <span class="badge bg-primary">Minta Admin</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
-                                    <?= $p['deadline'] ? date('d/m/Y', strtotime($p['deadline'])) : '-' ?>
-                                </td>
+                                <td><?= date('d/m/Y H:i', strtotime($p['created_at'])) ?></td>
                                 <td>
                                     <?php
                                     $status = strtolower($p['status']);
                                     $badge = [
-                                        'pending' => 'bg-warning text-dark',
-                                        'diterima' => 'bg-success',
-                                        'ditolak' => 'bg-danger',
-                                        'selesai' => 'bg-primary'
+                                        'pending'    => 'bg-warning text-dark',
+                                        'diterima'   => 'bg-success',
+                                        'ditolak'    => 'bg-danger',
+                                        'selesai'    => 'bg-primary',
+                                        'dibatalkan' => 'bg-secondary'
                                     ];
                                     ?>
                                     <span class="badge <?= $badge[$status] ?? 'bg-secondary' ?>">
                                         <?= ucfirst($p['status']) ?>
                                     </span>
                                 </td>
+
+                                <!-- ============================= -->
+                                <!--           AKSI BUTTONS        -->
+                                <!-- ============================= -->
                                 <td>
                                     <div class="d-flex justify-content-center">
                                         <?php if ($p['status'] == 'pending'): ?>
+                                            <!-- APPROVE / REJECT -->
                                             <button onclick="confirmApprove(<?= $p['id'] ?>, '<?= esc($p['username']) ?>', 'Rp <?= number_format($p['nominal'], 0, ',', '.') ?>', '<?= esc($p['keterangan']) ?>', '<?= $p['tipe'] ?>', <?= $p['nominal'] ?>)"
                                                 class="btn btn-sm btn-outline-success stylish-btn me-1"
                                                 title="Setujui Pengajuan">
@@ -234,30 +332,41 @@
                                                 title="Tolak Pengajuan">
                                                 <i class="bi bi-x-lg"></i>
                                             </button>
+
                                         <?php elseif ($p['status'] == 'diterima'): ?>
+                                            <!-- LIHAT / PROSES / BATALKAN -->
                                             <?php if (!empty($p['file_nota'])): ?>
-                                                <!-- Tombol Lihat Rincian (menggantikan Lihat Nota) -->
                                                 <button class="btn btn-sm btn-outline-info stylish-btn me-1"
                                                     data-bs-toggle="modal" data-bs-target="#detailModal<?= $p['id'] ?>"
                                                     title="Lihat Rincian Pengajuan">
                                                     <i class="bi bi-eye"></i>
                                                 </button>
+
                                                 <?php if ($p['tipe'] === 'uang_sendiri'): ?>
                                                     <button onclick="confirmProcessUangSendiri(<?= $p['id'] ?>, '<?= esc($p['username']) ?>', 'Rp <?= number_format($p['nominal'], 0, ',', '.') ?>', '<?= esc($p['keterangan']) ?>', <?= $p['nominal'] ?>)"
-                                                        class="btn btn-sm btn-outline-light stylish-btn"
+                                                        class="btn btn-sm btn-outline-light stylish-btn me-1"
                                                         title="Proses Pengajuan">
                                                         <i class="bi bi-gear"></i>
                                                     </button>
                                                 <?php else: ?>
                                                     <form action="<?= site_url('admin/pengajuan/process/' . $p['id']) ?>"
                                                         method="post" style="display:inline;">
-                                                        <button type="submit" class="btn btn-sm btn-outline-light stylish-btn"
+                                                        <button type="submit" class="btn btn-sm btn-outline-light stylish-btn me-1"
                                                             title="Proses Pengajuan">
                                                             <i class="bi bi-gear"></i>
                                                         </button>
                                                     </form>
                                                 <?php endif; ?>
+
+                                                <!-- TOMBOL BATALKAN -->
+                                                <a href="<?= site_url('admin/pengajuan/cancel/' . $p['id']) ?>"
+                                                    class="btn btn-sm btn-outline-warning stylish-btn"
+                                                    onclick="return confirm('Yakin ingin membatalkan pengajuan ini?')"
+                                                    title="Batalkan Pengajuan">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </a>
                                             <?php else: ?>
+                                                <!-- UPLOAD NOTA -->
                                                 <button type="button"
                                                     class="btn btn-sm btn-outline-light stylish-btn"
                                                     data-bs-toggle="modal"
@@ -266,19 +375,26 @@
                                                     <i class="bi bi-upload"></i>
                                                 </button>
                                             <?php endif; ?>
+
                                         <?php elseif ($p['status'] == 'selesai' && $p['file_nota']): ?>
-                                            <!-- Tombol Lihat Rincian untuk status selesai -->
+                                            <!-- LIHAT RINCIAN -->
                                             <button class="btn btn-sm btn-outline-info stylish-btn"
                                                 data-bs-toggle="modal" data-bs-target="#detailModal<?= $p['id'] ?>"
                                                 title="Lihat Rincian Pengajuan">
                                                 <i class="bi bi-eye"></i>
                                             </button>
+
+                                        <?php elseif ($p['status'] == 'dibatalkan'): ?>
+                                            <!-- STATUS DIBATALKAN -->
+                                            <span class="text-muted small fst-italic">Dibatalkan</span>
+
                                         <?php else: ?>
                                             <span class="text-muted small">-</span>
                                         <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>
+
 
                             <!-- Modal Detail Pengajuan (Menggantikan modal lihat nota) -->
                             <?php if (($p['status'] == 'diterima' || $p['status'] == 'selesai') && !empty($p['file_nota'])): ?>
@@ -288,11 +404,11 @@
                                             <div class="modal-header stylish-modal-header">
                                                 <div class="d-flex align-items-center">
                                                     <div class="modal-icon me-3">
-                                                        <i class="bi bi-info-circle-fill"></i>
+                                                        <i class="bi bi-receipt-cutoff"></i>
                                                     </div>
                                                     <div>
-                                                        <h5 class="modal-title mb-0">Rincian Pengajuan</h5>
-                                                        <p class="modal-subtitle mb-0">Detail lengkap pengajuan #<?= $p['id'] ?></p>
+                                                        <h5 class="modal-title mb-0">Detail Pengajuan</h5>
+                                                        <p class="modal-subtitle mb-0">ID: #<?= $p['id'] ?></p>
                                                     </div>
                                                 </div>
                                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -301,70 +417,34 @@
                                                 <!-- Info Pengajuan -->
                                                 <div class="info-card mb-4">
                                                     <h6 class="section-title mb-3">
-                                                        <i class="bi bi-card-checklist me-2"></i>Data Pengajuan
+                                                        <i class="bi bi-card-checklist me-2"></i>Informasi Pengajuan
                                                     </h6>
                                                     <div class="row g-3">
+                                                        <!-- Baris 1: User dan Nominal -->
                                                         <div class="col-md-6">
                                                             <div class="info-item">
                                                                 <div class="info-icon">
-                                                                    <i class="bi bi-person"></i>
+                                                                    <i class="bi bi-person-circle"></i>
                                                                 </div>
                                                                 <div class="info-content">
-                                                                    <div class="info-label">User</div>
-                                                                    <div class="info-value"><?= esc($p['username']) ?></div>
+                                                                    <div class="info-label">Pengaju</div>
+                                                                    <div class="info-value fw-semibold"><?= esc($p['username']) ?></div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="info-item">
                                                                 <div class="info-icon">
-                                                                    <i class="bi bi-cash-coin"></i>
+                                                                    <i class="bi bi-currency-dollar"></i>
                                                                 </div>
                                                                 <div class="info-content">
                                                                     <div class="info-label">Nominal</div>
-                                                                    <div class="info-value text-success">Rp <?= number_format($p['nominal'], 0, ',', '.') ?></div>
+                                                                    <div class="info-value text-success fw-bold">Rp <?= number_format($p['nominal'], 0, ',', '.') ?></div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-12">
-                                                            <div class="info-item">
-                                                                <div class="info-icon">
-                                                                    <i class="bi bi-chat-left-text"></i>
-                                                                </div>
-                                                                <div class="info-content">
-                                                                    <div class="info-label">Keterangan</div>
-                                                                    <div class="info-value"><?= esc($p['keterangan']) ?></div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="info-item">
-                                                                <div class="info-icon">
-                                                                    <i class="bi bi-tag"></i>
-                                                                </div>
-                                                                <div class="info-content">
-                                                                    <div class="info-label">Tipe</div>
-                                                                    <div class="info-value">
-                                                                        <?php if ($p['tipe'] === 'uang_sendiri'): ?>
-                                                                            <span class="badge bg-info">Uang Sendiri</span>
-                                                                        <?php else: ?>
-                                                                            <span class="badge bg-primary">Minta Admin</span>
-                                                                        <?php endif; ?>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="info-item">
-                                                                <div class="info-icon">
-                                                                    <i class="bi bi-calendar"></i>
-                                                                </div>
-                                                                <div class="info-content">
-                                                                    <div class="info-label">Tanggal Pengajuan</div>
-                                                                    <div class="info-value"><?= date('d/m/Y', strtotime($p['created_at'])) ?></div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+
+                                                        <!-- Baris 2: Status dan Tipe -->
                                                         <div class="col-md-6">
                                                             <div class="info-item">
                                                                 <div class="info-icon">
@@ -383,6 +463,9 @@
                                                                         ];
                                                                         ?>
                                                                         <span class="badge <?= $badge[$status] ?? 'bg-secondary' ?>">
+                                                                            <i class="bi 
+                                                    <?= $status == 'pending' ? 'bi-clock' : ($status == 'diterima' ? 'bi-check-circle' : ($status == 'ditolak' ? 'bi-x-circle' : ($status == 'selesai' ? 'bi-check-all' : 'bi-dash-circle'))) ?> me-1">
+                                                                            </i>
                                                                             <?= ucfirst($p['status']) ?>
                                                                         </span>
                                                                     </div>
@@ -392,11 +475,70 @@
                                                         <div class="col-md-6">
                                                             <div class="info-item">
                                                                 <div class="info-icon">
+                                                                    <i class="bi bi-tag"></i>
+                                                                </div>
+                                                                <div class="info-content">
+                                                                    <div class="info-label">Tipe Pengajuan</div>
+                                                                    <div class="info-value">
+                                                                        <?php if ($p['tipe'] === 'uang_sendiri'): ?>
+                                                                            <span class="badge bg-info">
+                                                                                <i class="bi bi-wallet2 me-1"></i>Uang Sendiri
+                                                                            </span>
+                                                                        <?php else: ?>
+                                                                            <span class="badge bg-primary">
+                                                                                <i class="bi bi-person-gear me-1"></i>Minta Admin
+                                                                            </span>
+                                                                        <?php endif; ?>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Baris 3: Tanggal Pengajuan dan Konfirmasi -->
+                                                        <div class="col-md-6">
+                                                            <div class="info-item">
+                                                                <div class="info-icon">
+                                                                    <i class="bi bi-calendar-plus"></i>
+                                                                </div>
+                                                                <div class="info-content">
+                                                                    <div class="info-label">Tanggal Dibuat</div>
+                                                                    <div class="info-value"><?= date('d/m/Y H:i', strtotime($p['created_at'])) ?></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="info-item">
+                                                                <div class="info-icon">
                                                                     <i class="bi bi-calendar-check"></i>
                                                                 </div>
                                                                 <div class="info-content">
-                                                                    <div class="info-label">Deadline</div>
-                                                                    <div class="info-value"><?= $p['deadline'] ? date('d/m/Y', strtotime($p['deadline'])) : '-' ?></div>
+                                                                    <div class="info-label">Tanggal Dikonfirmasi</div>
+                                                                    <div class="info-value">
+                                                                        <?php if ($p['confirm_at']): ?>
+                                                                            <?= date('d/m/Y H:i', strtotime($p['updated_at'])) ?>
+                                                                        <?php else: ?>
+                                                                            <span class="text-muted">-</span>
+                                                                        <?php endif; ?>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Baris 4: Keterangan (Full Width) -->
+                                                        <div class="col-12">
+                                                            <div class="info-item">
+                                                                <div class="info-icon">
+                                                                    <i class="bi bi-chat-left-text"></i>
+                                                                </div>
+                                                                <div class="info-content">
+                                                                    <div class="info-label">Keterangan</div>
+                                                                    <div class="info-value">
+                                                                        <?php if (!empty($p['keterangan'])): ?>
+                                                                            <?= esc($p['keterangan']) ?>
+                                                                        <?php else: ?>
+                                                                            <span class="text-muted">-</span>
+                                                                        <?php endif; ?>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -406,7 +548,7 @@
                                                 <!-- File Nota -->
                                                 <div class="file-section">
                                                     <h6 class="section-title mb-3">
-                                                        <i class="bi bi-file-earmark-text me-2"></i>File Nota
+                                                        <i class="bi bi-paperclip me-2"></i>File Nota
                                                     </h6>
                                                     <div class="file-preview-card">
                                                         <div class="preview-header">
@@ -415,46 +557,65 @@
                                                                     <?php
                                                                     $fileExtension = pathinfo($p['file_nota'], PATHINFO_EXTENSION);
                                                                     $iconClass = 'bi-file-earmark-text';
+                                                                    $fileType = 'Dokumen';
+
                                                                     if (in_array(strtolower($fileExtension), ['jpg', 'jpeg', 'png', 'gif'])) {
                                                                         $iconClass = 'bi-file-image';
+                                                                        $fileType = 'Gambar';
                                                                     } elseif (strtolower($fileExtension) === 'pdf') {
                                                                         $iconClass = 'bi-file-pdf';
+                                                                        $fileType = 'PDF';
                                                                     }
                                                                     ?>
                                                                     <i class="bi <?= $iconClass ?>"></i>
                                                                 </div>
                                                                 <div class="file-details">
-                                                                    <div class="file-name"><?= $p['file_nota'] ?></div>
-                                                                    <div class="file-type"><?= strtoupper($fileExtension) ?> File</div>
+                                                                    <div class="file-name fw-semibold"><?= $p['file_nota'] ?></div>
+                                                                    <div class="file-type text-muted small"><?= $fileType ?> • <?= strtoupper($fileExtension) ?></div>
                                                                 </div>
                                                             </div>
                                                             <a href="<?= base_url('uploads/nota/' . $p['file_nota']) ?>"
                                                                 target="_blank"
-                                                                class="btn btn-outline-light btn-sm stylish-btn">
-                                                                <i class="bi bi-download me-1"></i> Download
+                                                                class="btn btn-primary btn-sm stylish-btn">
+                                                                <i class="bi bi-download me-1"></i> Unduh
                                                             </a>
                                                         </div>
                                                         <div class="preview-content mt-3">
                                                             <?php if (in_array(strtolower($fileExtension), ['jpg', 'jpeg', 'png', 'gif'])): ?>
                                                                 <!-- Preview Gambar -->
-                                                                <div class="image-preview">
+                                                                <div class="image-preview text-center">
                                                                     <img src="<?= base_url('uploads/nota/' . $p['file_nota']) ?>"
                                                                         alt="Nota Pengajuan"
-                                                                        class="img-fluid rounded"
-                                                                        style="max-height: 400px; object-fit: contain;">
+                                                                        class="img-fluid rounded shadow-sm"
+                                                                        style="max-height: 400px; object-fit: contain;"
+                                                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                                    <div class="no-preview text-center py-4" style="display: none;">
+                                                                        <i class="bi bi-file-image display-4 text-muted mb-3"></i>
+                                                                        <p class="text-muted">Gambar tidak dapat dimuat</p>
+                                                                        <a href="<?= base_url('uploads/nota/' . $p['file_nota']) ?>"
+                                                                            target="_blank"
+                                                                            class="btn btn-outline-primary btn-sm">
+                                                                            Lihat File
+                                                                        </a>
+                                                                    </div>
                                                                 </div>
                                                             <?php elseif (strtolower($fileExtension) === 'pdf'): ?>
                                                                 <!-- Preview PDF (Embed) -->
-                                                                <div class="pdf-preview">
-                                                                    <iframe src="<?= base_url('uploads/nota/' . $p['file_nota']) ?>"
+                                                                <div class="pdf-preview position-relative">
+                                                                    <iframe src="<?= base_url('uploads/nota/' . $p['file_nota']) ?>#view=fitH"
                                                                         width="100%"
                                                                         height="400"
-                                                                        style="border: none; border-radius: 8px;">
+                                                                        style="border: none; border-radius: 8px;"
+                                                                        class="shadow-sm">
                                                                         Browser Anda tidak mendukung preview PDF.
-                                                                        <a href="<?= base_url('uploads/nota/' . $p['file_nota']) ?>" target="_blank">
-                                                                            Download file
-                                                                        </a>
                                                                     </iframe>
+                                                                    <div class="position-absolute top-50 start-50 translate-middle opacity-0 hover-opacity-100 transition-opacity">
+                                                                        <a href="<?= base_url('uploads/nota/' . $p['file_nota']) ?>"
+                                                                            target="_blank"
+                                                                            class="btn btn-primary">
+                                                                            Buka di Tab Baru
+                                                                        </a>
+                                                                    </div>
                                                                 </div>
                                                             <?php else: ?>
                                                                 <!-- File tidak dapat dipreview -->
@@ -463,8 +624,8 @@
                                                                     <p class="text-muted">Preview tidak tersedia untuk file ini</p>
                                                                     <a href="<?= base_url('uploads/nota/' . $p['file_nota']) ?>"
                                                                         target="_blank"
-                                                                        class="btn btn-outline-light stylish-btn">
-                                                                        <i class="bi bi-download me-1"></i> Download File
+                                                                        class="btn btn-primary">
+                                                                        <i class="bi bi-download me-1"></i> Unduh File
                                                                     </a>
                                                                 </div>
                                                             <?php endif; ?>
@@ -473,7 +634,7 @@
                                                 </div>
                                             </div>
                                             <div class="modal-footer stylish-modal-footer">
-                                                <button type="button" class="btn btn-outline-light stylish-reset-btn" data-bs-dismiss="modal">
+                                                <button type="button" class="btn btn-secondary stylish-reset-btn" data-bs-dismiss="modal">
                                                     <i class="bi bi-x-lg me-1"></i> Tutup
                                                 </button>
                                             </div>
@@ -481,7 +642,6 @@
                                     </div>
                                 </div>
                             <?php endif; ?>
-
                             <!-- Modal Upload Nota (Tetap sama) -->
                             <?php if ($p['status'] == 'diterima' && empty($p['file_nota'])): ?>
                                 <div class="modal fade" id="processModal<?= $p['id'] ?>" tabindex="-1">
@@ -701,7 +861,7 @@
     </div>
 </div>
 
-<!-- Styling tambahan untuk modal rincian -->
+<!-- Tambahkan CSS untuk info cards -->
 <style>
     .dashboard-card {
         background: rgba(26, 26, 26, 0.9);
@@ -1629,11 +1789,55 @@
         border-radius: 8px;
         padding: 2rem;
     }
+
+    .card-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        font-size: 1.8rem;
+    }
+
+    .card-title {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #aaa;
+    }
+
+    .card-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .card-footer {
+        border-top-color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* Warna untuk card icons */
+    .text-primary {
+        color: #4361ee !important;
+    }
+
+    .text-warning {
+        color: #ffd166 !important;
+    }
+
+    .text-success {
+        color: #06d6a0 !important;
+    }
+
+    .text-info {
+        color: #118ab2 !important;
+    }
 </style>
 
+<!-- Script lainnya tetap sama -->
 <script>
     // ===========================
-    // FILE UPLOAD FUNCTIONALITY (Tetap sama)
+    // FILE UPLOAD FUNCTIONALITY
     // ===========================
 
     function initFileUploadModal(modalId) {
@@ -1766,7 +1970,7 @@
     });
 
     // ===========================
-    // EXISTING FUNCTIONALITY (Tetap sama)
+    // EXISTING FUNCTIONALITY
     // ===========================
 
     const rowsPerPageSelect = document.getElementById("rowsPerPage");
@@ -1860,7 +2064,7 @@
     });
 
     // ===========================
-    // FILTER FUNCTIONALITY (Tetap sama)
+    // FILTER FUNCTIONALITY
     // ===========================
     document.getElementById('applyFilter').addEventListener('click', function() {
         const status = document.getElementById('filterStatus').value;
@@ -1940,7 +2144,7 @@
     });
 
     // ===========================
-    // FUNGSI POST DINAMIS (Tetap sama)
+    // FUNGSI POST DINAMIS
     // ===========================
     function postToProcess(id) {
         const form = document.createElement('form');
@@ -1950,7 +2154,7 @@
         form.submit();
     }
 
-    // Konfirmasi Approve dengan Validasi Saldo (Tetap sama)
+    // Konfirmasi Approve dengan Validasi Saldo
     function confirmApprove(id, username, nominal, keterangan, tipe, nominalAngka) {
         // CEK SALDO TERLEBIH DAHULU
         if (nominalAngka > saldoAkhir) {
@@ -2098,7 +2302,7 @@
         });
     }
 
-    // Konfirmasi Reject (Tetap sama)
+    // Konfirmasi Reject
     function confirmReject(id, username, nominal, keterangan) {
         Swal.fire({
             html: `
@@ -2170,7 +2374,7 @@
         });
     }
 
-    // Konfirmasi Process untuk Uang Sendiri (Tetap sama)
+    // Konfirmasi Process untuk Uang Sendiri
     function confirmProcessUangSendiri(id, username, nominal, keterangan, nominalAngka) {
         // CEK SALDO JUGA SAAT PROCESS
         if (nominalAngka > saldoAkhir) {

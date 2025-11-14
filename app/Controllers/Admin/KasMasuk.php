@@ -47,6 +47,9 @@ class KasMasuk extends BaseController
         }
         $data['totalKas'] = $totalKas;
 
+        $data['total_pengajuan'] = count($data['kas_masuk']);
+
+
         return view('admin/kas_masuk/index', $data);
     }
 

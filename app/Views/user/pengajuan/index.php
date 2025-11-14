@@ -169,7 +169,6 @@
                             <th style="width: 15%;">Nominal</th>
                             <th>Keterangan</th>
                             <th style="width: 12%;">Tipe</th>
-                            <th style="width: 12%;">Deadline</th>
                             <th style="width: 12%;">Status</th>
                         </tr>
                     </thead>
@@ -187,7 +186,6 @@
                                             ? '<span class="badge bg-info">Uang Sendiri</span>'
                                             : '<span class="badge bg-primary">Minta Uang</span>' ?>
                                     </td>
-                                    <td><?= $p['deadline'] ? date('d/m/Y', strtotime($p['deadline'])) : '-' ?></td>
                                     <td>
                                         <span class="badge bg-<?=
                                                                 $p['status'] == 'diterima' ? 'success' : ($p['status'] == 'ditolak' ? 'danger' : ($p['status'] == 'selesai' ? 'warning' : 'secondary'))
