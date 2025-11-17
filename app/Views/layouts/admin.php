@@ -460,8 +460,8 @@
                         <span>Manajemen User</span>
                     </a>
                 </li>
-                <li><a class="nav-link <?= service('uri')->getSegment(2) === 'laporan' ? 'active' : '' ?>"
-                        href="<?= site_url('admin/laporan') ?>">
+                <li><a class="nav-link <?= service('uri')->getSegment(2) === 'activity' ? 'active' : '' ?>"
+                        href="<?= site_url('admin/activity') ?>">
                         <i class="bi bi-activity"></i>
                         <span>Aktivitas User</span>
                     </a>

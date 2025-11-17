@@ -91,77 +91,71 @@
         </div>
     </div>
 
-   
+    <!-- Aksi Cepat -->
+    <div class="row">
+        <div class="col-12">
+            <div class="quick-actions-grid">
+                <div class="row g-3">
+                    <!-- Baris Pertama - 2 Kartu dengan lebar sama -->
+                    <div class="col-md-6">
+                        <a href="<?= site_url('user/pengajuan/create') ?>" class="quick-action-card create">
+                            <div class="action-content-wrapper">
+                                <div class="action-icon">
+                                    <i class="bi bi-plus-circle"></i>
+                                </div>
+                                <div class="action-content">
+                                    <div class="action-title">Ajukan Kas Baru</div>
+                                    <div class="action-desc">Buat pengajuan dana baru</div>
+                                </div>
+                            </div>
+                            <div class="action-indicator">
+                                <span class="action-badge">Baru</span>
+                                <i class="bi bi-arrow-right action-arrow"></i>
+                            </div>
+                        </a>
+                    </div>
 
-        <!-- Aksi Cepat -->
-        <div class="col-lg-8 mb-4">
-            <div class="card-body d-flex flex-column bg-transparent p-0">
-                <div class="quick-actions-grid">
-                    <div class="row g-3">
-                        <!-- Baris Pertama - 2 Kartu -->
-                        <div class="col-md-6">
-                            <a href="<?= site_url('user/pengajuan/create') ?>" class="quick-action-card create">
-                                <div class="action-content-wrapper">
-                                    <div class="action-icon">
-                                        <i class="bi bi-plus-circle"></i>
-                                    </div>
-                                    <div class="action-content">
-                                        <div class="action-title">Ajukan Kas Baru</div>
-                                        <div class="action-desc">Buat pengajuan dana baru</div>
-                                    </div>
+                    <div class="col-md-6">
+                        <a href="<?= site_url('user/pengajuan') ?>" class="quick-action-card pengajuan">
+                            <div class="action-content-wrapper">
+                                <div class="action-icon">
+                                    <i class="bi bi-list-ul"></i>
                                 </div>
-                                <div class="action-indicator">
-                                    <span class="action-badge">Baru</span>
-                                    <i class="bi bi-arrow-right action-arrow"></i>
+                                <div class="action-content">
+                                    <div class="action-title">Lihat Pengajuan</div>
+                                    <div class="action-desc">Kelola semua pengajuan Anda</div>
                                 </div>
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            <a href="<?= site_url('user/pengajuan') ?>" class="quick-action-card pengajuan">
-                                <div class="action-content-wrapper">
-                                    <div class="action-icon">
-                                        <i class="bi bi-list-ul"></i>
-                                    </div>
-                                    <div class="action-content">
-                                        <div class="action-title">Lihat Pengajuan</div>
-                                        <div class="action-desc">Kelola semua pengajuan Anda</div>
-                                    </div>
-                                </div>
-                                <div class="action-indicator">
-                                    <span class="action-badge"><?= $total_pengajuan ?> Total</span>
-                                    <i class="bi bi-arrow-right action-arrow"></i>
-                                </div>
-                            </a>
-                        </div>
+                            </div>
+                            <div class="action-indicator">
+                                <span class="action-badge"><?= $total_pengajuan ?> Total</span>
+                                <i class="bi bi-arrow-right action-arrow"></i>
+                            </div>
+                        </a>
+                    </div>
 
-                        <!-- Baris Kedua - Kartu Profil Saya yang Panjang -->
-                        <div class="col-12">
-                            <a href="<?= site_url('user/profile') ?>" class="quick-action-card profile full-width">
-                                <div class="action-content-wrapper">
-                                    <div class="action-icon">
-                                        <i class="bi bi-person"></i>
-                                    </div>
-                                    <div class="action-content">
-                                        <div class="action-title">Profil Saya</div>
-                                        <div class="action-desc">Kelola informasi akun dan preferensi Anda</div>
-                                    </div>
+                    <!-- Baris Kedua - Kartu Profil Saya yang memanjang -->
+                    <div class="col-12">
+                        <a href="<?= site_url('user/profile') ?>" class="quick-action-card profile">
+                            <div class="action-content-wrapper">
+                                <div class="action-icon">
+                                    <i class="bi bi-person"></i>
                                 </div>
-                                <div class="action-indicator">
-                                    <span class="action-badge">Update</span>
-                                    <i class="bi bi-arrow-right action-arrow"></i>
+                                <div class="action-content">
+                                    <div class="action-title">Profil Saya</div>
+                                    <div class="action-desc">Kelola informasi akun dan preferensi Anda</div>
                                 </div>
-                            </a>
-                        </div>
+                            </div>
+                            <div class="action-indicator">
+                                <span class="action-badge">Update</span>
+                                <i class="bi bi-arrow-right action-arrow"></i>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    
 </div>
-
-
 
 <style>
     :root {
@@ -196,25 +190,6 @@
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
     }
 
-    /* Dashboard Card untuk Diagram Donat */
-    .dashboard-card {
-        background: linear-gradient(145deg, rgba(33, 33, 33, 0.9), rgba(26, 26, 26, 0.9));
-        border-radius: 16px;
-        box-shadow:
-            0 4px 20px rgba(0, 0, 0, 0.4),
-            inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(10px);
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .text-steam-blue {
-        color: #66c0f4 !important;
-    }
-
     .card-icon {
         width: 50px;
         height: 50px;
@@ -227,46 +202,9 @@
         color: #66c0f4;
     }
 
-    /* Modern Donut Container - Diperbesar */
-    .modern-donut-container {
-        background: linear-gradient(145deg, rgba(26, 26, 26, 0.7), rgba(40, 40, 40, 0.7));
-        border-radius: 12px;
-        padding: 2rem;
-        box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.05),
-            0 8px 32px rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .percentage-display {
-        background: rgba(26, 26, 26, 0.8);
-        border-radius: 50%;
-        width: 120px;
-        height: 120px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .percentage-display h2 {
-        font-size: 2rem;
-        font-weight: 700;
-    }
-
-    .percentage-display small {
-        font-size: 0.8rem;
-    }
-
-    /* AKSI CEPAT */
+    /* AKSI CEPAT - TANPA BACKGROUND */
     .quick-actions-grid {
-        flex: 1;
+        width: 100%;
     }
 
     .quick-action-card {
@@ -279,15 +217,11 @@
         text-decoration: none;
         color: var(--text);
         transition: all 0.3s ease;
-        border: 1px solid transparent;
+        border: 1px solid var(--border);
         height: 100%;
         min-height: 100px;
-    }
-
-    /* Kartu Profil Saya yang Panjang */
-    .quick-action-card.full-width {
-        min-height: 100px;
         width: 100%;
+        box-sizing: border-box;
     }
 
     .quick-action-card:hover {
@@ -302,6 +236,7 @@
         display: flex;
         align-items: center;
         flex: 1;
+        min-width: 0;
     }
 
     .quick-action-card .action-icon {
@@ -314,6 +249,7 @@
         margin-right: 16px;
         font-size: 1.5rem;
         transition: all 0.3s ease;
+        flex-shrink: 0;
     }
 
     .quick-action-card.create .action-icon {
@@ -340,6 +276,7 @@
 
     .action-content {
         flex: 1;
+        min-width: 0;
     }
 
     .action-title {
@@ -347,18 +284,26 @@
         font-size: 1rem;
         margin-bottom: 4px;
         color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .action-desc {
         font-size: 0.8rem;
         color: var(--text-muted);
         line-height: 1.4;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .action-indicator {
         display: flex;
         align-items: center;
         gap: 12px;
+        flex-shrink: 0;
+        margin-left: 12px;
     }
 
     .action-badge {
@@ -367,12 +312,14 @@
         border-radius: 6px;
         background: rgba(255, 255, 255, 0.1);
         color: var(--text-muted);
+        white-space: nowrap;
     }
 
     .action-arrow {
         color: var(--text-muted);
         transition: all 0.3s ease;
         font-size: 1rem;
+        flex-shrink: 0;
     }
 
     .quick-action-card:hover .action-arrow {
@@ -380,148 +327,11 @@
         color: var(--text);
     }
 
-    /* Daftar Transaksi */
-    .transaction-category {
-        margin-bottom: 25px;
-    }
-
-    .category-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: var(--text);
-        padding-bottom: 8px;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .transaction-list .transaction-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        transition: all 0.3s;
-    }
-
-    .transaction-list .transaction-item:hover {
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 8px;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    .transaction-list .transaction-item:last-child {
-        border-bottom: none;
-    }
-
-    .transaction-details {
-        display: flex;
-        align-items: center;
-    }
-
-    .transaction-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 12px;
-        font-size: 1rem;
-    }
-
-    .transaction-icon.income {
-        background: rgba(76, 175, 80, 0.15);
-        color: var(--success);
-        border: 1px solid rgba(76, 175, 80, 0.3);
-    }
-
-    .transaction-icon.expense {
-        background: rgba(239, 83, 80, 0.15);
-        color: var(--danger);
-        border: 1px solid rgba(239, 83, 80, 0.3);
-    }
-
-    .transaction-icon.pending {
-        background: rgba(255, 152, 0, 0.15);
-        color: var(--warning);
-        border: 1px solid rgba(255, 152, 0, 0.3);
-    }
-
-    .transaction-info {
-        flex: 1;
-    }
-
-    .transaction-description {
-        font-weight: 500;
-        font-size: 0.9rem;
-    }
-
-    .transaction-date {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-    }
-
-    .amount {
-        font-weight: 600;
-    }
-
-    .amount.positive {
-        color: var(--success);
-    }
-
-    .amount.negative {
-        color: var(--danger);
-    }
-
-    .amount.warning {
-        color: var(--warning);
-    }
-
-    .transaction-status {
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        margin-top: 4px;
-        display: inline-block;
-    }
-
-    .status-diterima {
-        background: rgba(76, 175, 80, 0.2);
-        color: var(--success);
-    }
-
-    .status-ditolak {
-        background: rgba(239, 83, 80, 0.2);
-        color: var(--danger);
-    }
-
-    .status-pending {
-        background: rgba(255, 152, 0, 0.2);
-        color: var(--warning);
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 30px;
-        color: var(--text-muted);
-    }
-
-    .empty-state i {
-        font-size: 2rem;
-        opacity: .5;
-        margin-bottom: 6px;
-    }
-
-    /* Responsive */
+    /* PERBAIKAN RESPONSIVE */
     @media (max-width: 768px) {
         .quick-action-card {
             min-height: 90px;
             padding: 16px;
-        }
-
-        .quick-action-card.full-width {
-            min-height: 90px;
         }
 
         .quick-action-card .action-icon {
@@ -531,93 +341,68 @@
             margin-right: 12px;
         }
 
-        .transaction-item {
-            flex-direction: column;
-            align-items: flex-start;
+        .action-title {
+            font-size: 0.9rem;
         }
 
-        .transaction-amount {
-            margin-top: 8px;
-            text-align: left;
-            width: 100%;
+        .action-desc {
+            font-size: 0.75rem;
         }
 
-        .percentage-display {
-            width: 100px;
-            height: 100px;
-        }
-
-        .percentage-display h2 {
-            font-size: 1.5rem;
+        .action-badge {
+            font-size: 0.7rem;
+            padding: 3px 6px;
         }
     }
 
     @media (max-width: 576px) {
         .quick-action-card {
-            flex-direction: column;
-            text-align: center;
-            padding: 20px 16px;
-        }
-
-        .quick-action-card.full-width {
-            flex-direction: row;
-            text-align: left;
+            padding: 14px;
+            min-height: 85px;
         }
 
         .action-content-wrapper {
             flex-direction: column;
-            text-align: center;
-            margin-bottom: 12px;
-        }
-
-        .quick-action-card.full-width .action-content-wrapper {
-            flex-direction: row;
+            align-items: flex-start;
             text-align: left;
-            margin-bottom: 0;
         }
 
         .quick-action-card .action-icon {
             margin-right: 0;
             margin-bottom: 8px;
-        }
-
-        .quick-action-card.full-width .action-icon {
-            margin-right: 16px;
-            margin-bottom: 0;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
         }
 
         .action-indicator {
-            flex-direction: row;
-            justify-content: center;
+            margin-left: 0;
+            margin-top: 8px;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .action-content {
             width: 100%;
         }
 
-        .quick-action-card.full-width .action-indicator {
-            width: auto;
-        }
-
-        .modern-donut-container {
-            padding: 1rem;
-        }
-
-        .percentage-display {
-            width: 80px;
-            height: 80px;
-        }
-
-        .percentage-display h2 {
-            font-size: 1.25rem;
+        .action-title,
+        .action-desc {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
         }
     }
 
-    .btn-outline-light {
-        border-radius: 8px;
-        transition: all 0.3s ease;
+    /* Pastikan row dan col tidak memiliki padding/margin berlebihan */
+    .row.g-3 {
+        margin-left: -6px;
+        margin-right: -6px;
     }
 
-    .btn-outline-light:hover {
-        background: rgba(255, 255, 255, 0.1);
-        transform: translateY(-1px);
+    .row.g-3>[class*="col-"] {
+        padding-left: 6px;
+        padding-right: 6px;
     }
 </style>
 

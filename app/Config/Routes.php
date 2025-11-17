@@ -48,7 +48,7 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     $routes->post('kas_keluar/update/(:num)', 'Admin\KasKeluar::update/$1');
     $routes->get('kas_keluar/delete/(:num)', 'Admin\KasKeluar::delete/$1');
 
-    $routes->get('laporan', 'Admin\Laporan::index');
+    $routes->get('activity', 'Admin\Activity::index');
 
     $routes->get('profile', 'Admin\Profile::index');
     $routes->post('profile/update', 'Admin\Profile::update');

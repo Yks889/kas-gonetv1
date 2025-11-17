@@ -9,7 +9,7 @@ use App\Models\PengajuanModel;
 use App\Models\UserModel;
 use App\Models\ActivityLogModel;
 
-class Laporan extends BaseController
+class Activity extends BaseController
 {
     public function index()
     {
@@ -21,7 +21,7 @@ class Laporan extends BaseController
         $activityModel   = new ActivityLogModel();
 
         $data = [
-            'title'             => 'Laporan Kas',
+            'title'             => 'Activity kas',
             'saldo'             => $kasSaldoModel->first(),
             'total_masuk'       => $kasMasukModel->selectSum('nominal', 'total')->first(),
             'total_keluar'      => $kasKeluarModel->selectSum('nominal', 'total')->first(),
@@ -32,6 +32,6 @@ class Laporan extends BaseController
             'activities'        => $activityModel->getAllActivities(20),
         ];
 
-        return view('admin/laporan/index', $data);
+        return view('admin/activity/index', $data);
     }
 }
