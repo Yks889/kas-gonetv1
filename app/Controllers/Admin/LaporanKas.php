@@ -8,7 +8,7 @@ use App\Models\KasMasukModel;
 use App\Models\KasKeluarModel;
 use App\Models\PengajuanModel;
 
-class InformasiKas extends BaseController
+class LaporanKas extends BaseController
 {
     public function index()
     {
@@ -17,7 +17,7 @@ class InformasiKas extends BaseController
         $kasKeluarModel = new KasKeluarModel();
         $pengajuanModel = new PengajuanModel();
 
-        // Ambil filter bulan (jika ada) - Hanya untuk Status Pengajuan
+        // Ambil filter bulan (jika ada) - Untuk Status Pengajuan dan Card
         $bulan = $this->request->getGet('bulan'); // nilai 1-12
 
         // Saldo kas (TETAP data keseluruhan)
@@ -31,6 +31,23 @@ class InformasiKas extends BaseController
         // Total Keluar (TETAP data keseluruhan)
         $total_keluar = $kasKeluarModel->selectSum('nominal', 'total')->first();
         $data['total_keluar'] = $total_keluar['total'] ?? 0;
+
+        // Data yang DIFILTER untuk Card
+        $total_masuk_filter = $kasMasukModel;
+        $total_keluar_filter = $kasKeluarModel;
+
+        if ($bulan) {
+            $total_masuk_filter->where('MONTH(created_at)', $bulan);
+            $total_keluar_filter->where('MONTH(created_at)', $bulan);
+        }
+
+        $total_masuk_filter = $total_masuk_filter->selectSum('nominal', 'total')->first();
+        $data['total_masuk_filter'] = $total_masuk_filter['total'] ?? 0;
+
+        $total_keluar_filter = $total_keluar_filter->selectSum('nominal', 'total')->first();
+        $data['total_keluar_filter'] = $total_keluar_filter['total'] ?? 0;
+
+        $data['saldo_bersih_filter'] = $data['total_masuk_filter'] - $data['total_keluar_filter'];
 
         // Statistik Pengajuan (MENGIKUTI FILTER BULAN)
         $pengajuanQuery = $pengajuanModel;
@@ -97,6 +114,6 @@ class InformasiKas extends BaseController
 
         $data['bulanDipilih'] = $bulan;
 
-        return view('admin/informasi_kas/index', $data);
+        return view('admin/laporan_kas/index', $data);
     }
 }

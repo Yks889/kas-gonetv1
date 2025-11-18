@@ -56,8 +56,8 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     $routes->post('profile/update-photo', 'Admin\Profile::updatePhoto');
     $routes->post('profile/remove-photo', 'Admin\Profile::removePhoto');
     
-    $routes->get('informasi_kas', 'Admin\InformasiKas::index');
-    $routes->get('informasi-kas', 'Admin\InformasiKas::index');
+    $routes->get('laporan_kas', 'Admin\LaporanKas::index');
+    $routes->get('laporan-kas', 'Admin\LaporanKas::index');
 });
 
 // User Routes
