@@ -296,17 +296,30 @@ class Pengajuan extends BaseController
         // Hapus kas_keluar terkait (jika ada)
         $kasKeluarModel = new KasKeluarModel();
         $kasKeluar = $kasKeluarModel->where('pengajuan_id', $id)->first();
-        if ($kasKeluar) {
-            $kasKeluarModel->delete($kasKeluar['id']);
-        }
 
-        // Kembalikan saldo (jika sudah terpotong sebelumnya)
-        $kasSaldoModel = new KasSaldoModel();
-        $saldo = $kasSaldoModel->first();
-        if ($saldo && $pengajuan['nominal'] > 0) {
-            $kasSaldoModel->update($saldo['id'], [
-                'saldo_akhir' => $saldo['saldo_akhir'] + $pengajuan['nominal']
-            ]);
+        if ($kasKeluar) {
+            // Untuk minta admin: kembalikan saldo jika sudah dipotong
+            if ($pengajuan['tipe'] === 'minta_admin' && !empty($kasKeluar['file_nota'])) {
+                $kasSaldoModel = new KasSaldoModel();
+                $saldo = $kasSaldoModel->first();
+
+                if ($saldo && $pengajuan['nominal'] > 0) {
+                    $kasSaldoModel->update($saldo['id'], [
+                        'saldo_akhir' => $saldo['saldo_akhir'] + $pengajuan['nominal']
+                    ]);
+                }
+            }
+
+            // Hapus record kas_keluar
+            $kasKeluarModel->delete($kasKeluar['id']);
+
+            // Hapus file nota jika ada
+            if (!empty($kasKeluar['file_nota'])) {
+                $filePath = FCPATH . 'uploads/nota/' . $kasKeluar['file_nota'];
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            }
         }
 
         // Simpan log aktivitas
@@ -314,7 +327,7 @@ class Pengajuan extends BaseController
         $activityLog->logActivity(
             $session->get('id'),
             'pengajuan dibatalkan',
-            'Membatalkan pengajuan ID ' . $id
+            'Membatalkan pengajuan ID ' . $id . ' (Tipe: ' . $pengajuan['tipe'] . ')'
         );
 
         return redirect()->to('/admin/pengajuan')->with('success', 'Pengajuan berhasil dibatalkan.');

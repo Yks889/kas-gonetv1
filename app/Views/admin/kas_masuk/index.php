@@ -4,17 +4,17 @@
 <div class="container-fluid">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center pb-3 mb-5 border-bottom">
-        <h1 class="h3 mb-1 text-white">
+        <h1 class="h3 mb-1 text-white animate-fade-in">
             <i class="bi bi-cash-coin me-2"></i> Data Kas Masuk
         </h1>
         <a href="<?= site_url('admin/kas_masuk/create') ?>"
-            class="btn btn-gradient-primary shadow-sm btn-add-user mb-2">
+            class="btn btn-gradient-primary shadow-sm btn-add-user mb-2 animate-slide-in-right">
             <i class="bi bi-plus-circle me-1"></i> Tambah Kas Masuk
         </a>
     </div>
 
     <?php if (session()->getFlashdata('success')): ?>
-        <div class="alert alert-success alert-dismissible fade show stylish-alert" role="alert">
+        <div class="alert alert-success alert-dismissible fade show stylish-alert animate-bounce-in" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
             <?= session()->getFlashdata('success') ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -24,7 +24,7 @@
     <!-- Info Cards -->
     <div class="row mb-4">
         <!-- Total Kas Masuk -->
-        <div class="col-md-4 mb-3">
+        <div class="col-md-4 mb-3 animate-fade-in-up" style="animation-delay: 0.1s;">
             <div class="dashboard-card p-4">
                 <div class="d-flex align-items-center">
                     <div class="card-icon me-3">
@@ -45,9 +45,9 @@
                 </div>
             </div>
         </div>
- 
+
         <!-- Total Data Pengajuan -->
-        <div class="col-md-4 mb-3">
+        <div class="col-md-4 mb-3 animate-fade-in-up" style="animation-delay: 0.2s;">
             <div class="dashboard-card p-4">
                 <div class="d-flex align-items-center">
                     <div class="card-icon me-3">
@@ -71,7 +71,7 @@
     </div>
 
     <!-- Table Controls -->
-    <div class="row mb-3 g-2">
+    <div class="row mb-3 g-2 animate-fade-in-up" style="animation-delay: 0.3s;">
         <!-- Rows per page -->
         <div class="col-md-3 d-flex align-items-center">
             <label class="text-white me-2">Tampilkan</label>
@@ -180,7 +180,7 @@
     </div>
 
     <!-- Tabel Kas Masuk -->
-    <div class="dashboard-card p-0 overflow-hidden">
+    <div class="dashboard-card p-0 overflow-hidden animate-scale-in">
         <div class="table-responsive">
             <table class="table table-dark table-hover align-middle mb-0" id="kasTable">
                 <thead>
@@ -196,7 +196,7 @@
                     <?php if (!empty($kas_masuk)): ?>
                         <?php $no = 1;
                         foreach ($kas_masuk as $kas): ?>
-                            <tr class="text-center">
+                            <tr class="text-center animate-row-in" style="animation-delay: <?= $no * 0.05 ?>s;">
                                 <td><?= $no++ ?></td>
                                 <td><?= date('d/m/Y H:i', strtotime($kas['created_at'])) ?></td>
                                 <td class="fw-bold text-success">Rp <?= number_format($kas['nominal'], 0, ',', '.') ?></td>
@@ -215,7 +215,7 @@
                             </tr>
                         <?php endforeach ?>
                     <?php else: ?>
-                        <tr>
+                        <tr class="animate-fade-in">
                             <td colspan="5" class="text-center text-light py-5">
                                 <div class="py-4">
                                     <i class="bi bi-cash-stack display-1 text-light"></i>
@@ -232,13 +232,13 @@
 
     <!-- Pagination -->
     <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" id="paginationContainer">
-        <button id="prevPage" class="btn btn-sm btn-outline-light stylish-btn" disabled>
+        <button id="prevPage" class="btn btn-sm btn-outline-light stylish-btn animate-fade-in-left" disabled>
             <i class="bi bi-chevron-left"></i> Prev
         </button>
 
-        <div id="paginationInfo" class="text-white small text-center flex-grow-1"></div>
+        <div id="paginationInfo" class="text-white small text-center flex-grow-1 animate-fade-in"></div>
 
-        <button id="nextPage" class="btn btn-sm btn-outline-light stylish-btn">
+        <button id="nextPage" class="btn btn-sm btn-outline-light stylish-btn animate-fade-in-right">
             Next <i class="bi bi-chevron-right"></i>
         </button>
     </div>
@@ -246,6 +246,211 @@
 
 <!-- Styling tambahan -->
 <style>
+    /* ANIMASI BARU */
+    .animate-fade-in {
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    .animate-fade-in-up {
+        animation: fadeInUp 0.8s ease-out both;
+    }
+
+    .animate-slide-in-right {
+        animation: slideInRight 0.8s ease-out 0.3s both;
+    }
+
+    .animate-scale-in {
+        animation: scaleIn 0.6s ease-out 0.4s both;
+    }
+
+    .animate-bounce-in {
+        animation: bounceIn 0.8s ease-out;
+    }
+
+    .animate-row-in {
+        animation: slideInUp 0.5s ease-out both;
+        opacity: 0;
+    }
+
+    .animate-fade-in-left {
+        animation: fadeInLeft 0.6s ease-out 0.5s both;
+    }
+
+    .animate-fade-in-right {
+        animation: fadeInRight 0.6s ease-out 0.5s both;
+    }
+
+    /* Keyframes untuk animasi */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes bounceIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.3);
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        70% {
+            transform: scale(0.9);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* Efek hover yang lebih smooth */
+    .table tbody tr {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .table tbody tr:hover {
+        background: rgba(67, 97, 238, 0.08) !important;
+        transform: translateX(8px) scale(1.01);
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.2);
+    }
+
+    /* Animasi untuk tombol */
+    .stylish-btn {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stylish-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .stylish-btn:hover::before {
+        left: 100%;
+    }
+
+    .stylish-btn:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+    }
+
+    /* Animasi untuk card icon */
+    .card-icon {
+        transition: all 0.3s ease;
+    }
+
+    .dashboard-card:hover .card-icon {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+    }
+
+    /* Animasi untuk alert */
+    .alert {
+        animation: slideInDown 0.6s ease-out;
+    }
+
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* STYLING EXISTING (tetap dipertahankan) */
     .dashboard-card {
         background: rgba(26, 26, 26, 0.9);
         border-radius: 14px;
@@ -277,27 +482,6 @@
     .table thead {
         background: rgba(67, 97, 238, 0.15);
         border-bottom: 2px solid rgba(67, 97, 238, 0.3);
-    }
-
-    .table tbody tr:hover {
-        background: rgba(67, 97, 238, 0.08) !important;
-        transform: translateX(2px);
-        transition: all 0.3s ease;
-    }
-
-    .stylish-btn {
-        border-radius: 10px;
-        padding: 4px 14px;
-        transition: 0.3s;
-        margin: 0 2px;
-    }
-
-    .stylish-btn:hover {
-        background: #4361ee;
-        border-color: #4361ee;
-        color: #fff;
-        box-shadow: 0 0 8px rgba(67, 97, 238, 0.8);
-        transform: translateY(-1px);
     }
 
     .modern-select {
@@ -697,6 +881,14 @@
 
 <!-- Script Pagination + Search + Filter + Delete Confirmation -->
 <script>
+    // Inisialisasi animasi saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+        // Trigger reflow untuk memastikan animasi berjalan
+        document.querySelectorAll('.animate-row-in').forEach((el, index) => {
+            el.style.animationDelay = `${index * 0.05}s`;
+        });
+    });
+
     const rowsPerPageSelect = document.getElementById("rowsPerPage");
     const table = document.getElementById("kasTable").getElementsByTagName("tbody")[0];
     const paginationInfo = document.getElementById("paginationInfo");

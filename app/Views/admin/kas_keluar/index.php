@@ -342,7 +342,7 @@
                                                                     <?php if (!empty($row['confirm_at'])): ?>
                                                                         <?= date('d/m/Y H:i', strtotime($row['confirm_at'])) ?>
                                                                     <?php else: ?>
-                                                                        <span class="text-muted">-</span>
+                                                                        <span class="text-light">-</span>
                                                                     <?php endif; ?>
                                                                 </div>
                                                             </div>
