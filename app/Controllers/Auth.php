@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Models\UserModel;
@@ -17,14 +18,20 @@ class Auth extends Controller
     {
         $session = session();
         $model = new UserModel();
-        $logModel = new ActivityLogModel(); 
+        $logModel = new ActivityLogModel();
 
         $username = $this->request->getVar('username');
         $password = $this->request->getVar('password');
-        
+
         $user = $model->where('username', $username)->first();
-        
+
         if ($user) {
+            // Cek apakah akun aktif
+            if ($user['is_active'] == 0) {
+                $session->setFlashdata('error', 'Akun Anda belum dikonfirmasi admin. Silakan tunggu hingga akun diaktifkan.');
+                return redirect()->to('/login');
+            }
+
             if (password_verify($password, $user['password'])) {
                 $ses_data = [
                     'id' => $user['id'],
@@ -37,11 +44,11 @@ class Auth extends Controller
                 // ✅ Catat aktivitas login
                 $logModel->logActivity($user['id'], 'login', 'User berhasil login');
 
-                if ($user['role'] == 'admin') {
-                    return redirect()->to('/admin/dashboard');
-                } else {
-                    return redirect()->to('/user/dashboard');
-                }
+                // Set flashdata untuk login berhasil
+                $session->setFlashdata('login_success', true);
+                $session->setFlashdata('redirect_url', $user['role'] == 'admin' ? '/admin/dashboard' : '/user/dashboard');
+
+                return redirect()->to('/login');
             } else {
                 $session->setFlashdata('error', 'Password salah');
                 return redirect()->to('/login');
@@ -72,10 +79,14 @@ class Auth extends Controller
             $data = [
                 'username' => $this->request->getVar('username'),
                 'password' => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
-                'role' => 'user'
+                'role' => 'user',
+                'is_active' => 0
             ];
             $model->save($data);
-            return redirect()->to('/login')->with('success', 'Registrasi berhasil. Silakan login.');
+
+            // Set flashdata success
+            session()->setFlashdata('success', 'Registrasi berhasil. Akun Anda menunggu konfirmasi admin.');
+            return redirect()->to('/login');
         } else {
             return view('auth/register', [
                 'validation' => $this->validator
@@ -86,7 +97,7 @@ class Auth extends Controller
     public function logout()
     {
         $session = session();
-        $userId = $session->get('id');   
+        $userId = $session->get('id');
         $logModel = new ActivityLogModel();
 
         if ($userId) {

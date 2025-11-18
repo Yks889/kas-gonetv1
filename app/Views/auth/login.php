@@ -8,6 +8,7 @@
     <!-- Bootstrap & Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
@@ -311,8 +312,65 @@
         </div>
     </div>
 
-    <!-- Script -->
     <script>
+        // Custom SweetAlert2 Styling
+        const swalCustom = Swal.mixin({
+            background: '#1a1a1a',
+            color: '#f8f9fa',
+            confirmButtonColor: '#4361ee',
+            cancelButtonColor: '#3a0ca3',
+            buttonsStyling: true,
+            showClass: {
+                popup: `
+            animate__animated
+            animate__fadeInUp
+            animate__faster
+        `
+            },
+            hideClass: {
+                popup: `
+            animate__animated
+            animate__fadeOutDown
+            animate__faster
+        `
+            },
+            customClass: {
+                popup: 'swal-custom-popup',
+                title: 'swal-custom-title',
+                icon: 'swal-custom-icon',
+                confirmButton: 'swal-custom-btn',
+            }
+        });
+
+        // Add animation CSS
+        const style = document.createElement('style');
+        style.innerHTML = `
+    .swal2-popup.swal-custom-popup {
+        border-radius: 18px !important;
+        padding: 25px !important;
+        border: 1px solid rgba(76, 201, 240, 0.25) !important;
+        box-shadow: 0 0 25px rgba(76, 201, 240, 0.18) !important;
+        backdrop-filter: blur(6px) !important;
+    }
+    .swal2-title.swal-custom-title {
+        font-weight: 700 !important;
+        font-size: 1.5rem !important;
+        text-shadow: 0 0 10px rgba(76, 201, 240, 0.4);
+    }
+    .swal2-confirm.swal-custom-btn {
+        padding: 10px 25px !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        transition: 0.3s ease !important;
+    }
+    .swal2-confirm.swal-custom-btn:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 0 12px rgba(67, 97, 238, 0.6) !important;
+    }
+`;
+        document.head.appendChild(style);
+
         // Toggle password
         const passwordToggle = document.getElementById('passwordToggle');
         const passwordInput = document.getElementById('password');
@@ -323,11 +381,200 @@
             this.querySelector('i').classList.toggle('fa-eye-slash');
         });
 
+        // ==============================
+        //  Flashdata Handlers
+        // ==============================
+
+        // Success: Login berhasil - tampilkan popup lalu redirect
+        <?php if (session()->getFlashdata('login_success')): ?>
+            const redirectUrl = '<?= session()->getFlashdata('redirect_url') ?? "/admin/dashboard" ?>';
+
+            swalCustom.fire({
+                icon: 'success',
+                title: 'Login Berhasil! 🎉',
+                html: `
+            <div class="login-success-content">
+                <div class="welcome-message">
+                    <p>Selamat datang di Sistem Kas GONET</p>
+                    <small class="redirect-text">Mengarahkan ke dashboard...</small>
+                </div>
+                <div class="loading-animation">
+                    <div class="loading-spinner">
+                        <div class="spinner-circle"></div>
+                        <div class="spinner-circle"></div>
+                        <div class="spinner-circle"></div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="progress-text">Mempersiapkan dashboard...</div>
+                    </div>
+                </div>
+            </div>
+        `,
+                showConfirmButton: false,
+                showCancelButton: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                timer: 2500,
+                didOpen: () => {
+                    // Animasi progress bar
+                    const progressFill = document.querySelector('.progress-fill');
+                    progressFill.style.animation = 'progressFill 2.5s linear forwards';
+                },
+                willClose: () => {
+                    window.location.href = redirectUrl;
+                }
+            });
+
+            // Tambahkan CSS untuk loading animation
+            const successStyle = document.createElement('style');
+            successStyle.innerHTML = `
+        .login-success-content {
+            text-align: center;
+            padding: 10px 0;
+        }
+        
+        .welcome-message p {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: #e0e0e0;
+        }
+        
+        .redirect-text {
+            color: #4cc9f0;
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 20px;
+        }
+        
+        .loading-animation {
+            margin-top: 15px;
+        }
+        
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .spinner-circle {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #4361ee, #4cc9f0);
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        
+        .spinner-circle:nth-child(1) { animation-delay: -0.32s; }
+        .spinner-circle:nth-child(2) { animation-delay: -0.16s; }
+        .spinner-circle:nth-child(3) { animation-delay: 0s; }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 8px;
+            margin-top: 10px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4361ee, #4cc9f0);
+            border-radius: 3px;
+            width: 0%;
+            transform-origin: left;
+        }
+        
+        .progress-text {
+            font-size: 0.8rem;
+            color: #adb5bd;
+            text-align: center;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes progressFill {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+        
+        .swal2-popup .swal2-success [class^='swal2-success-circular-line'] {
+            background: transparent;
+        }
+        
+        .swal2-popup .swal2-icon.swal2-success .swal2-success-ring {
+            border: 0.25em solid rgba(67, 97, 238, 0.3);
+        }
+        
+        .swal2-popup .swal2-icon.swal2-success .swal2-success-line-tip,
+        .swal2-popup .swal2-icon.swal2-success .swal2-success-line-long {
+            background-color: #4361ee;
+        }
+        
+        .swal2-popup .swal2-icon.swal2-success {
+            border-color: #4361ee;
+        }
+    `;
+            document.head.appendChild(successStyle);
+        <?php endif; ?>
+
+        // Error: Belum dikonfirmasi admin
+        <?php if (session()->getFlashdata('error')): ?>
+            swalCustom.fire({
+                icon: 'warning',
+                title: 'Login Gagal',
+                text: '<?= session()->getFlashdata('error') ?>',
+                confirmButtonText: '<i class="fas fa-redo me-2"></i>Coba Lagi'
+            });
+        <?php endif; ?>
+
+        // Success: Registrasi sukses
+        <?php if (session()->getFlashdata('success')): ?>
+            swalCustom.fire({
+                icon: 'success',
+                title: 'Registrasi Berhasil!',
+                text: '<?= session()->getFlashdata('success') ?>',
+                confirmButtonText: '<i class="fas fa-check me-2"></i>Mengerti'
+            });
+        <?php endif; ?>
+
         // Form validation
         document.querySelector('form').addEventListener('submit', function(e) {
-            if (!passwordInput.value || !document.getElementById('username').value) {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
                 e.preventDefault();
-                alert('Harap isi semua field yang diperlukan');
+                swalCustom.fire({
+                    icon: 'warning',
+                    title: 'Form Tidak Lengkap',
+                    text: 'Harap isi username dan password',
+                    confirmButtonText: '<i class="fas fa-edit me-2"></i>Perbaiki'
+                });
             }
         });
     </script>
