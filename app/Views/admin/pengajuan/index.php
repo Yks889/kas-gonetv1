@@ -314,7 +314,6 @@
                                         <?= ucfirst($p['status']) ?>
                                     </span>
                                 </td>
-
                                 <!-- ============================= -->
                                 <!--           AKSI BUTTONS        -->
                                 <!-- ============================= -->
@@ -357,24 +356,23 @@
                                                         </button>
                                                     </form>
                                                 <?php endif; ?>
-
-                                                <!-- TOMBOL BATALKAN -->
-                                                <a href="<?= site_url('admin/pengajuan/cancel/' . $p['id']) ?>"
-                                                    class="btn btn-sm btn-outline-warning stylish-btn"
-                                                    onclick="return confirm('Yakin ingin membatalkan pengajuan ini?')"
-                                                    title="Batalkan Pengajuan">
-                                                    <i class="bi bi-x-circle"></i>
-                                                </a>
                                             <?php else: ?>
                                                 <!-- UPLOAD NOTA -->
                                                 <button type="button"
-                                                    class="btn btn-sm btn-outline-light stylish-btn"
+                                                    class="btn btn-sm btn-outline-light stylish-btn me-1"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#processModal<?= $p['id'] ?>"
                                                     title="Upload Nota">
                                                     <i class="bi bi-upload"></i>
                                                 </button>
                                             <?php endif; ?>
+
+                                            <!-- TOMBOL BATALKAN UNTUK SEMUA TIPE -->
+                                            <button onclick="confirmCancel(<?= $p['id'] ?>, '<?= esc($p['username']) ?>', 'Rp <?= number_format($p['nominal'], 0, ',', '.') ?>', '<?= $p['tipe'] ?>')"
+                                                class="btn btn-sm btn-outline-warning stylish-btn"
+                                                title="Batalkan Pengajuan">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
 
                                         <?php elseif ($p['status'] == 'selesai' && $p['file_nota']): ?>
                                             <!-- LIHAT RINCIAN -->
@@ -386,7 +384,7 @@
 
                                         <?php elseif ($p['status'] == 'dibatalkan'): ?>
                                             <!-- STATUS DIBATALKAN -->
-                                            <span class="text-muted small fst-italic">Dibatalkan</span>
+                                            <span class="text-white small fst-italic">Dibatalkan</span>
 
                                         <?php else: ?>
                                             <span class="text-muted small">-</span>
@@ -517,7 +515,7 @@
                                                                         <?php if ($p['confirm_at']): ?>
                                                                             <?= date('d/m/Y H:i', strtotime($p['updated_at'])) ?>
                                                                         <?php else: ?>
-                                                                            <span class="text-muted">-</span>
+                                                                            <span class="text-white">-</span>
                                                                         <?php endif; ?>
                                                                     </div>
                                                                 </div>
@@ -2519,6 +2517,84 @@
                     }
                 });
                 postToProcess(id);
+            }
+        });
+    }
+
+    // Konfirmasi Cancel untuk semua tipe pengajuan
+    function confirmCancel(id, username, nominal, tipe) {
+        const tipeText = tipe === 'uang_sendiri' ? 'Uang Sendiri' : 'Minta Admin';
+
+        Swal.fire({
+            html: `
+        <div class="swal2-custom">
+            <div class="d-flex align-items-center">
+                <div class="modal-icon me-3 reject-icon">
+                    <i class="bi bi-x-circle-fill"></i>
+                </div>
+                <div>
+                    <div class="swal2-title">Batalkan Pengajuan</div>
+                    <div class="modal-subtitle">Konfirmasi pembatalan pengajuan kas</div>
+                </div>
+            </div>
+
+            <div class="swal2-html-container mt-3">
+                <p>Apakah Anda yakin ingin membatalkan pengajuan berikut:</p>
+                <div class="info-highlight user-highlight">
+                    <i class="bi bi-person-fill"></i>
+                    <span class="fw-bold">${username}</span>
+                </div>
+                <div class="info-highlight tipe-highlight">
+                    <i class="bi bi-tag-fill"></i>
+                    <span class="fw-bold">${tipeText}</span>
+                </div>
+                <div class="info-highlight nominal-highlight">
+                    <i class="bi bi-cash-coin"></i>
+                    <span>${nominal}</span>
+                </div>
+                <div class="warning-text">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span class="fw-bold">Saldo akan dikembalikan jika sudah terpotong</span>
+                </div>
+                <div class="warning-text">
+                    <i class="bi bi-info-circle"></i>
+                    <span>Status pengajuan akan berubah menjadi "Dibatalkan"</span>
+                </div>
+            </div>
+        </div>
+    `,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonText: '<i class="bi bi-check-lg me-1"></i> Ya, Batalkan',
+            cancelButtonText: '<i class="bi bi-x-lg me-1"></i> Batal',
+            customClass: {
+                popup: 'stylish-modal',
+                header: 'd-none',
+                title: 'swal2-title',
+                htmlContainer: 'swal2-html-container',
+                confirmButton: 'swal2-confirm reject-confirm',
+                cancelButton: 'swal2-cancel'
+            },
+            buttonsStyling: false,
+            showClass: {
+                popup: 'swal2-noanimation',
+                backdrop: 'swal2-noanimation'
+            },
+            hideClass: {
+                popup: '',
+                backdrop: ''
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Membatalkan...',
+                    text: 'Pengajuan sedang diproses',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                window.location.href = "<?= site_url('admin/pengajuan/cancel/') ?>" + id;
             }
         });
     }
