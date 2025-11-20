@@ -22,13 +22,13 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
 
     $routes->get('dashboard/get_detail/(:segment)/(:num)', 'Admin\Dashboard::get_detail/$1/$2');
 
-
     $routes->get('users', 'Admin\Users::index');
     $routes->get('users/create', 'Admin\Users::create');
     $routes->post('users/store', 'Admin\Users::store');
     $routes->get('users/edit/(:num)', 'Admin\Users::edit/$1');
     $routes->post('users/update/(:num)', 'Admin\Users::update/$1');
     $routes->get('users/delete/(:num)', 'Admin\Users::delete/$1');
+    $routes->get('users/activate/(:num)', 'Admin\Users::activate/$1');
 
     $routes->get('kas_masuk', 'Admin\KasMasuk::index');
     $routes->get('kas_masuk/create', 'Admin\KasMasuk::create');

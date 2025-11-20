@@ -23,9 +23,16 @@ class Auth extends Controller
         $username = $this->request->getVar('username');
         $password = $this->request->getVar('password');
 
+        // Cari user termasuk yang sudah di soft delete
         $user = $model->where('username', $username)->first();
 
         if ($user) {
+            // Cek apakah akun sudah di soft delete
+            if ($user['deleted_at'] !== null) {
+                $session->setFlashdata('error', 'Akun Anda telah dihapus. Silakan hubungi administrator.');
+                return redirect()->to('/login');
+            }
+
             // Cek apakah akun aktif
             if ($user['is_active'] == 0) {
                 $session->setFlashdata('error', 'Akun Anda belum dikonfirmasi admin. Silakan tunggu hingga akun diaktifkan.');
@@ -68,6 +75,17 @@ class Auth extends Controller
     public function attemptRegister()
     {
         helper(['form']);
+
+        // Cek apakah username sudah ada (termasuk yang di soft delete)
+        $model = new UserModel();
+        $existingUser = $model->withDeleted()->where('username', $this->request->getVar('username'))->first();
+
+        if ($existingUser) {
+            // Jika username sudah ada (baik aktif, nonaktif, atau dihapus)
+            session()->setFlashdata('error', 'Username sudah digunakan. Silakan gunakan username lain.');
+            return redirect()->to('/register');
+        }
+
         $rules = [
             'username' => 'required|min_length[3]|max_length[20]|is_unique[users.username]',
             'password' => 'required|min_length[6]|max_length[200]',
@@ -75,7 +93,6 @@ class Auth extends Controller
         ];
 
         if ($this->validate($rules)) {
-            $model = new UserModel();
             $data = [
                 'username' => $this->request->getVar('username'),
                 'password' => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
