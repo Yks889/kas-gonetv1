@@ -63,6 +63,7 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
 // User Routes
 $routes->group('user', ['filter' => 'auth:teknisi,penagih'], function ($routes) {
     $routes->get('dashboard', 'User\Dashboard::index');
+    $routes->get('dashboard/get_detail/(:any)/(:num)', 'User\Dashboard::get_detail/$1/$2');
     $routes->get('pengajuan', 'User\Pengajuan::index');
     $routes->get('pengajuan/create', 'User\Pengajuan::create');
     $routes->post('pengajuan/store', 'User\Pengajuan::store');
