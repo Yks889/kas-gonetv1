@@ -7,72 +7,104 @@ use App\Models\PengajuanModel;
 use App\Models\KasKeluarModel;
 use App\Models\KasSaldoModel;
 use App\Models\ActivityLogModel;
+use App\Models\UserModel;
+
 
 class KasKeluar extends BaseController
 {
     public function index()
     {
         $kasKeluarModel = new KasKeluarModel();
-        $kasKeluarModel->select('kas_keluar.*, pengajuan.status, pengajuan.confirm_at, users.username');
-        $kasKeluarModel->join('pengajuan', 'pengajuan.id = kas_keluar.pengajuan_id', 'left');
-        $kasKeluarModel->join('users', 'users.id = pengajuan.user_id', 'left');
+        $userModel = new UserModel();
+        $pengajuanModel = new PengajuanModel();
 
-        // 🟦 Ambil filter dari GET
-        $month = $this->request->getGet('month');
-        $year  = $this->request->getGet('year');
+        $kasKeluarModel
+            ->withDeleted() // <--- WAJIB supaya join tidak hilang ketika soft delete
+            ->select('kas_keluar.*, p.status, p.confirm_at, u.username')
+            ->join('pengajuan p', 'p.id = kas_keluar.pengajuan_id', 'left')
+            ->join('users u', 'u.id = p.user_id', 'left');
+
+
+        $kasKeluarModel->withDeleted();
+
+        // Filter
+        $month  = $this->request->getGet('month');
+        $year   = $this->request->getGet('year');
         $search = $this->request->getGet('search');
 
-        // 🔍 Filter pencarian (user, keterangan, status)
         if ($search) {
             $kasKeluarModel->groupStart()
-                ->like('users.username', $search)
+                ->like('u.username', $search)
                 ->orLike('kas_keluar.keterangan', $search)
-                ->orLike('pengajuan.status', $search)
+                ->orLike('p.status', $search)
                 ->groupEnd();
         }
 
-        // 📅 Filter bulan dan tahun
         if ($month) {
-            $kasKeluarModel->where('MONTH(pengajuan.updated_at)', $month);
+            $kasKeluarModel->where('MONTH(kas_keluar.created_at)', $month);
         }
         if ($year) {
-            $kasKeluarModel->where('YEAR(pengajuan.updated_at)', $year);
+            $kasKeluarModel->where('YEAR(kas_keluar.created_at)', $year);
         }
 
-
-        // Urutkan terbaru
         $kasKeluarModel->orderBy('kas_keluar.created_at', 'DESC');
+
         $data['kas_keluar'] = $kasKeluarModel->findAll();
-
-        // 🔸 Hitung total pengeluaran (yang selesai)
-        $totalQuery = clone $kasKeluarModel;
-        $data['total_pengeluaran'] = $totalQuery
-            ->selectSum('kas_keluar.nominal')
-            ->join('pengajuan p', 'p.id = kas_keluar.pengajuan_id', 'left')
-            ->where('p.status', 'selesai')
-            ->get()
-            ->getRow()->nominal ?? 0;
-
-        // 🔸 Total transaksi selesai
-        $countSelesai = clone $kasKeluarModel;
-        $data['total_selesai'] = $countSelesai
-            ->join('pengajuan p2', 'p2.id = kas_keluar.pengajuan_id', 'left')
-            ->where('p2.status', 'selesai')
-            ->countAllResults();
-
-        // 🔸 Total user unik
-        $countUser = clone $kasKeluarModel;
-        $data['total_user'] = $countUser
-            ->join('pengajuan p3', 'p3.id = kas_keluar.pengajuan_id', 'left')
-            ->join('users u3', 'u3.id = p3.user_id', 'left')
-            ->distinct()
-            ->select('u3.id')
-            ->countAllResults();
-
         $data['title'] = 'Kas Keluar';
         $data['search'] = $search;
-        $data['month'] = $month;
-        $data['year'] = $year;
+        $data['month']  = $month;
+        $data['year']   = $year;
+
+        // Total Pengeluaran (semua kas keluar yang sudah selesai)
+        $totalPengeluaranQuery = $kasKeluarModel
+            ->withDeleted()
+            ->selectSum('kas_keluar.nominal')
+            ->join('pengajuan p', 'p.id = kas_keluar.pengajuan_id')
+            ->where('p.status', 'selesai');
+
+        // Apply filter yang sama untuk total pengeluaran
+        if ($month) {
+            $totalPengeluaranQuery->where('MONTH(kas_keluar.created_at)', $month);
+        }
+        if ($year) {
+            $totalPengeluaranQuery->where('YEAR(kas_keluar.created_at)', $year);
+        }
+
+        $data['total_pengeluaran'] = $totalPengeluaranQuery->get()
+            ->getRow()
+            ->nominal ?? 0;
+
+        // Total Data Selesai (pengajuan dengan status selesai)
+        $totalSelesaiQuery = $kasKeluarModel
+            ->join('pengajuan p', 'p.id = kas_keluar.pengajuan_id')
+            ->where('p.status', 'selesai');
+
+        // Apply filter yang sama untuk total selesai
+        if ($month) {
+            $totalSelesaiQuery->where('MONTH(created_at)', $month);
+        }
+        if ($year) {
+            $totalSelesaiQuery->where('YEAR(created_at)', $year);
+        }
+
+        $data['total_selesai'] = $totalSelesaiQuery->countAllResults();
+
+        // Total User Mengajukan (user unik yang memiliki pengajuan selesai)
+        $totalUserQuery = $userModel
+            ->select('users.id')
+            ->join('pengajuan', 'pengajuan.user_id = users.id')
+            ->where('pengajuan.status', 'selesai')
+            ->distinct();
+
+        // Apply filter yang sama untuk total user
+        if ($month) {
+            $totalUserQuery->where('MONTH(pengajuan.created_at)', $month);
+        }
+        if ($year) {
+            $totalUserQuery->where('YEAR(pengajuan.created_at)', $year);
+        }
+
+        $data['total_user'] = $totalUserQuery->countAllResults();
 
         return view('admin/kas_keluar/index', $data);
     }

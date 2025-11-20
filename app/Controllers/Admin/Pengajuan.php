@@ -18,6 +18,9 @@ class Pengajuan extends BaseController
         $model->join('users', 'users.id = pengajuan.user_id');
         $model->join('kas_keluar', 'kas_keluar.pengajuan_id = pengajuan.id', 'left');
 
+        // TAMBAHKAN: Hanya tampilkan data yang belum di soft delete
+        $model->where('pengajuan.deleted_at IS NULL');
+
         // FILTER FUNCTIONALITY
         $filters = $this->request->getGet();
 
@@ -31,20 +34,18 @@ class Pengajuan extends BaseController
             $model->where('pengajuan.tipe', $filters['tipe']);
         }
 
-        // Filter by bulan dan tahun
-        if (!empty($filters['month']) || !empty($filters['year'])) {
-            if (!empty($filters['month']) && !empty($filters['year'])) {
-                $firstDay = date('Y-m-01', strtotime($filters['year'] . '-' . $filters['month'] . '-01'));
-                $lastDay = date('Y-m-t', strtotime($firstDay));
-                $model->where("DATE(pengajuan.created_at) BETWEEN '$firstDay' AND '$lastDay'");
-            } elseif (!empty($filters['year'])) {
-                $model->where('YEAR(pengajuan.created_at)', $filters['year']);
-            } elseif (!empty($filters['month'])) {
-                $currentYear = date('Y');
-                $firstDay = date('Y-m-01', strtotime($currentYear . '-' . $filters['month'] . '-01'));
-                $lastDay = date('Y-m-t', strtotime($firstDay));
-                $model->where("DATE(pengajuan.created_at) BETWEEN '$firstDay' AND '$lastDay'");
-            }
+        // Filter by bulan dan tahun - PERBAIKI QUERY INI
+        if (!empty($filters['month']) && !empty($filters['year'])) {
+            $firstDay = $filters['year'] . '-' . str_pad($filters['month'], 2, '0', STR_PAD_LEFT) . '-01';
+            $lastDay = date('Y-m-t', strtotime($firstDay));
+            $model->where("DATE(pengajuan.created_at) BETWEEN '$firstDay' AND '$lastDay'");
+        } elseif (!empty($filters['year'])) {
+            $model->where('YEAR(pengajuan.created_at)', $filters['year']);
+        } elseif (!empty($filters['month'])) {
+            $currentYear = date('Y');
+            $firstDay = $currentYear . '-' . str_pad($filters['month'], 2, '0', STR_PAD_LEFT) . '-01';
+            $lastDay = date('Y-m-t', strtotime($firstDay));
+            $model->where("DATE(pengajuan.created_at) BETWEEN '$firstDay' AND '$lastDay'");
         }
 
         // Urutkan data terbaru
@@ -52,29 +53,37 @@ class Pengajuan extends BaseController
         $data['pengajuan'] = $model->findAll();
 
         // ==================================================
-        // 🔹 Tambahan untuk INFO CARDS
+        // 🔹 Tambahan untuk INFO CARDS - PERBAIKI DENGAN SOFT DELETE
         // ==================================================
         $pengajuanModel = new PengajuanModel();
 
-        // Total seluruh pengajuan
+        // Total seluruh pengajuan (hanya yang belum dihapus)
         $data['total_nominal'] = $pengajuanModel
-            ->selectSum('nominal')
+            ->where('deleted_at IS NULL')
             ->where('status', 'selesai')
+            ->selectSum('nominal')
             ->get()
             ->getRow()
             ->nominal ?? 0;
 
-        // Total pending
-        $data['total_pending'] = $pengajuanModel->where('status', 'pending')->countAllResults();
+        // Total pending (hanya yang belum dihapus)
+        $data['total_pending'] = $pengajuanModel
+            ->where('deleted_at IS NULL')
+            ->where('status', 'pending')
+            ->countAllResults();
 
-        // Total selesai
-        $data['total_selesai'] = $pengajuanModel->where('status', 'selesai')->countAllResults();
+        // Total selesai (hanya yang belum dihapus)
+        $data['total_selesai'] = $pengajuanModel
+            ->where('deleted_at IS NULL')
+            ->where('status', 'selesai')
+            ->countAllResults();
 
-        // Total user unik yang pernah mengajukan
+        // Total user unik yang pernah mengajukan (hanya yang belum dihapus)
         $userModel = new UserModel();
         $data['total_user'] = $userModel
             ->select('users.id')
-            ->join('pengajuan', 'pengajuan.user_id = users.id', 'inner')
+            ->join('pengajuan', 'pengajuan.user_id = users.id AND pengajuan.deleted_at IS NULL', 'inner')
+            ->where('users.deleted_at IS NULL') // Hanya user yang belum dihapus
             ->distinct()
             ->countAllResults();
 
@@ -100,7 +109,9 @@ class Pengajuan extends BaseController
     {
         $session = session();
         $model = new PengajuanModel();
-        $pengajuan = $model->find($id);
+
+        // TAMBAHKAN: Cek apakah data belum di soft delete
+        $pengajuan = $model->where('deleted_at IS NULL')->find($id);
 
         if (!$pengajuan) {
             return redirect()->to('/admin/pengajuan')->with('error', 'Data pengajuan tidak ditemukan.');
@@ -131,9 +142,15 @@ class Pengajuan extends BaseController
     {
         $session = session();
         $model = new PengajuanModel();
-        $model->update($id, ['status' => 'ditolak']);
 
-        $pengajuan = $model->find($id);
+        // TAMBAHKAN: Cek apakah data belum di soft delete
+        $pengajuan = $model->where('deleted_at IS NULL')->find($id);
+
+        if (!$pengajuan) {
+            return redirect()->to('/admin/pengajuan')->with('error', 'Data pengajuan tidak ditemukan.');
+        }
+
+        $model->update($id, ['status' => 'ditolak']);
 
         // Simpan aktivitas log
         $activityLog = new ActivityLogModel();
@@ -154,7 +171,8 @@ class Pengajuan extends BaseController
         $kasSaldoModel  = new KasSaldoModel();
         $activityLog    = new ActivityLogModel();
 
-        $pengajuan = $pengajuanModel->find($id);
+        // TAMBAHKAN: Cek apakah data belum di soft delete
+        $pengajuan = $pengajuanModel->where('deleted_at IS NULL')->find($id);
         if (!$pengajuan) {
             return redirect()->back()->with('error', 'Data pengajuan tidak ditemukan.');
         }
@@ -238,12 +256,19 @@ class Pengajuan extends BaseController
                     $newName = $file->getRandomName();
                     $file->move(FCPATH . 'uploads/nota', $newName);
 
-                    $kasKeluarModel->save([
-                        'pengajuan_id' => $id,
-                        'nominal'      => $pengajuan['nominal'],
-                        'keterangan'   => $pengajuan['keterangan'],
-                        'file_nota'    => $newName
-                    ]);
+                    // Update atau insert kas_keluar
+                    if ($kasKeluar) {
+                        $kasKeluarModel->update($kasKeluar['id'], [
+                            'file_nota' => $newName
+                        ]);
+                    } else {
+                        $kasKeluarModel->save([
+                            'pengajuan_id' => $id,
+                            'nominal'      => $pengajuan['nominal'],
+                            'keterangan'   => $pengajuan['keterangan'],
+                            'file_nota'    => $newName
+                        ]);
+                    }
 
                     if ($saldo) {
                         $newSaldo = $saldo['saldo_akhir'] - $pengajuan['nominal'];
@@ -276,7 +301,9 @@ class Pengajuan extends BaseController
     {
         $session = session();
         $model = new PengajuanModel();
-        $pengajuan = $model->find($id);
+
+        // TAMBAHKAN: Cek apakah data belum di soft delete
+        $pengajuan = $model->where('deleted_at IS NULL')->find($id);
 
         if (!$pengajuan) {
             return redirect()->to('/admin/pengajuan')->with('error', 'Data pengajuan tidak ditemukan.');
@@ -298,8 +325,8 @@ class Pengajuan extends BaseController
         $kasKeluar = $kasKeluarModel->where('pengajuan_id', $id)->first();
 
         if ($kasKeluar) {
-            // Untuk minta admin: kembalikan saldo jika sudah dipotong
-            if ($pengajuan['tipe'] === 'minta_admin' && !empty($kasKeluar['file_nota'])) {
+            // Untuk minta uang: kembalikan saldo jika sudah dipotong
+            if ($pengajuan['tipe'] === 'minta_uang' && !empty($kasKeluar['file_nota'])) {
                 $kasSaldoModel = new KasSaldoModel();
                 $saldo = $kasSaldoModel->first();
 
@@ -331,5 +358,32 @@ class Pengajuan extends BaseController
         );
 
         return redirect()->to('/admin/pengajuan')->with('success', 'Pengajuan berhasil dibatalkan.');
+    }
+
+    // TAMBAHKAN: Fungsi untuk soft delete pengajuan
+    public function delete($id)
+    {
+        $session = session();
+        $model = new PengajuanModel();
+
+        // Cek apakah data belum di soft delete
+        $pengajuan = $model->where('deleted_at IS NULL')->find($id);
+
+        if (!$pengajuan) {
+            return redirect()->to('/admin/pengajuan')->with('error', 'Data pengajuan tidak ditemukan.');
+        }
+
+        // Soft delete pengajuan
+        $model->update($id, ['deleted_at' => date('Y-m-d H:i:s')]);
+
+        // Simpan log aktivitas
+        $activityLog = new ActivityLogModel();
+        $activityLog->logActivity(
+            $session->get('id'),
+            'pengajuan dihapus',
+            'Menghapus pengajuan ID ' . $id . ' (Soft Delete)'
+        );
+
+        return redirect()->to('/admin/pengajuan')->with('success', 'Pengajuan berhasil dihapus.');
     }
 }

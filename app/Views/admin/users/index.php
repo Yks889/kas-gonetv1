@@ -126,16 +126,50 @@
         </div>
     </div>
 
+    <!-- Bulk Actions -->
+    <div id="bulkActions" class="row mb-3 animate-fade-in-up d-none">
+        <div class="col-12">
+            <div class="dashboard-card p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <span class="text-white me-3" id="selectedCount">0 user terpilih</span>
+
+                        <!-- Bulk Action Buttons -->
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-outline-success btn-sm stylish-btn"
+                                onclick="bulkActivateUsers()" id="bulkActivateBtn" disabled>
+                                <i class="bi bi-check-lg me-1"></i> Aktifkan
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm stylish-btn"
+                                onclick="bulkDeleteUsers()" id="bulkDeleteBtn" disabled>
+                                <i class="bi bi-trash me-1"></i> Hapus
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-light btn-sm stylish-btn"
+                        onclick="clearSelection()">
+                        <i class="bi bi-x-lg me-1"></i> Batalkan Pilihan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Tabel User -->
     <div class="dashboard-card p-0 overflow-hidden animate-scale-in">
         <div class="table-responsive">
             <table class="table table-dark table-hover align-middle mb-0" id="userTable">
                 <thead>
                     <tr class="text-steam-blue text-uppercase small text-center">
+                        <th style="width: 5%;">
+                            <input type="checkbox" id="selectAll" class="form-check-input stylish-checkbox">
+                        </th>
                         <th style="width: 5%;">No</th>
-                        <th style="width: 25%;" class="text-start">Username</th>
-                        <th style="width: 20%;">Role</th>
-                        <th style="width: 30%;">Tanggal Dibuat</th>
+                        <th style="width: 20%;" class="text-start">Username</th>
+                        <th style="width: 15%;">Role</th>
+                        <th style="width: 15%;">Status</th>
+                        <th style="width: 20%;">Tanggal Dibuat</th>
                         <th style="width: 20%;">Aksi</th>
                     </tr>
                 </thead>
@@ -144,6 +178,10 @@
                         <?php $no = 1;
                         foreach ($users as $user): ?>
                             <tr class="text-center animate-row-in" style="animation-delay: <?= $no * 0.05 ?>s;">
+                                <td>
+                                    <input type="checkbox" class="form-check-input user-checkbox stylish-checkbox"
+                                        value="<?= $user['id'] ?>">
+                                </td>
                                 <td><?= $no++ ?></td>
                                 <td class="text-start">
                                     <div class="d-flex align-items-center">
@@ -166,11 +204,29 @@
                                         </span>
                                     <?php endif; ?>
                                 </td>
+                                <td>
+                                    <?php if ($user['is_active'] == 1): ?>
+                                        <span class="badge bg-gradient-success px-3 py-2">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Aktif
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge bg-gradient-warning text-light px-3 py-2">
+                                            <i class="bi bi-hourglass-split me-1"></i> Pending
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
                                 <td class="text-light">
                                     <?= date('d M Y', strtotime($user['created_at'] ?? 'now')) ?>
                                 </td>
                                 <td>
                                     <div class="d-flex justify-content-center">
+                                        <?php if ($user['is_active'] == 0): ?>
+                                            <a href="<?= base_url('admin/users/activate/' . $user['id']) ?>"
+                                                class="btn btn-sm btn-outline-success stylish-btn me-1"
+                                                title="Konfirmasi User">
+                                                <i class="bi bi-check-lg"></i>
+                                            </a>
+                                        <?php endif; ?>
                                         <a href="<?= base_url('admin/users/edit/' . $user['id']) ?>"
                                             class="btn btn-sm btn-outline-light stylish-btn me-1"
                                             title="Edit User">
@@ -187,7 +243,7 @@
                         <?php endforeach ?>
                     <?php else: ?>
                         <tr class="animate-fade-in">
-                            <td colspan="5" class="text-center text-light py-5">
+                            <td colspan="7" class="text-center text-light py-5">
                                 <div class="py-4">
                                     <i class="bi bi-people display-1 text-light"></i>
                                     <h5 class="mt-3 text-light">Belum ada data user</h5>
@@ -220,6 +276,61 @@
 
 
 <style>
+    /* Styling untuk Checkbox */
+    .stylish-checkbox {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .stylish-checkbox:checked {
+        background: #4361ee;
+        border-color: #4361ee;
+    }
+
+    .stylish-checkbox:checked::after {
+        content: '✓';
+        position: absolute;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .stylish-checkbox:hover {
+        border-color: #4361ee;
+        transform: scale(1.1);
+    }
+
+    /* Animasi untuk bulk actions */
+    #bulkActions {
+        animation: slideInDown 0.4s ease-out;
+    }
+
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Hover effect untuk row dengan checkbox */
+    .table tbody tr:hover .stylish-checkbox {
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
     /* ANIMASI BARU */
     .animate-fade-in {
         animation: fadeIn 0.8s ease-out;
@@ -1057,6 +1168,288 @@
                 window.location.href = "<?= base_url('admin/users/delete/') ?>" + id;
             }
         });
+    }
+    // Bulk Selection Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const bulkActions = document.getElementById('bulkActions');
+        const selectedCount = document.getElementById('selectedCount');
+        const bulkActivateBtn = document.getElementById('bulkActivateBtn');
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+        // Select All functionality
+        selectAllCheckbox.addEventListener('change', function() {
+            const isChecked = this.checked;
+            const userCheckboxes = document.querySelectorAll('.user-checkbox');
+            userCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+            updateBulkActions();
+        });
+
+        // Update bulk actions when checkboxes change
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('user-checkbox')) {
+                updateBulkActions();
+            }
+        });
+
+        function updateBulkActions() {
+            const selectedUsers = getSelectedUsers();
+            const count = selectedUsers.length;
+
+            if (count > 0) {
+                bulkActions.classList.remove('d-none');
+                selectedCount.textContent = `${count} user terpilih`;
+
+                let hasPending = false;
+                let hasActive = false;
+
+                selectedUsers.forEach(userId => {
+                    const checkbox = document.querySelector(`.user-checkbox[value="${userId}"]`);
+                    const row = checkbox.closest('tr');
+                    const statusText = row.cells[4].innerText.trim().toLowerCase();
+
+                    if (statusText.includes('pending') || statusText.includes('menunggu')) {
+                        hasPending = true;
+                    }
+                    if (statusText.includes('active') || statusText.includes('aktif')) {
+                        hasActive = true;
+                    }
+                });
+
+                // aturan baru:
+                // Jika ADA user aktif → bulk activate disabled
+                // Jika semua pending → bulk activate enabled
+                if (hasActive) {
+                    bulkActivateBtn.disabled = true;
+                } else {
+                    bulkActivateBtn.disabled = !hasPending;
+                }
+
+                bulkDeleteBtn.disabled = false;
+
+                // Update select all state
+                const totalCheckboxes = document.querySelectorAll('.user-checkbox').length;
+                const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked').length;
+                selectAllCheckbox.checked = selectedCheckboxes === totalCheckboxes;
+                selectAllCheckbox.indeterminate = selectedCheckboxes > 0 && selectedCheckboxes < totalCheckboxes;
+
+            } else {
+                bulkActions.classList.add('d-none');
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            }
+        }
+
+        // Clear selection
+        window.clearSelection = function() {
+            const userCheckboxes = document.querySelectorAll('.user-checkbox');
+            userCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+            updateBulkActions();
+        };
+    });
+
+    // Bulk Actions Functions
+    function bulkActivateUsers() {
+        const selectedUsers = getSelectedUsers();
+        if (selectedUsers.length === 0) {
+            Swal.fire('Peringatan', 'Tidak ada user yang dipilih', 'warning');
+            return;
+        }
+
+        Swal.fire({
+            html: `
+            <div class="swal2-custom">
+                <div class="d-flex align-items-center">
+                    <div class="modal-icon me-3" style="background: rgba(40, 167, 69, 0.2);">
+                        <i class="bi bi-check-circle-fill" style="color: #28a745;"></i>
+                    </div>
+                    <div>
+                        <div class="swal2-title">Aktifkan User</div>
+                        <div class="modal-subtitle">Konfirmasi aktivasi multiple user</div>
+                    </div>
+                </div>
+
+                <div class="swal2-html-container mt-3">
+                    <p>Apakah Anda yakin ingin mengaktifkan <strong>${selectedUsers.length} user</strong>?</p>
+                    <div class="info-highlight" style="background: rgba(40, 167, 69, 0.1); border-color: rgba(40, 167, 69, 0.3);">
+                        <i class="bi bi-people-fill" style="color: #28a745;"></i>
+                        <span>${selectedUsers.length} user pending akan diaktifkan</span>
+                    </div>
+                </div>
+            </div>
+        `,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonText: '<i class="bi bi-check-lg me-1"></i> Ya, Aktifkan',
+            cancelButtonText: '<i class="bi bi-x-lg me-1"></i> Batal',
+            customClass: {
+                popup: 'stylish-modal',
+                header: 'd-none',
+                title: 'swal2-title',
+                htmlContainer: 'swal2-html-container',
+                confirmButton: 'swal2-confirm',
+                cancelButton: 'swal2-cancel'
+            },
+            buttonsStyling: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Mengaktifkan...',
+                    text: `${selectedUsers.length} user sedang diaktifkan`,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading()
+                    }
+                });
+
+                // Create form data for POST request
+                const formData = new FormData();
+                formData.append('user_ids', JSON.stringify(selectedUsers));
+
+                // Send batch activation request
+                fetch('<?= base_url('admin/users/bulk-activate') ?>', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: `${selectedUsers.length} user berhasil diaktifkan`,
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            throw new Error(data.message || 'Terjadi kesalahan');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Error', 'Terjadi kesalahan saat mengaktifkan user: ' + error.message, 'error');
+                    });
+            }
+        });
+    }
+
+    function bulkDeleteUsers() {
+        const selectedUsers = getSelectedUsers();
+        if (selectedUsers.length === 0) {
+            Swal.fire('Peringatan', 'Tidak ada user yang dipilih', 'warning');
+            return;
+        }
+
+        Swal.fire({
+            html: `
+            <div class="swal2-custom">
+                <div class="d-flex align-items-center">
+                    <div class="modal-icon me-3">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                    <div>
+                        <div class="swal2-title">Hapus User</div>
+                        <div class="modal-subtitle">Konfirmasi penghapusan multiple user</div>
+                    </div>
+                </div>
+
+                <div class="swal2-html-container mt-3">
+                    <p>Apakah Anda yakin ingin menghapus <strong>${selectedUsers.length} user</strong> secara permanen?</p>
+                    <div class="info-highlight">
+                        <i class="bi bi-people-fill"></i>
+                        <span>${selectedUsers.length} user akan dihapus permanen</span>
+                    </div>
+                    <div class="warning-text">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <span>Data yang dihapus tidak dapat dikembalikan!</span>
+                    </div>
+                </div>
+            </div>
+        `,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonText: '<i class="bi bi-check-lg me-1"></i> Ya, Hapus',
+            cancelButtonText: '<i class="bi bi-x-lg me-1"></i> Batal',
+            customClass: {
+                popup: 'stylish-modal',
+                header: 'd-none',
+                title: 'swal2-title',
+                htmlContainer: 'swal2-html-container',
+                confirmButton: 'swal2-confirm',
+                cancelButton: 'swal2-cancel'
+            },
+            buttonsStyling: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Menghapus...',
+                    text: `${selectedUsers.length} user sedang dihapus`,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading()
+                    }
+                });
+
+                // Create form data for POST request
+                const formData = new FormData();
+                formData.append('user_ids', JSON.stringify(selectedUsers));
+
+                // Send batch delete request
+                fetch('<?= base_url('admin/users/bulk-delete') ?>', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: `${selectedUsers.length} user berhasil dihapus`,
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            throw new Error(data.message || 'Terjadi kesalahan');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Error', 'Terjadi kesalahan saat menghapus user: ' + error.message, 'error');
+                    });
+            }
+        });
+    }
+
+    function getSelectedUsers() {
+        const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
+        return Array.from(selectedCheckboxes).map(cb => cb.value);
     }
 </script>
 
