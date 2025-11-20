@@ -56,16 +56,14 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     $routes->post('profile/update-photo', 'Admin\Profile::updatePhoto');
     $routes->post('profile/remove-photo', 'Admin\Profile::removePhoto');
     
-    $routes->get('informasi_kas', 'Admin\InformasiKas::index');
-    $routes->get('informasi-kas', 'Admin\InformasiKas::index');
-
-    $routes->post('users/bulk-activate', 'Admin\Users::bulkActivate');
-    $routes->post('users/bulk-delete', 'Admin\Users::bulkDelete');
+    $routes->get('laporan_kas', 'Admin\LaporanKas::index');
+    $routes->get('laporan-kas', 'Admin\LaporanKas::index');
 });
 
 // User Routes
 $routes->group('user', ['filter' => 'auth:teknisi,penagih'], function ($routes) {
     $routes->get('dashboard', 'User\Dashboard::index');
+    $routes->get('dashboard/get_detail/(:any)/(:num)', 'User\Dashboard::get_detail/$1/$2');
     $routes->get('pengajuan', 'User\Pengajuan::index');
     $routes->get('pengajuan/create', 'User\Pengajuan::create');
     $routes->post('pengajuan/store', 'User\Pengajuan::store');

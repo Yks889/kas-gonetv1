@@ -466,8 +466,8 @@
                         <span>Aktivitas User</span>
                     </a>
                 </li>
-                <li><a class="nav-link <?= service('uri')->getSegment(2) === 'informasi_kas' ? 'active' : '' ?>"
-                        href="<?= site_url('admin/informasi_kas') ?>">
+                <li><a class="nav-link <?= service('uri')->getSegment(2) === 'laporan_kas' ? 'active' : '' ?>"
+                        href="<?= site_url('admin/laporan_kas') ?>">
                         <i class="bi bi-graph-up"></i>
                         <span>Laporan Kas</span>
                     </a>
