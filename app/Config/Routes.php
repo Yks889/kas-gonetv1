@@ -58,6 +58,9 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     
     $routes->get('laporan_kas', 'Admin\LaporanKas::index');
     $routes->get('laporan-kas', 'Admin\LaporanKas::index');
+
+    $routes->post('users/bulk-activate', 'Admin\Users::bulkActivate');
+    $routes->post('users/bulk-delete', 'Admin\Users::bulkDelete');
 });
 
 // User Routes
